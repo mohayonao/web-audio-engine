@@ -1,11 +1,23 @@
 {
-  "presets": [
-    "es2015"
-  ],
-  "ignore": "test/**/*.js",
   "env": {
+    "production": {
+      "only": [ "src" ],
+      "plugins": [
+        [ "babel-plugin-unassert" ]
+      ]
+    },
     "development": {
-      "sourceMaps": "inline"
+      "only": [ "src", "test" ],
+      "plugins": [
+        [ "babel-plugin-espower" ]
+      ]
+    },
+    "coverage": {
+      "only": [ "src" ],
+      "sourceMaps": "inline",
+      "plugins": [
+        [ "transform-es2015-classes", { "loose": true } ]
+      ]
     }
   }
 }
