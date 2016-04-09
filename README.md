@@ -7,8 +7,10 @@ This library implements the [Web Audio API](https://www.w3.org/TR/webaudio/) spe
 
 ## Implemented API
 
-- `OscillatorNode (sine only)`
+- `OscillatorNode (wavetable synthesis)`
 - `GainNode`
+- `BiquadFilterNode`
+- `StereoPannerNode`
 
 ## Installation
 
@@ -53,6 +55,9 @@ context.resume();
 ## Demo
 
 ```
+$ git clone git@github.com:mohayonao/web-audio-engine.git
+$ cd web-audio-engine
+$ npm install .
 $ cd demo
 $ npm install .
 $ node . --help
