@@ -1,3 +1,7 @@
 "use strict";
 
-module.exports = {};
+const StreamAudioContext = require("./context/StreamAudioContext");
+
+module.exports = {
+  StreamAudioContext
+};
