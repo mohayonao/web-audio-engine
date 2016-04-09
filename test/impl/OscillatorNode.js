@@ -1,6 +1,9 @@
 "use strict";
 
 const assert = require("power-assert");
+const sinon = require("sinon");
+const deepEqual = require("deep-equal");
+const np = require("../helpers/np");
 const attrTester = require("../helpers/attrTester");
 const AudioContext = require("../../src/impl/AudioContext");
 const OscillatorNode = require("../../src/impl/OscillatorNode");
@@ -70,6 +73,43 @@ describe("OscillatorNode", () => {
       node1.connect(node2);
 
       assert(node2.getInput(0).getNumberOfChannels() === 1);
+    });
+  });
+
+  describe("processing", () => {
+    before(() => {
+      context.resume();
+    });
+
+    it("start - stop", () => {
+      const node = new OscillatorNode(context);
+      const output = context.getDestination().getOutput().getAudioBus().getChannelData()[0];
+      const onended = sinon.spy();
+
+      node.start((16+4)/8000);
+      node.stop((48+2)/8000);
+      node.connect(context.getDestination());
+      node.addEventListener("ended", onended);
+
+      context.process();
+      assert(deepEqual(output, np.zeros(16)));
+
+      context.process();
+      assert(deepEqual(output.subarray(0, 5), np.zeros(5)));
+      assert(output.subarray(5).every(x => x !== 0));
+
+      context.process();
+      assert(output.every(x => x !== 0));
+      assert(onended.callCount === 0);
+
+      context.process();
+      assert(output.subarray(0, 2).every(x => x !== 0));
+      assert(deepEqual(output.subarray(2), np.zeros(14)));
+      assert(onended.callCount === 1);
+
+      context.process();
+      assert(deepEqual(output, np.zeros(16)));
+      assert(onended.callCount === 1);
     });
   });
 });

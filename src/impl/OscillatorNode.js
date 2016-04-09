@@ -3,6 +3,7 @@
 const util = require("../_util");
 const AudioSourceNode = require("./AudioSourceNode");
 const PeriodicWave = require("./PeriodicWave");
+const OscillatorNodeDSP = require("./dsp/OscillatorNode");
 
 const OscillatorTypes = PeriodicWave.BasicWaveForms;
 const DefaultPeriodicWaves = {};
@@ -16,6 +17,8 @@ class OscillatorNode extends AudioSourceNode {
     this._periodicWave = this.buildPeriodicWave(this._type);
     this._startTime = Infinity;
     this._stopTime = Infinity;
+
+    this.dspInit();
   }
 
   getType() {
@@ -86,4 +89,4 @@ class OscillatorNode extends AudioSourceNode {
   }
 }
 
-module.exports = OscillatorNode;
+module.exports = util.mixin(OscillatorNode, OscillatorNodeDSP);
