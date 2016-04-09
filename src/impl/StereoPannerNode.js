@@ -1,6 +1,8 @@
 "use strict";
 
+const util = require("../_util");
 const BasePannerNode = require("./BasePannerNode");
+const StereoPannerNodeDSP = require("./dsp/StereoPannerNode");
 
 class StereoPannerNode extends BasePannerNode {
   constructor(context) {
@@ -13,4 +15,4 @@ class StereoPannerNode extends BasePannerNode {
   }
 }
 
-module.exports = StereoPannerNode;
+module.exports = util.mixin(StereoPannerNode, StereoPannerNodeDSP);
