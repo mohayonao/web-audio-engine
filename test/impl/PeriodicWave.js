@@ -11,7 +11,7 @@ const imag = new Float32Array([ 0, 1 ]);
 const testSpec = {};
 
 testSpec.constraints = {
-  testCase: [ { expected: true } ]
+  testCase: [ { expected: false } ]
 };
 
 testSpec.real = {

@@ -29,9 +29,7 @@ class OscillatorNode {
     if (this._type === "sine") {
       writeIndex = this.dspSine(output, frameOffset, fillToFrame, sampleRate);
     } else {
-      // TODO: implements
-      // writeIndex = this.dspWave(output, writeIndex, fillToFrame, sampleRate);
-      writeIndex = this.dspSine(output, frameOffset, fillToFrame, sampleRate);
+      writeIndex = this.dspWave(output, writeIndex, fillToFrame, sampleRate);
     }
 
     if (writeIndex < inNumSamples) {
@@ -74,6 +72,52 @@ class OscillatorNode {
         const computedFrequency = frequencyValue * Math.pow(2, detuneValue / 1200);
 
         output[writeIndex++] = Math.sin(phase);
+        phase += frequencyToPhaseIncr * computedFrequency;
+      }
+    }
+
+    this._phase = phase;
+
+    return writeIndex;
+  }
+
+  dspWave(output, writeIndex, inNumSamples, sampleRate) {
+    const frequency = this._frequency;
+    const detune = this._detune;
+    const algorithm = frequency.hasSampleAccurateValues() * 2 + detune.hasSampleAccurateValues();
+    const waveTable = this._waveTable;
+    const waveTableLength = waveTable.length - 1;
+    const frequencyToPhaseIncr = 1 / sampleRate;
+
+    let phase = this._phase;
+
+    if (algorithm === 0) {
+      const frequencyValue = frequency.getValue();
+      const detuneValue = detune.getValue();
+      const computedFrequency = frequencyValue * Math.pow(2, detuneValue / 1200);
+      const phaseIncr = frequencyToPhaseIncr * computedFrequency;
+
+      while (writeIndex < inNumSamples) {
+        const idx = (phase * waveTableLength) % waveTableLength;
+        const v0 = waveTable[(idx|0)];
+        const v1 = waveTable[(idx|0) + 1];
+
+        output[writeIndex++] = v0 + (idx % 1) * (v1 - v0);
+        phase += phaseIncr;
+      }
+    } else {
+      const frequencyValues = frequency.getSampleAccurateValues();
+      const detuneValues = detune.getSampleAccurateValues();
+
+      while (writeIndex < inNumSamples) {
+        const frequencyValue = frequencyValues[writeIndex];
+        const detuneValue = detuneValues[writeIndex];
+        const computedFrequency = frequencyValue * Math.pow(2, detuneValue / 1200);
+        const idx = (phase * waveTableLength) % waveTableLength;
+        const v0 = waveTable[(idx|0)];
+        const v1 = waveTable[(idx|0) + 1];
+
+        output[writeIndex++] = v0 + (idx % 1) * (v1 - v0);
         phase += frequencyToPhaseIncr * computedFrequency;
       }
     }

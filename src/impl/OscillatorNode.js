@@ -15,6 +15,7 @@ class OscillatorNode extends AudioSourceNode {
     this._detune = this.addParam("audio", 0);
     this._type = "sine";
     this._periodicWave = this.buildPeriodicWave(this._type);
+    this._waveTable = null;
     this._startTime = Infinity;
     this._stopTime = Infinity;
 
@@ -30,6 +31,7 @@ class OscillatorNode extends AudioSourceNode {
     if (OscillatorTypes.indexOf(value) !== -1) {
       this._type = value;
       this._periodicWave = this.buildPeriodicWave(value);
+      this._waveTable = this._periodicWave.getWaveTable();
     }
   }
 
@@ -65,6 +67,7 @@ class OscillatorNode extends AudioSourceNode {
     if (periodicWave instanceof PeriodicWave) {
       this._type = "custom";
       this._periodicWave = periodicWave;
+      this._waveTable = this._periodicWave.getWaveTable();
     }
   }
 
