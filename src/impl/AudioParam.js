@@ -4,14 +4,7 @@ const assert = require("power-assert");
 const util = require("../_util");
 const AudioNodeInput = require("./core/AudioNodeInput");
 const AudioBus = require("./core/AudioBus");
-
-const SET_VALUE_AT_TIME = 1;
-const LINEAR_RAMP_TO_VALUE_AT_TIME = 2;
-const EXPONENTIAL_RAMP_TO_VALUE_AT_TIME = 3;
-const SET_TARGET_AT_TIME = 4;
-const SET_VALUE_CURVE_AT_TIME = 5;
-const AUDIO = 1;
-const CONTROL = 2;
+const AudioParamDSP = require("./dsp/AudioParam");
 
 class AudioParam {
   constructor(context, opts) {
@@ -36,7 +29,8 @@ class AudioParam {
     ];
     this._outpus = [];
     this._outputBus = new AudioBus(1, this.processingSizeInFrames, this.sampleRate);
-    this._hasSampleAccurateValues = true;
+
+    this.dspInit(this._rate);
   }
 
   getValue() {
@@ -56,7 +50,7 @@ class AudioParam {
     startTime = Math.max(0, util.toNumber(startTime));
 
     this.insertEvent({
-      type: SET_VALUE_AT_TIME,
+      type: AudioParamDSP.SET_VALUE_AT_TIME,
       time: startTime,
       args: [ value, startTime ]
     });
@@ -67,7 +61,7 @@ class AudioParam {
     endTime = Math.max(0, util.toNumber(endTime));
 
     this.insertEvent({
-      type: LINEAR_RAMP_TO_VALUE_AT_TIME,
+      type: AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME,
       time: endTime,
       args: [ value, endTime ]
     });
@@ -78,7 +72,7 @@ class AudioParam {
     endTime = Math.max(0, util.toNumber(endTime));
 
     this.insertEvent({
-      type: EXPONENTIAL_RAMP_TO_VALUE_AT_TIME,
+      type: AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME,
       time: endTime,
       args: [ value, endTime ]
     });
@@ -90,7 +84,7 @@ class AudioParam {
     timeConstant = Math.max(0, util.toNumber(timeConstant));
 
     this.insertEvent({
-      type: SET_TARGET_AT_TIME,
+      type: AudioParamDSP.SET_TARGET_AT_TIME,
       time: startTime,
       args: [ target, startTime, timeConstant ]
     });
@@ -101,7 +95,7 @@ class AudioParam {
     duration = Math.max(0, util.toNumber(duration));
 
     this.insertEvent({
-      type: SET_VALUE_CURVE_AT_TIME,
+      type: AudioParamDSP.SET_VALUE_CURVE_AT_TIME,
       time: startTime,
       args: [ values, startTime, duration ]
     });
@@ -187,13 +181,13 @@ class AudioParam {
 
   fromRateName(value) {
     if (value === "audio") {
-      return AUDIO;
+      return AudioParamDSP.AUDIO;
     }
-    return CONTROL;
+    return AudioParamDSP.CONTROL;
   }
 
   toRateName(value) {
-    if (value === AUDIO) {
+    if (value === AudioParamDSP.AUDIO) {
       return "audio";
     }
     return "control";
@@ -201,28 +195,20 @@ class AudioParam {
 
   toMethodName(value) {
     switch (value) {
-    case SET_VALUE_AT_TIME:
+    case AudioParamDSP.SET_VALUE_AT_TIME:
       return "setValueAtTime";
-    case LINEAR_RAMP_TO_VALUE_AT_TIME:
+    case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
       return "linearRampToValueAtTime";
-    case EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
+    case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
       return "exponentialRampToValueAtTime";
-    case SET_TARGET_AT_TIME:
+    case AudioParamDSP.SET_TARGET_AT_TIME:
       return "setTargetAtTime";
-    case SET_VALUE_CURVE_AT_TIME:
+    case AudioParamDSP.SET_VALUE_CURVE_AT_TIME:
       return "setValueCurveAtTime"
     }
     /* istanbul ignore next */
     assert(!"NOT REACHED");
   }
-
-  dspProcess(e) {
-    const input = this._inputs[0];
-
-    if (input.getNumberOfFanOuts()) {
-      input.pull(e);
-    }
-  }
 }
 
-module.exports = AudioParam;
+module.exports = util.mixin(AudioParam, AudioParamDSP);

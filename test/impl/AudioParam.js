@@ -1,9 +1,10 @@
 "use strict";
 
 const assert = require("power-assert");
-const sinon = require("sinon");
 const deepEqual = require("deep-equal");
+const np = require("../helpers/np");
 const attrTester = require("../helpers/attrTester");
+const paramTester = require("../helpers/paramTester");
 const AudioContext = require("../../src/impl/AudioContext");
 const AudioParam = require("../../src/impl/AudioParam");
 const AudioNode = require("../../src/impl/AudioNode");
@@ -176,34 +177,406 @@ describe("AudioParam", () => {
     // | GainNode (node2) |    |
     // | gain (param)    <-----+
     // +------------------+
-    let node1, node2, param, input;
+    let node1, node2, param;
 
     beforeEach(() => {
       node1 = new AudioNode(context, { inputs: [], outputs: [ 1 ] });
       node2 = new GainNode(context);
       param = node2.getGain();
-      input = param.getInput(0);
-      input.pull = sinon.spy();
       node1.connect(param);
     });
 
-    it("process when connected node is enabled", () => {
-      const e = {};
+    function procEvent(times) {
+      const inNumSamples = context.processingSizeInFrames;
+      const currentTime = (inNumSamples * times) / 8000;
+      const nextCurrentTime = (inNumSamples * (times + 1)) / 8000;
+      const sampleRate = context.sampleRate;
 
-      node1.getOutput(0).enable();
+      return { currentTime, nextCurrentTime, inNumSamples, sampleRate };
+    }
 
-      param.dspProcess(e);
-      assert(input.pull.callCount === 1);
-      assert(input.pull.calledWith(e));
+    it("static value", () => {
+      [ 0, 0.25, 0.5, 0.5 ].forEach((value, procIndex) => {
+        param.setValue(value);
+        param.dspProcess(procEvent(procIndex));
+
+        const expected = new Float32Array(16).fill(value);
+        const actual = param.getSampleAccurateValues();
+
+        assert(param.hasSampleAccurateValues() === false);
+        assert(deepEqual(actual, expected));
+      });
     });
 
-    it("NOT process when connected node is not enabled", () => {
-      const e = {};
+    it("input and offset", () => {
+      node1.enableOutputsIfNecessary();
 
-      node1.getOutput(0).disable();
+      [ 0, 0.25, 0.5, 0.5 ].forEach((value, procIndex) => {
+        const noise = np.random_sample(16);
 
-      param.dspProcess(e);
-      assert(input.pull.callCount === 0);
+        node1.getOutput(0).getAudioBus().getMutableData()[0].set(noise);
+
+        param.setValue(value);
+        param.dspProcess(procEvent(procIndex));
+
+        const expected = new Float32Array(16).map((_, i) => value + noise[i]);
+        const actual = param.getSampleAccurateValues();
+
+        assert(param.hasSampleAccurateValues() === true);
+        assert(deepEqual(actual, expected));
+      });
+    });
+
+    it("events", () => {
+      param.setValueAtTime(0, 0);
+      param.linearRampToValueAtTime(1, 16/8000);
+
+      param.setValue(1);
+      param.dspProcess(procEvent(0));
+
+      const expected = new Float32Array(16).map((_, i) => i / 16);
+      const actual = param.getSampleAccurateValues();
+
+      assert(param.hasSampleAccurateValues() === true);
+      assert(deepEqual(actual, expected));
+    });
+
+    it("events and input", () => {
+      const noise = np.random_sample(16);
+
+      node1.enableOutputsIfNecessary();
+      node1.getOutput(0).getAudioBus().getMutableData()[0].set(noise);
+
+      param.setValueAtTime(0, 0);
+      param.linearRampToValueAtTime(1, 16/8000);
+
+      param.setValue(1);
+      param.dspProcess(procEvent(0));
+
+      const expected = new Float32Array(16).map((_, i) => (i / 16) + noise[i]);
+      const actual = param.getSampleAccurateValues();
+
+      assert(param.hasSampleAccurateValues() === true);
+      assert(deepEqual(actual, expected));
+    });
+  });
+
+  describe("event processing", () => {
+    let param;
+
+    beforeEach(() => {
+      param = new GainNode(context).getGain();
+    });
+
+    function procEvent(times) {
+      const inNumSamples = context.processingSizeInFrames;
+      const currentTime = (inNumSamples * times) / 8000;
+      const nextCurrentTime = (inNumSamples * (times + 1)) / 8000;
+      const sampleRate = context.sampleRate;
+
+      return { currentTime, nextCurrentTime, inNumSamples, sampleRate };
+    }
+
+    function deepCloseTo(a, b, delta) {
+      assert(a.length === b.length);
+
+      for (let i = 0, imax = a.length; i < imax; i++) {
+        assert(Math.abs(a[i] - b[i]) <= delta, `a[${i}]=${a[i]}, b[${i}]=${b[i]}`);
+      }
+
+      return true;
+    }
+
+    describe("setValueAtTime", () => {
+      //|0123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|
+      //|................|...............|...............|...............|...............|
+      const expectedValues = paramTester.toValues(`
+        |                |               |            **********************             |
+        |                |               |               |               |               |
+        |                |               |               |               |               |
+        |                |               |               |               |               |
+        |                |      **********************   |               |  *************|
+        |                |               |               |               |               |
+        |                |               |               |               |               |
+        |                |               |               |               |               |
+        |***********************         |               |               |               |
+      `);
+
+      beforeEach(() => {
+        param.setValue(0);
+        param.setValueAtTime(0.5, 23/8000);
+        param.setValueAtTime(1.0, 45/8000);
+      });
+
+      it("works", () => {
+        for (let i = 0; i < 4; i++) {
+          param.dspProcess(procEvent(i));
+
+          const expected = expectedValues.subarray(i * 16, (i + 1) * 16);
+          const actual = param.getSampleAccurateValues();
+
+          assert(param.hasSampleAccurateValues() === true);
+          assert(deepCloseTo(actual, expected, 0.0625));
+        }
+      });
+
+      it("works partially", () => {
+        param.dspProcess(procEvent(2));
+
+        const expected = expectedValues.subarray(2 * 16, 3 * 16);
+        const actual = param.getSampleAccurateValues();
+
+        assert(param.hasSampleAccurateValues() === true);
+        assert(deepCloseTo(actual, expected, 0.0625));
+      });
+
+      it("works with dynamic insertion", () => {
+        for (let i = 0; i < 4; i++) {
+          param.dspProcess(procEvent(i));
+        }
+        param.setValueAtTime(0.5, 67/8000);
+        param.dspProcess(procEvent(4));
+
+        const expected = expectedValues.subarray(4 * 16, (4 + 1) * 16);
+        const actual = param.getSampleAccurateValues();
+
+        assert(param.hasSampleAccurateValues() === true);
+        assert(deepCloseTo(actual, expected, 0.0625));
+      });
+    });
+
+    describe("linearRampToValueAtTime", () => {
+      //|0123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|
+      //|................|...............|...............|...............|...............|
+      const expectedValues = paramTester.toValues(`
+        |                |               |            ** |               |               |
+        |                |               |         ***  *|               |               |
+        |                |               |     ****      *               |               |
+        |                |               |  ***          |*              |               |
+        |                |               ***             | *             |     **********|
+        |                |            ***|               |  *            | ****          |
+        |                |        ****   |               |   *           **              |
+        |                |     ***       |               |    *          |               |
+        |**********************          |               |     **********|               |
+      `);
+
+      beforeEach(() => {
+        param.setValue(0);
+        param.setValueAtTime(0, 20/8000);
+        param.linearRampToValueAtTime(1, 46/8000);
+        param.linearRampToValueAtTime(0, 54/8000);
+      });
+
+      it("works", () => {
+        for (let i = 0; i < 4; i++) {
+          param.dspProcess(procEvent(i));
+
+          const expected = expectedValues.subarray(i * 16, (i + 1) * 16);
+          const actual = param.getSampleAccurateValues();
+
+          assert(param.hasSampleAccurateValues() === true);
+          assert(deepCloseTo(actual, expected, 0.0625));
+        }
+      });
+
+      it("works partially", () => {
+        param.dspProcess(procEvent(3));
+
+        const expected = expectedValues.subarray(3 * 16, 4 * 16);
+        const actual = param.getSampleAccurateValues();
+
+        assert(param.hasSampleAccurateValues() === true);
+        assert(deepCloseTo(actual, expected, 0.0625));
+      });
+
+      it("works with dynamic insertion", () => {
+        for (let i = 0; i < 4; i++) {
+          param.dspProcess(procEvent(i));
+        }
+        param.linearRampToValueAtTime(0.5, 72/8000);
+        param.dspProcess(procEvent(4));
+
+        const expected = expectedValues.subarray(4 * 16, (4 + 1) * 16);
+        const actual = param.getSampleAccurateValues();
+
+        assert(param.hasSampleAccurateValues() === true);
+        assert(deepCloseTo(actual, expected, 0.0625));
+      });
+    });
+
+    describe("exponentialRampToValueAtTime", () => {
+      //|0123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|
+      //|................|...............|...............|...............|...............|
+      const expectedValues = paramTester.toValues(`
+        |                |               |             * |               |               |
+        |                |               |            *  |               |               |
+        |                |               |           *   |               |               |
+        |                |               |          *    |               |               |
+        |                |               |         *    *|               |       ********|
+        |                |               |       **      *               |     **        |
+        |                |               |    ***        |               |   **          |
+        |                |              ******           |**             ****            |
+        |******************************* |               |  *************|               |
+      `);
+
+      beforeEach(() => {
+        param.setValue(0);
+        param.setValueAtTime(0.01, 20/8000);
+        param.exponentialRampToValueAtTime(1, 46/8000);
+        param.exponentialRampToValueAtTime(0.01, 54/8000);
+      });
+
+      it("works", () => {
+        for (let i = 0; i < 4; i++) {
+          param.dspProcess(procEvent(i));
+
+          const expected = expectedValues.subarray(i * 16, (i + 1) * 16);
+          const actual = param.getSampleAccurateValues();
+
+          assert(param.hasSampleAccurateValues() === true);
+          assert(deepCloseTo(actual, expected, 0.0625));
+        }
+      });
+
+      it("works partially", () => {
+        param.dspProcess(procEvent(3));
+
+        const expected = expectedValues.subarray(3 * 16, 4 * 16);
+        const actual = param.getSampleAccurateValues();
+
+        assert(param.hasSampleAccurateValues() === true);
+        assert(deepCloseTo(actual, expected, 0.0625));
+      });
+
+      it("works with dynamic insertion", () => {
+        for (let i = 0; i < 4; i++) {
+          param.dspProcess(procEvent(i));
+        }
+        param.exponentialRampToValueAtTime(0.5, 72/8000);
+        param.dspProcess(procEvent(4));
+
+        const expected = expectedValues.subarray(4 * 16, (4 + 1) * 16);
+        const actual = param.getSampleAccurateValues();
+
+        assert(param.hasSampleAccurateValues() === true);
+        assert(deepCloseTo(actual, expected, 0.0625));
+      });
+    });
+
+    describe("setTargetAtTime", () => {
+      //|0123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|
+      //|................|...............|...............|...............|...............|
+      const expectedValues = paramTester.toValues(`
+        |                |               |               |               |               |
+        |                |               |               |               |               |
+        |                |             ****              |               |               |
+        |                |          ***  | **            |               |               |
+        |                |        **     |   ***         |               |               |
+        |                |      **       |      ****     |               |             **|
+        |                |     *         |          *******              |          ***  |
+        |                |    *          |               | ************* |        **     |
+        |*********************           |               |              **********       |
+      `);
+
+      beforeEach(() => {
+        param.setValue(0);
+        param.setTargetAtTime(1, 20/8000, 8/8000);
+        param.setTargetAtTime(0, 32/8000, 12/8000);
+      });
+
+      it("works", () => {
+        for (let i = 0; i < 4; i++) {
+          param.dspProcess(procEvent(i));
+
+          const expected = expectedValues.subarray(i * 16, (i + 1) * 16);
+          const actual = param.getSampleAccurateValues();
+
+          assert(param.hasSampleAccurateValues() === true);
+          assert(deepCloseTo(actual, expected, 0.0625));
+        }
+      });
+
+      it.skip("works partially", () => {
+        param.dspProcess(procEvent(3));
+
+        const expected = expectedValues.subarray(3 * 16, 4 * 16);
+        const actual = param.getSampleAccurateValues();
+
+        assert(param.hasSampleAccurateValues() === true);
+        assert(deepCloseTo(actual, expected, 0.0625));
+      });
+
+      it("works with dynamic insertion", () => {
+        for (let i = 0; i < 4; i++) {
+          param.dspProcess(procEvent(i));
+        }
+        param.setTargetAtTime(1, 72/8000, 16/8000);
+        param.dspProcess(procEvent(4));
+
+        const expected = expectedValues.subarray(4 * 16, (4 + 1) * 16);
+        const actual = param.getSampleAccurateValues();
+
+        assert(param.hasSampleAccurateValues() === true);
+        assert(deepCloseTo(actual, expected, 0.0625));
+      });
+    });
+
+    describe("setValueCurveAtTime", () => {
+      //|0123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|
+      //|................|...............|...............|...............|...............|
+      const expectedValues = paramTester.toValues(`
+        |                |               |               |      *****************        |
+        |                |               |               |    **         |               |
+        |                |               |   ****        | ***           |            * *|
+        |                |               | **    *****   **              |               |
+        |                |****          ***           ***|               |           * * |
+        |              ***    ****    ** |               |               |        **     |
+        |            **  |        ****   |               |               |          *    |
+        |          **    |               |               |               |               |
+        |**********      |               |               |               |       *       |
+      `);
+      const curve = new Float32Array([ 0, 0.5, 0.25, 0.75, 0.5, 1 ]);
+
+      beforeEach(() => {
+        param.setValue(0);
+        param.setValueCurveAtTime(curve, 8/8000, 48/8000);
+      });
+
+      it("works", () => {
+        for (let i = 0; i < 4; i++) {
+          param.dspProcess(procEvent(i));
+
+          const expected = expectedValues.subarray(i * 16, (i + 1) * 16);
+          const actual = param.getSampleAccurateValues();
+
+          assert(param.hasSampleAccurateValues() === true);
+          assert(deepCloseTo(actual, expected, 0.0625));
+        }
+      });
+
+      it("works partially", () => {
+        param.dspProcess(procEvent(3));
+
+        const expected = expectedValues.subarray(3 * 16, 4 * 16);
+        const actual = param.getSampleAccurateValues();
+
+        assert(param.hasSampleAccurateValues() === true);
+        assert(deepCloseTo(actual, expected, 0.0625));
+      });
+
+      it("works with dynamic insertion", () => {
+        for (let i = 0; i < 4; i++) {
+          param.dspProcess(procEvent(i));
+        }
+        param.setValueCurveAtTime(curve, 72/8000, 8/8000);
+        param.dspProcess(procEvent(4));
+
+        const expected = expectedValues.subarray(4 * 16, (4 + 1) * 16);
+        const actual = param.getSampleAccurateValues();
+
+        assert(param.hasSampleAccurateValues() === true);
+        assert(deepCloseTo(actual, expected, 0.0625));
+      });
     });
   });
 });
