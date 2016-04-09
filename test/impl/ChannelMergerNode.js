@@ -1,6 +1,8 @@
 "use strict";
 
 const assert = require("power-assert");
+const deepEqual = require("deep-equal");
+const np = require("../helpers/np");
 const attrTester = require("../helpers/attrTester");
 const AudioContext = require("../../src/impl/AudioContext");
 const ChannelMergerNode = require("../../src/impl/ChannelMergerNode");
@@ -89,10 +91,10 @@ describe("ChannelMergerNode", () => {
     it("always enabled", () => {
       const node1 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
       const node2 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
-      const node3 = new ChannelMergerNode(context, { numberOfInputs: 2 });
+      const node3 = new ChannelMergerNode(context, { numberOfInputs: 4 });
 
-      node1.connect(node3);
-      node2.connect(node3);
+      node1.connect(node3, 0, 0);
+      node2.connect(node3, 0, 1);
 
       assert(node3.isEnabled() === false);
 
@@ -107,6 +109,32 @@ describe("ChannelMergerNode", () => {
 
       node2.disableOutputsIfNecessary();
       assert(node3.isEnabled() === false);
+    });
+  });
+
+  describe("processing", () => {
+    it("works", () => {
+      const node1 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      const node2 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      const node3 = new ChannelMergerNode(context, { numberOfInputs: 4 });
+      const noise1 = np.random_sample(16);
+      const noise2 = np.random_sample(16);
+
+      context.resume();
+      node1.connect(node3, 0, 0);
+      node2.connect(node3, 0, 1);
+      node3.connect(context.getDestination());
+      node1.enableOutputsIfNecessary();
+      node2.enableOutputsIfNecessary();
+      node1.getOutput(0).getAudioBus().getMutableData()[0].set(noise1);
+      node2.getOutput(0).getAudioBus().getMutableData()[0].set(noise2);
+
+      context.process();
+
+      const actual = node3.getOutput(0).getAudioBus().getChannelData();
+      const expected = [ noise1, noise2, np.zeros(16), np.zeros(16) ];
+
+      assert(deepEqual(actual, expected));
     });
   });
 });
