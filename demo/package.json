@@ -1,0 +1,58 @@
+{
+  "name": "@web-audio-engine/demo",
+  "description": "sound test",
+  "version": "0.0.0",
+  "cliOptions": {
+    "prepend": "Usage: cmd [options] demo-name",
+    "options": [
+      {
+        "option": "help",
+        "alias": "h",
+        "type": "Boolean",
+        "description": "display help"
+      },
+      {
+        "option": "list",
+        "alias": "l",
+        "type": "Boolean",
+        "description": "display demo name"
+      },
+      {
+        "option": "type",
+        "alias": "t",
+        "type": "String",
+        "description": "File type of audio",
+        "default": "s16"
+      },
+      {
+        "option": "rate",
+        "alias": "r",
+        "type": "Number",
+        "description": "Sample rate of audio",
+        "default": "44100"
+      },
+      {
+        "option": "channels",
+        "alias": "c",
+        "type": "Number",
+        "description": "Number of channels of audio data; e.g. 2 = stereo",
+        "default": "2"
+      },
+      {
+        "option": "no-show-progress",
+        "alias": "q",
+        "type": "Boolean",
+        "description": "Run in quite mode",
+        "default": "false"
+      }
+    ],
+    "append": "AUDIO FILE FORMATS: s16 s32 u8 raw"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "optionator": "^0.8.1"
+  },
+  "license": "MIT",
+  "main": "index.js",
+  "private": true
+}
