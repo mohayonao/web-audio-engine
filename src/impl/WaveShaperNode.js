@@ -1,6 +1,8 @@
 "use strict";
 
+const util = require("../_util");
 const AudioNode = require("./AudioNode");
+const WaveShaperNodeDSP = require("./dsp/WaveShaperNode");
 
 const OverSampleTypes = [ "none", "2x", "4x" ];
 
@@ -43,4 +45,4 @@ class WaveShaperNode extends AudioNode {
   }
 }
 
-module.exports = WaveShaperNode;
+module.exports = util.mixin(WaveShaperNode, WaveShaperNodeDSP);
