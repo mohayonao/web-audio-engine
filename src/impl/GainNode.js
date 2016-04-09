@@ -1,6 +1,8 @@
 "use strict";
 
+const util = require("../_util");
 const AudioNode = require("./AudioNode");
+const GainNodeDSP = require("./dsp/GainNode");
 
 class GainNode extends AudioNode {
   constructor(context) {
@@ -22,4 +24,4 @@ class GainNode extends AudioNode {
   }
 }
 
-module.exports = GainNode;
+module.exports = util.mixin(GainNode, GainNodeDSP);
