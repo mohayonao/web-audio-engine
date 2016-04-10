@@ -9,11 +9,11 @@ class DelayNode extends AudioNode {
     super(context);
 
     this._impl = new impl.DelayNode(context._impl, opts);
-    this._impl.$delay = new AudioParam(context, this._impl.getDelay());
+    this._impl.$delayTime = new AudioParam(context, this._impl.getDelayTime());
   }
 
-  get delay() {
-    return this._impl.$delay;
+  get delayTime() {
+    return this._impl.$delayTime;
   }
 }
 
