@@ -33,6 +33,13 @@ class IIRFilterNode extends AudioNode {
   channelDidUpdate(numberOfChannels) {
     this.getOutput(0).setNumberOfChannels(numberOfChannels);
   }
+
+  dspProcess() {
+    const inputBus = this.getInput(0).getAudioBus();
+    const outputBus = this.getOutput(0).getAudioBus();
+
+    outputBus.copyFrom(inputBus);
+  }
 }
 
 module.exports = IIRFilterNode;

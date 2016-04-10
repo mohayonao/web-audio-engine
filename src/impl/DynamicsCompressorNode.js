@@ -41,6 +41,14 @@ class DynamicsCompressorNode extends AudioNode {
   getRelease() {
     return this._release;
   }
+
+  dspProcess() {
+    const inputBus = this.getInput(0).getAudioBus();
+    const outputBus = this.getOutput(0).getAudioBus();
+
+    outputBus.zeros();
+    outputBus.sumFrom(inputBus);
+  }
 }
 
 module.exports = DynamicsCompressorNode;

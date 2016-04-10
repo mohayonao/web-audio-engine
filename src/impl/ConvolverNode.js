@@ -56,6 +56,14 @@ class ConvolverNode extends AudioNode {
 
     this.getOutput(0).setNumberOfChannels(numberOfChannels);
   }
+
+  dspProcess() {
+    const inputBus = this.getInput(0).getAudioBus();
+    const outputBus = this.getOutput(0).getAudioBus();
+
+    outputBus.zeros();
+    outputBus.sumFrom(inputBus);
+  }
 }
 
 module.exports = ConvolverNode;

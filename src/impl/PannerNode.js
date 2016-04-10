@@ -21,6 +21,14 @@ class PannerNode extends BasePannerNode {
   setVelocity() {
     throw new TypeError("NOT YET IMPLEMENTED");
   }
+
+  dspProcess() {
+    const inputBus = this.getInput(0).getAudioBus();
+    const outputBus = this.getOutput(0).getAudioBus();
+
+    outputBus.zeros();
+    outputBus.sumFrom(inputBus);
+  }
 }
 
 module.exports = PannerNode;

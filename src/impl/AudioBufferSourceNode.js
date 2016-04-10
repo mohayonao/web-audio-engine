@@ -3,6 +3,7 @@
 const util = require("../_util");
 const AudioSourceNode = require("./AudioSourceNode");
 const AudioBuffer = require("./AudioBuffer");
+const AudioBufferSourceNodeDSP = require("./dsp/AudioBufferSourceNode");
 
 class AudioBufferSourceNode extends AudioSourceNode {
   constructor(context) {
@@ -14,8 +15,10 @@ class AudioBufferSourceNode extends AudioSourceNode {
     this._loop = false;
     this._loopStart = 0;
     this._loopEnd = 0;
-    this._startTime = -1;
-    this._stopTime = -1;
+    this._offset = 0;
+    this._startTime = Infinity;
+    this._stopTime = Infinity;
+    this._implicitStopTime = Infinity;
   }
 
   getBuffer() {
@@ -67,22 +70,30 @@ class AudioBufferSourceNode extends AudioSourceNode {
     this._loopEnd = value;
   }
 
-  start(when) {
+  start(when, offset, duration) {
     /* istanbul ignore else */
-    if (this._startTime === -1) {
+    if (this._startTime === Infinity && this._audioData !== null) {
       when = Math.max(this.context.currentTime, util.toNumber(when));
+      offset = offset|0;
       this._startTime = when;
+      this._offset = offset;
+      if (typeof duration !== "undefined") {
+        duration = Math.max(0, util.toNumber(duration));
+        this._implicitStopTime = when + duration;
+      }
+      this.dspStart();
       this.getOutput(0).enable();
     }
   }
 
   stop(when) {
     /* istanbul ignore else */
-    if (this._startTime !== -1 && this._stopTime === -1) {
+    if (this._startTime !== Infinity && this._stopTime === Infinity) {
       when = Math.max(this.context.currentTime, this._startTime, util.toNumber(when));
       this._stopTime = when;
+      this._implicitStopTime = Math.min(this._implicitStopTime, when);
     }
   }
 }
 
-module.exports = AudioBufferSourceNode;
+module.exports = util.mixin(AudioBufferSourceNode, AudioBufferSourceNodeDSP);

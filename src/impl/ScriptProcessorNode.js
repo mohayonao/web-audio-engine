@@ -2,6 +2,7 @@
 
 const util = require("../_util");
 const AudioNode = require("./AudioNode");
+const ScriptProcessorNodeDSP = require("./dsp/ScriptProcessorNode");
 
 class ScriptProcessorNode extends AudioNode {
   constructor(context, opts) {
@@ -15,13 +16,14 @@ class ScriptProcessorNode extends AudioNode {
     numberOfOutputChannels = util.toValidNumberOfChannels(numberOfOutputChannels);
 
     super(context, {
-      inputs: [ 1 ],
+      inputs: [ numberOfInputChannels ],
       outputs: [ numberOfOutputChannels ],
       channelCount: numberOfInputChannels,
       channelCountMode: "explicit"
     });
     this._bufferSize = bufferSize;
     this.enableOutputsIfNecessary();
+    this.dspInit();
   }
 
   getBufferSize() {
@@ -36,9 +38,13 @@ class ScriptProcessorNode extends AudioNode {
     // This node's channelCountMode cannot be changed.
   }
 
+  setEventItem(eventItem) {
+    this.dspSetEventItem(eventItem);
+  }
+
   disableOutputsIfNecessary() {
     // This node cannot disable.
   }
 }
 
-module.exports = ScriptProcessorNode;
+module.exports = util.mixin(ScriptProcessorNode, ScriptProcessorNodeDSP);

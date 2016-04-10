@@ -29,7 +29,7 @@ class OscillatorNode {
     if (this._type === "sine") {
       writeIndex = this.dspSine(output, frameOffset, fillToFrame, sampleRate);
     } else {
-      writeIndex = this.dspWave(output, writeIndex, fillToFrame, sampleRate);
+      writeIndex = this.dspWave(output, frameOffset, fillToFrame, sampleRate);
     }
 
     if (writeIndex < inNumSamples) {

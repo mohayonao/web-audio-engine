@@ -15,6 +15,8 @@ This library implements the [Web Audio API](https://www.w3.org/TR/webaudio/) spe
 - `ChannelSplitterNode`
 - `WaveShaperNode`
 - `DelayNode (noisy..)`
+- `ScriptProcessorNode`
+- `AudioBufferSourceNode`
 
 ## Installation
 
