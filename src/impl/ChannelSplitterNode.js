@@ -2,6 +2,7 @@
 
 const util = require("../_util");
 const AudioNode = require("./AudioNode");
+const ChannelSplitterNodeDSP = require("./dsp/ChannelSplitterNode");
 
 class ChannelSplitterNode extends AudioNode {
   constructor(context, opts) {
@@ -18,4 +19,4 @@ class ChannelSplitterNode extends AudioNode {
   }
 }
 
-module.exports = ChannelSplitterNode;
+module.exports = util.mixin(ChannelSplitterNode, ChannelSplitterNodeDSP);
