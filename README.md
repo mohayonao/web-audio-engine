@@ -11,6 +11,10 @@ This library implements the [Web Audio API](https://www.w3.org/TR/webaudio/) spe
 - `GainNode`
 - `BiquadFilterNode`
 - `StereoPannerNode`
+- `ChannelMergerNode`
+- `ChannelSplitterNode`
+- `WaveShaperNode`
+- `DelayNode (noisy..)`
 
 ## Installation
 
