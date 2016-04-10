@@ -106,7 +106,7 @@ function createEncoder(numberOfChannels, length, bitDepth, floatingPoint) {
 
   const bytes = bitDepth >> 3;
   const bufferLength = numberOfChannels * length * bytes;
-  const buffer = Buffer.alloc(bufferLength, 0);
+  const buffer = new global.Buffer(new Uint8Array(bufferLength));
   const writer = createBufferWriter(buffer);
   const methodName = "pcm" + bitDepth + floatingPoint;
 
