@@ -2,6 +2,7 @@
 
 const util = require("../_util");
 const AudioNode = require("./AudioNode");
+const DelayNodeDSP = require("./dsp/DelayNode");
 
 class DelayNode extends AudioNode {
   constructor(context, opts) {
@@ -14,11 +15,13 @@ class DelayNode extends AudioNode {
       channelCountMode: "max"
     });
     this._maxDelayTime = Math.max(0, util.toNumber(maxDelayTime) || 1);
-    this._delay = this.addParam("audio", 0);
+    this._delayTime = this.addParam("audio", 0);
+
+    this.dspInit(this._maxDelayTime);
   }
 
-  getDelay() {
-    return this._delay;
+  getDelayTime() {
+    return this._delayTime;
   }
 
   getMaxDelayTime() {
@@ -26,8 +29,9 @@ class DelayNode extends AudioNode {
   }
 
   channelDidUpdate(numberOfChannels) {
+    this.dspSetNumberOfChannels(numberOfChannels);
     this.getOutput(0).setNumberOfChannels(numberOfChannels);
   }
 }
 
-module.exports = DelayNode;
+module.exports = util.mixin(DelayNode, DelayNodeDSP);

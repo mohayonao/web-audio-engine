@@ -18,7 +18,7 @@ testSpec.numberOfOutputs = {
   testCase: [ { expected: 1 } ]
 };
 
-testSpec.delay = {
+testSpec.delayTime = {
   testCase: [ { expected: value => value instanceof AudioParam } ]
 };
 
