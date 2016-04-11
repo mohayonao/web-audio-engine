@@ -7,6 +7,7 @@ const api = require("../src/api");
 const AudioContext = require("../src/api/AudioContext");
 const AudioDestinationNode = require("../src/api/AudioDestinationNode");
 const AudioListener = require("../src/api/AudioListener");
+const AudioBuffer = require("../src/api/AudioBuffer");
 const AudioWorkerNode = require("../src/api/AudioWorkerNode");
 
 const context = new AudioContext();
@@ -62,6 +63,29 @@ describe("api test", () => {
       const target = new AudioContext();
 
       assert(target.listener instanceof AudioListener);
+    });
+
+    const wavData = new Uint32Array([
+     0x46464952, 0x0000002c, 0x45564157, 0x20746d66,
+     0x00000010, 0x00020001, 0x0000ac44, 0x0002b110,
+     0x00100004, 0x61746164, 0x00000008, 0x8000c000, 0x3fff7fff
+   ]).buffer;
+
+    it(".decodeAudioData()", () => {
+      const target = new AudioContext({ sampleRate: 44100 });
+
+      return target.decodeAudioData(wavData).then((audioBuffer) => {
+        assert(audioBuffer instanceof AudioBuffer);
+      });
+    });
+
+    it(".decodeAudioData() - callback style", (done) => {
+      const target = new AudioContext({ sampleRate: 44100 });
+
+      target.decodeAudioData(wavData, (audioBuffer) => {
+        assert(audioBuffer instanceof AudioBuffer);
+        done();
+      });
     });
   });
 

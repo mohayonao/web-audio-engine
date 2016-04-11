@@ -6,7 +6,9 @@
   "bugs": {
     "url": "https://github.com/mohayonao/web-audio-engine/issues"
   },
-  "dependencies": {},
+  "dependencies": {
+    "wav-decoder": "^1.1.0"
+  },
   "devDependencies": {
     "babel-cli": "^6.6.5",
     "babel-plugin-espower": "^2.1.2",
