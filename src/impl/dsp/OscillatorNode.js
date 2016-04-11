@@ -1,6 +1,8 @@
 "use strict";
 
-class OscillatorNode {
+const AudioSourceNode = require("../AudioSourceNode");
+
+class OscillatorNode extends AudioSourceNode {
   dspInit() {
     this._phase = 0;
   }

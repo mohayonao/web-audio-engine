@@ -1,8 +1,9 @@
 "use strict";
 
+const AudioNode = require("../AudioNode");
 const DSPAlgorithm = {};
 
-class GainNode {
+class GainNode extends AudioNode {
   dspProcess(e) {
     const inputBus = this.getInput(0).getAudioBus();
     const outputBus = this.getOutput(0).getAudioBus();

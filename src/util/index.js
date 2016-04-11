@@ -1,5 +1,7 @@
 "use strict";
 
+module.exports.mixin = require("./mixin");
+
 function clip(value, minValue, maxValue) {
   return Math.max(minValue, Math.min(value, maxValue));
 }
@@ -9,22 +11,6 @@ function defaults(value, defaultValue) {
   return typeof value !== "undefined" ? value : defaultValue;
 }
 module.exports.defaults = defaults;
-
-function mixin(targetKlass, partialKlass) {
-  const partialProto = partialKlass.prototype;
-  const targetProto = targetKlass.prototype;
-
-  Object.getOwnPropertyNames(partialProto).forEach((methodName) => {
-    if (methodName !== "constructor") {
-      const desc = Object.getOwnPropertyDescriptor(partialProto, methodName);
-
-      Object.defineProperty(targetProto, methodName, desc);
-    }
-  });
-
-  return targetKlass;
-}
-module.exports.mixin = mixin;
 
 function toArrayIfNeeded(value) {
   return Array.isArray(value) ? value : [ value ];
