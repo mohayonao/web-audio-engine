@@ -1,6 +1,6 @@
 "use strict";
 
-const util = require("../_util");
+const util = require("../util");
 const AudioNode = require("./AudioNode");
 
 class AudioWorkerNode extends AudioNode {

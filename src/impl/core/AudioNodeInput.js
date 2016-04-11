@@ -1,7 +1,7 @@
 "use strict";
 
 const assert = require("power-assert");
-const util = require("../../_util");
+const util = require("../../util");
 const AudioBus = require("./AudioBus");
 
 class AudioNodeInput {

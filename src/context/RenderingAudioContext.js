@@ -1,7 +1,7 @@
 "use strict";
 
 const AudioContext = require("../api/AudioContext");
-const encodeAudioData = require("../_util/encodeAudioDataAPI").encodeAudioData;
+const encodeAudioData = require("../util/encodeAudioDataAPI").encodeAudioData;
 
 class RenderingAudioContext extends AudioContext {
   constructor(opts) {

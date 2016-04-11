@@ -22,7 +22,7 @@ const ChannelMergerNode = require("./ChannelMergerNode");
 const DynamicsCompressorNode = require("./DynamicsCompressorNode");
 const OscillatorNode = require("./OscillatorNode");
 const PeriodicWave = require("./PeriodicWave");
-const decodeAudioData = require("../_util/decodeAudioDataAPI").decodeAudioData;
+const decodeAudioData = require("../util/decodeAudioDataAPI").decodeAudioData;
 
 class AudioContext extends EventTarget {
   constructor(opts) {
