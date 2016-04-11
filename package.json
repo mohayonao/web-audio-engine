@@ -7,7 +7,8 @@
     "url": "https://github.com/mohayonao/web-audio-engine/issues"
   },
   "dependencies": {
-    "wav-decoder": "^1.1.0"
+    "wav-decoder": "^1.1.0",
+    "wav-encoder": "^1.1.0"
   },
   "devDependencies": {
     "babel-cli": "^6.6.5",
