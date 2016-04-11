@@ -8,7 +8,7 @@ class DelayNode extends AudioNode {
   constructor(context, opts) {
     opts = opts || /* istanbul ignore next */ {};
 
-    let maxDelayTime = opts.maxDelayTime;
+    let maxDelayTime = util.defaults(opts.maxDelayTime, 1);
 
     super(context, {
       inputs: [ 1 ],
@@ -16,7 +16,7 @@ class DelayNode extends AudioNode {
       channelCount: 2,
       channelCountMode: "max"
     });
-    this._maxDelayTime = Math.max(0, util.toNumber(maxDelayTime) || 1);
+    this._maxDelayTime = Math.max(0, util.toNumber(maxDelayTime));
     this._delayTime = this.addParam("audio", 0);
 
     this.dspInit(this._maxDelayTime);

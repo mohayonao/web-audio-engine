@@ -52,7 +52,7 @@ describe("AudioDestinationNode", () => {
 
   describe("channel configuration", () => {
     it("should synchronize with the input, but clamped by max channel count", () => {
-      const node1 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 4 ] });
+      const node1 = new AudioNode(context, { outputs: [ 4 ] });
       const node2 = new AudioDestinationNode(context, { numberOfChannels: 2 });
 
       node1.getOutput(0).enable();
@@ -66,7 +66,7 @@ describe("AudioDestinationNode", () => {
 
   describe("processing", () => {
     it("silent", () => {
-      const node1 = new AudioNode(context, { inputs: [], outputs: [ 2 ] });
+      const node1 = new AudioNode(context, { outputs: [ 2 ] });
       const node2 = new AudioDestinationNode(context, { numberOfChannels: 2 });
       const outputBus = node2.getOutput(0).getAudioBus();
 
@@ -83,7 +83,7 @@ describe("AudioDestinationNode", () => {
       assert(deepEqual(outputBus.getChannelData()[1], np.zeros(16)));
     });
     it("noise", () => {
-      const node1 = new AudioNode(context, { inputs: [], outputs: [ 2 ] });
+      const node1 = new AudioNode(context, { outputs: [ 2 ] });
       const node2 = new AudioDestinationNode(context, { numberOfChannels: 2 });
       const noise1 = np.random_sample(16);
       const noise2 = np.random_sample(16);

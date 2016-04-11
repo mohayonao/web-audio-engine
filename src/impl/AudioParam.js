@@ -10,8 +10,8 @@ class AudioParam {
   constructor(context, opts) {
     opts = opts || /* istanbul ignore next */ {};
 
-    let rate = opts.rate;
-    let defaultValue = opts.defaultValue;
+    let rate = util.defaults(opts.rate, "control");
+    let defaultValue = util.defaults(opts.defaultValue, 0);
 
     this.context = context;
     this.processingSizeInFrames = context.processingSizeInFrames;

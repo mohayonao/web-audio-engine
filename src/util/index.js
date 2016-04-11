@@ -5,6 +5,11 @@ function clip(value, minValue, maxValue) {
 }
 module.exports.clip = clip;
 
+function defaults(value, defaultValue) {
+  return typeof value !== "undefined" ? value : defaultValue;
+}
+module.exports.defaults = defaults;
+
 function mixin(targetKlass, partialKlass) {
   const partialProto = partialKlass.prototype;
   const targetProto = targetKlass.prototype;

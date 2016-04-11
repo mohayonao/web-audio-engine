@@ -1,5 +1,6 @@
 "use strict";
 
+const util = require("../util");
 const AudioContext = require("../api/AudioContext");
 
 class StreamAudioContext extends AudioContext {
@@ -11,9 +12,9 @@ class StreamAudioContext extends AudioContext {
     let bitDepth = opts.bitDepth;
     let floatingPoint = opts.float || opts.floatingPoint;
 
-    sampleRate = defaults(sampleRate, 44100);
-    numberOfChannels = defaults(numberOfChannels, 2);
-    bitDepth = defaults(bitDepth, 16);
+    sampleRate = util.defaults(sampleRate, 44100);
+    numberOfChannels = util.defaults(numberOfChannels, 2);
+    bitDepth = util.defaults(bitDepth, 16);
     floatingPoint = !!floatingPoint;
 
     super({ sampleRate, numberOfChannels });
@@ -94,10 +95,6 @@ class StreamAudioContext extends AudioContext {
       this._stream = null;
     }
   }
-}
-
-function defaults(value, defaultValue) {
-  return typeof value !== "undefined" ? value : defaultValue;
 }
 
 function createEncoder(numberOfChannels, length, bitDepth, floatingPoint) {

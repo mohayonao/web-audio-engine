@@ -1,5 +1,6 @@
 "use strict";
 
+const util = require("../util");
 const AudioContext = require("../api/AudioContext");
 const encodeAudioData = require("../util/encodeAudioDataAPI").encodeAudioData;
 
@@ -12,9 +13,9 @@ class RenderingAudioContext extends AudioContext {
     let bitDepth = opts.bitDepth;
     let floatingPoint = opts.float || opts.floatingPoint;
 
-    sampleRate = defaults(sampleRate, 44100);
-    numberOfChannels = defaults(numberOfChannels, 2);
-    bitDepth = defaults(bitDepth, 16);
+    sampleRate = util.defaults(sampleRate, 44100);
+    numberOfChannels = util.defaults(numberOfChannels, 2);
+    bitDepth = util.defaults(bitDepth, 16);
     floatingPoint = !!floatingPoint;
 
     super({ sampleRate, numberOfChannels });
@@ -79,10 +80,6 @@ class RenderingAudioContext extends AudioContext {
     opts = Object.assign({}, this._format, opts);
     return encodeAudioData(audioData, opts);
   }
-}
-
-function defaults(value, defaultValue) {
-  return typeof value !== "undefined" ? value : defaultValue;
 }
 
 function toAudioTime(str) {

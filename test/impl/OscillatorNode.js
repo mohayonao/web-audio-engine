@@ -68,7 +68,7 @@ describe("OscillatorNode", () => {
   describe("channel configuration", () => {
     it("should be mono output", () => {
       const node1 = new OscillatorNode(context);
-      const node2 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      const node2 = new AudioNode(context, { inputs: [ 1 ] });
 
       node1.connect(node2);
 

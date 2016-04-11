@@ -8,9 +8,9 @@ class ChannelSplitterNode extends AudioNode {
   constructor(context, opts) {
     opts = opts || /* istanbul ignore next */ {};
 
-    let numberOfOutputs = opts.numberOfOutputs;
+    let numberOfOutputs = util.defaults(opts.numberOfOutputs, 6);
 
-    numberOfOutputs = util.toValidNumberOfChannels(numberOfOutputs || 6);
+    numberOfOutputs = util.toValidNumberOfChannels(numberOfOutputs);
 
     super(context, {
       inputs: [ 1 ],

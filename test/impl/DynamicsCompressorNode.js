@@ -57,9 +57,9 @@ describe("DynamicsCompressorNode", () => {
 
   describe("channel configuration", () => {
     it("should synchronize with the input, but clamped by 2", () => {
-      const node1 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 4 ] });
+      const node1 = new AudioNode(context, { outputs: [ 4 ] });
       const node2 = new DynamicsCompressorNode(context);
-      const node3 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      const node3 = new AudioNode(context, { inputs: [ 1 ] });
 
       node1.getOutput(0).enable();
       node2.getOutput(0).enable();
