@@ -8,6 +8,8 @@ const AudioParamDSP = require("./dsp/AudioParam");
 
 class AudioParam {
   constructor(context, opts) {
+    opts = opts || /* istanbul ignore next */ {};
+
     let rate = opts.rate;
     let defaultValue = opts.defaultValue;
 

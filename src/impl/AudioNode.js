@@ -8,6 +8,8 @@ const AudioParam = require("./AudioParam");
 
 class AudioNode extends EventTarget {
   constructor(context, opts) {
+    opts = opts || /* istanbul ignore next */ {};
+
     let inputs = opts.inputs;
     let outputs = opts.outputs;
     let channelCount = opts.channelCount;

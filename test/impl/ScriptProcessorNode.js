@@ -96,8 +96,8 @@ describe("ScriptProcessorNode", () => {
       node2.setEventItem({
         type: "audioprocess",
         playbackTime: 0,
-        inputBuffer: new AudioBuffer({}, {}),
-        outputBuffer: new AudioBuffer({}, {})
+        inputBuffer: new AudioBuffer({ sampleRate: 8000 }),
+        outputBuffer: new AudioBuffer({ sampleRate: 8000 })
       });
 
       node1.enableOutputsIfNecessary();

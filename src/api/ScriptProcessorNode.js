@@ -13,8 +13,8 @@ class ScriptProcessorNode extends AudioNode {
     this._impl.setEventItem({
       type: "audioprocess",
       playbackTime: 0,
-      inputBuffer: new AudioBuffer(context, {}),
-      outputBuffer: new AudioBuffer(context, {})
+      inputBuffer: new AudioBuffer(context),
+      outputBuffer: new AudioBuffer(context)
     })
   }
 

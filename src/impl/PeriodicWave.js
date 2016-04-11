@@ -5,6 +5,8 @@ const PeriodicWaveDSP = require("./dsp/PeriodicWave");
 
 class PeriodicWave {
   constructor(context, opts) {
+    opts = opts || /* istanbul ignore next */ {};
+
     let real = opts.real;
     let imag = opts.imag;
     let constraints = opts.constraints;

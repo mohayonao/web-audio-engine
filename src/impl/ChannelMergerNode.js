@@ -6,6 +6,8 @@ const ChannelMergerNodeDSP = require("./dsp/ChannelMergerNode");
 
 class ChannelMergerNode extends AudioNode {
   constructor(context, opts) {
+    opts = opts || /* istanbul ignore next */ {};
+
     let numberOfInputs = opts.numberOfInputs;
 
     numberOfInputs = util.toValidNumberOfChannels(numberOfInputs || 6);

@@ -5,6 +5,8 @@ const AudioNode = require("./AudioNode");
 
 class AudioWorkerNode extends AudioNode {
   constructor(context, opts) {
+    opts = opts || /* istanbul ignore next */ {};
+
     let worker = opts.worker;
     let numberOfInputs = opts.numberOfInputs;
     let numberOfOutputs = opts.numberOfOutputs;

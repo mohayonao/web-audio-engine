@@ -5,7 +5,7 @@ const encodeAudioData = require("../util/encodeAudioDataAPI").encodeAudioData;
 
 class RenderingAudioContext extends AudioContext {
   constructor(opts) {
-    opts = opts || {};
+    opts = opts || /* istanbul ignore next */ {};
 
     let sampleRate = opts.sampleRate;
     let numberOfChannels = opts.channels || opts.numberOfChannels;

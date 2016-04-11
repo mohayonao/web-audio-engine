@@ -6,6 +6,8 @@ const AudioNodeOutput = require("./core/AudioNodeOutput");
 
 class AudioDestinationNode extends AudioNode {
   constructor(context, opts) {
+    opts = opts || /* istanbul ignore next */ {};
+
     let numberOfChannels = opts.numberOfChannels;
 
     numberOfChannels = util.toValidNumberOfChannels(numberOfChannels);

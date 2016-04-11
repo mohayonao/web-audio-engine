@@ -6,6 +6,8 @@ const ChannelSplitterNodeDSP = require("./dsp/ChannelSplitterNode");
 
 class ChannelSplitterNode extends AudioNode {
   constructor(context, opts) {
+    opts = opts || /* istanbul ignore next */ {};
+
     let numberOfOutputs = opts.numberOfOutputs;
 
     numberOfOutputs = util.toValidNumberOfChannels(numberOfOutputs || 6);

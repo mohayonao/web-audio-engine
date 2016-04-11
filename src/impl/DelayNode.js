@@ -6,6 +6,8 @@ const DelayNodeDSP = require("./dsp/DelayNode");
 
 class DelayNode extends AudioNode {
   constructor(context, opts) {
+    opts = opts || /* istanbul ignore next */ {};
+
     let maxDelayTime = opts.maxDelayTime;
 
     super(context, {

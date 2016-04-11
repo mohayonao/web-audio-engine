@@ -6,6 +6,8 @@ const ScriptProcessorNodeDSP = require("./dsp/ScriptProcessorNode");
 
 class ScriptProcessorNode extends AudioNode {
   constructor(context, opts) {
+    opts = opts || /* istanbul ignore next */ {};
+
     let bufferSize = opts.bufferSize;
     let numberOfInputChannels = opts.numberOfInputChannels;
     let numberOfOutputChannels = opts.numberOfOutputChannels;
