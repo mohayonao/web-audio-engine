@@ -39,18 +39,31 @@
         "default": "2"
       },
       {
-        "option": "no-show-progress",
-        "alias": "q",
+        "option": "duration",
+        "alias": "d",
+        "type": "Number",
+        "description": "Number of duration for rendering"
+      },
+      {
+        "option": "out",
+        "alias": "o",
+        "type": "String",
+        "description": "Write output to <file>"
+      },
+      {
+        "option": "verbose",
+        "alias": "V",
         "type": "Boolean",
-        "description": "Run in quite mode",
+        "description": "Run in verbose mode",
         "default": "false"
       }
     ],
     "append": "AUDIO FILE FORMATS: s16 s32 u8 raw"
   },
-  "dependencies": {},
-  "devDependencies": {
-    "optionator": "^0.8.1"
+  "dependencies": {
+    "optionator": "^0.8.1",
+    "power-assert": "^1.3.1",
+    "tickable-timer": "^1.0.0"
   },
   "license": "MIT",
   "main": "index.js",
