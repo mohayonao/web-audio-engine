@@ -22,7 +22,7 @@ class StreamAudioContext extends AudioContext {
 
     this._encoder = createEncoder(numberOfChannels, blockSize, bitDepth, floatingPoint);
     this._blockSize = blockSize;
-    this._stream = null;
+    this._stream = { write: () => true };
     this._isPlaying = false;
   }
 
