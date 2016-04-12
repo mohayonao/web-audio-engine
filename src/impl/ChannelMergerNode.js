@@ -1,14 +1,16 @@
 "use strict";
 
-const util = require("../_util");
+const util = require("../util");
 const AudioNode = require("./AudioNode");
 const ChannelMergerNodeDSP = require("./dsp/ChannelMergerNode");
 
 class ChannelMergerNode extends AudioNode {
   constructor(context, opts) {
-    let numberOfInputs = opts.numberOfInputs;
+    opts = opts || /* istanbul ignore next */ {};
 
-    numberOfInputs = util.toValidNumberOfChannels(numberOfInputs || 6);
+    let numberOfInputs = util.defaults(opts.numberOfInputs, 6);
+
+    numberOfInputs = util.toValidNumberOfChannels(numberOfInputs);
 
     super(context, {
       inputs: new Array(numberOfInputs).fill(1),

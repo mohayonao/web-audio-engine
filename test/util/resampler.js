@@ -1,9 +1,9 @@
 "use strict";
 
 const assert = require("power-assert");
-const resampler = require("../../src/_util/resampler");
+const resampler = require("../../src/util/resampler");
 
-describe("_util/resampler", () => {
+describe("util/resampler", () => {
   describe("resample(audioData: AudioData, sampleRate: number): AudioData", () => {
     it("works", () => {
       const source = {

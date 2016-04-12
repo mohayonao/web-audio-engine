@@ -1,13 +1,15 @@
 "use strict";
 
-const util = require("../_util");
+const util = require("../util");
 const AudioNode = require("./AudioNode");
 
 class AudioWorkerNode extends AudioNode {
   constructor(context, opts) {
+    opts = opts || /* istanbul ignore next */ {};
+
     let worker = opts.worker;
-    let numberOfInputs = opts.numberOfInputs;
-    let numberOfOutputs = opts.numberOfOutputs;
+    let numberOfInputs = util.defaults(opts.numberOfInputs, 0);
+    let numberOfOutputs = util.defaults(opts.numberOfOutputs, 0);
 
     const inputs = util.toArrayIfNeeded(numberOfInputs).map(util.toValidNumberOfChannels);
     const outputs = util.toArrayIfNeeded(numberOfOutputs).map(util.toValidNumberOfChannels);

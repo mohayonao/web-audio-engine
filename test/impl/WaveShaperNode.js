@@ -57,9 +57,9 @@ describe("WaveShaperNode", () => {
 
   describe("channel configuration", () => {
     it("should synchronize with the input", () => {
-      const node1 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 4 ] });
+      const node1 = new AudioNode(context, { outputs: [ 4 ] });
       const node2 = new WaveShaperNode(context);
-      const node3 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      const node3 = new AudioNode(context, { inputs: [ 1 ] });
 
       node1.getOutput(0).enable();
       node2.getOutput(0).enable();
@@ -77,7 +77,7 @@ describe("WaveShaperNode", () => {
 
   describe("processing", () => {
     it("works", () => {
-      const node1 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 2 ] });
+      const node1 = new AudioNode(context, { outputs: [ 2 ] });
       const node2 = new WaveShaperNode(context);
       const curve = new Float32Array([ 1, 0, 1 ]);
       const noise1 = np.random_sample(16).map(x => (x - 0.5) * 2);
@@ -102,7 +102,7 @@ describe("WaveShaperNode", () => {
     });
 
     it("works - without curve", () => {
-      const node1 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 2 ] });
+      const node1 = new AudioNode(context, { outputs: [ 2 ] });
       const node2 = new WaveShaperNode(context);
       const noise1 = np.random_sample(16).map(x => (x - 0.5) * 2);
       const noise2 = np.random_sample(16).map(x => (x - 0.5) * 2);

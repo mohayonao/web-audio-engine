@@ -2,9 +2,9 @@
 
 const assert = require("power-assert");
 const sinon = require("sinon");
-const decodeAudioDataAPI = require("../../src/_util/decodeAudioDataAPI");
+const decodeAudioDataAPI = require("../../src/util/decodeAudioDataAPI");
 
-describe("_util/decodeAudioDataAPI", () => {
+describe("util/decodeAudioDataAPI", () => {
   let saved;
 
   before(() => {

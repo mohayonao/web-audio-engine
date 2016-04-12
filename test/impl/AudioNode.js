@@ -58,7 +58,7 @@ testSpec.channelInterpretation = {
 describe("AudioNode", () => {
   describe("inherits", () => {
     it("AudioNode < EventTarget", () => {
-      const node = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      const node = new AudioNode(context);
 
       assert(node instanceof AudioNode);
       assert(node instanceof EventTarget);
@@ -73,17 +73,17 @@ describe("AudioNode", () => {
     });
 
     it(".context", () => {
-      const node = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      const node = new AudioNode(context);
 
       assert(node.context === context);
     });
     it(".sampleRate", () => {
-      const node = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      const node = new AudioNode(context);
 
       assert(node.sampleRate === context.sampleRate);
     });
     it(".processingSizeInFrames", () => {
-      const node = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      const node = new AudioNode(context);
 
       assert(node.processingSizeInFrames === context.processingSizeInFrames);
     });
@@ -104,8 +104,8 @@ describe("AudioNode", () => {
 
   describe("connection", () => {
     it("basic operation", () => {
-      const node1 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const node2 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
+      const node1 = new AudioNode(context, { outputs: [ 1, 1 ] });
+      const node2 = new AudioNode(context, { inputs: [ 1, 1 ] });
 
       node1.connect(node2);
 
@@ -117,8 +117,8 @@ describe("AudioNode", () => {
     });
 
     it("with the channel", () => {
-      const node1 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ]});
-      const node2 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ]});
+      const node1 = new AudioNode(context, { outputs: [ 1, 1 ] });
+      const node2 = new AudioNode(context, { inputs: [ 1, 1 ] });
 
       node1.connect(node2, 1);
 
@@ -136,8 +136,8 @@ describe("AudioNode", () => {
     });
 
     it("disconnect with the node", () => {
-      const node1 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const node2 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
+      const node1 = new AudioNode(context, { outputs: [ 1, 1 ] });
+      const node2 = new AudioNode(context, { inputs: [ 1, 1 ] });
 
       node1.connect(node2);
 
@@ -153,8 +153,8 @@ describe("AudioNode", () => {
     });
 
     it("complex case", () => {
-      const node1 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const node2 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
+      const node1 = new AudioNode(context, { outputs: [ 1, 1 ] });
+      const node2 = new AudioNode(context, { inputs: [ 1, 1 ] });
 
       node1.connect(node2, 0);
 
@@ -173,8 +173,8 @@ describe("AudioNode", () => {
     });
 
     it("misc", () => {
-      const node1 = new AudioNode(context, { inputs: [], outputs: [] });
-      const node2 = new AudioNode(context, { inputs: [], outputs: [] });
+      const node1 = new AudioNode(context);
+      const node2 = new AudioNode(context);
 
       assert(node1.isConnectedTo() === false);
       assert(node2.isConnectedFrom() === false);
@@ -185,7 +185,7 @@ describe("AudioNode", () => {
     let node, output;
 
     before(() => {
-      node = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      node = new AudioNode(context, { outputs: [ 1 ] });
       output = node.getOutput(0);
 
       output.enable = sinon.spy();

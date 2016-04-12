@@ -1,15 +1,17 @@
 "use strict";
 
-const assert = require("power-assert");
-const util = require("../_util");
+const assert = require("assert");
+const util = require("../util");
 const AudioNodeInput = require("./core/AudioNodeInput");
 const AudioBus = require("./core/AudioBus");
 const AudioParamDSP = require("./dsp/AudioParam");
 
 class AudioParam {
   constructor(context, opts) {
-    let rate = opts.rate;
-    let defaultValue = opts.defaultValue;
+    opts = opts || /* istanbul ignore next */ {};
+
+    let rate = util.defaults(opts.rate, "control");
+    let defaultValue = util.defaults(opts.defaultValue, 0);
 
     this.context = context;
     this.processingSizeInFrames = context.processingSizeInFrames;

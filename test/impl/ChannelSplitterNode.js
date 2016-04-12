@@ -39,9 +39,9 @@ describe("ChannelSplitterNode", () => {
 
   describe("channel configuration", () => {
     it("should be kept by the initial configuration", () => {
-      const node1 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 4 ] });
+      const node1 = new AudioNode(context, { outputs: [ 4 ] });
       const node2 = new ChannelSplitterNode(context, { numberOfOutputs: 6 });
-      const node3 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      const node3 = new AudioNode(context, { inputs: [ 1 ] });
 
       node1.getOutput(0).enable();
       node2.getOutput(0).enable();
@@ -59,7 +59,7 @@ describe("ChannelSplitterNode", () => {
 
   describe("processing", () => {
     it("works", () => {
-      const node1 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 4 ] });
+      const node1 = new AudioNode(context, { outputs: [ 4 ] });
       const node2 = new ChannelSplitterNode(context, { numberOfOutputs: 6 });
       const noise1 = np.random_sample(16);
       const noise2 = np.random_sample(16);
@@ -95,7 +95,7 @@ describe("ChannelSplitterNode", () => {
       assert(deepEqual(actual[5], np.zeros(16)));
     });
     it("works - silent", () => {
-      const node1 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 4 ] });
+      const node1 = new AudioNode(context, { outputs: [ 4 ] });
       const node2 = new ChannelSplitterNode(context, { numberOfOutputs: 6 });
 
       context.resume();

@@ -1,11 +1,13 @@
 "use strict";
 
-const util = require("../_util");
+const util = require("../util");
 const AudioNode = require("./AudioNode");
 const AudioNodeOutput = require("./core/AudioNodeOutput");
 
 class AudioDestinationNode extends AudioNode {
   constructor(context, opts) {
+    opts = opts || /* istanbul ignore next */ {};
+
     let numberOfChannels = opts.numberOfChannels;
 
     numberOfChannels = util.toValidNumberOfChannels(numberOfChannels);

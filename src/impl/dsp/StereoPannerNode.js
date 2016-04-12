@@ -1,8 +1,8 @@
 "use strict";
 
-const AudioNode = require("../AudioNode");
+const BasePannerNode = require("../BasePannerNode");
 
-class StereoPannerNode extends AudioNode {
+class StereoPannerNode extends BasePannerNode {
   dspProcess(e) {
     const inputBus = this.getInput(0).getAudioBus();
     const outputBus = this.getOutput(0).getAudioBus();

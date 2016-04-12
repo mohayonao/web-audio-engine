@@ -1,14 +1,16 @@
 "use strict";
 
-const util = require("../_util");
+const util = require("../util");
 const AudioNode = require("./AudioNode");
 const ChannelSplitterNodeDSP = require("./dsp/ChannelSplitterNode");
 
 class ChannelSplitterNode extends AudioNode {
   constructor(context, opts) {
-    let numberOfOutputs = opts.numberOfOutputs;
+    opts = opts || /* istanbul ignore next */ {};
 
-    numberOfOutputs = util.toValidNumberOfChannels(numberOfOutputs || 6);
+    let numberOfOutputs = util.defaults(opts.numberOfOutputs, 6);
+
+    numberOfOutputs = util.toValidNumberOfChannels(numberOfOutputs);
 
     super(context, {
       inputs: [ 1 ],

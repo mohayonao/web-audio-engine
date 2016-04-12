@@ -1,6 +1,6 @@
 "use strict";
 
-const util = require("../_util");
+const util = require("../util");
 const AudioNode = require("./AudioNode");
 
 const PanningModelTypes = [ "equalpower", "HRTF" ];

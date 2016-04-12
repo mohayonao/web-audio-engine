@@ -73,10 +73,10 @@ describe("AudioWorkerNode", () => {
 
   describe("channel configuration", () => {
     it("should be kept by the initial configuration", () => {
-      const node1 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 4 ] });
+      const node1 = new AudioNode(context, { outputs: [ 4 ] });
       const node2 = new AudioWorkerNode(context, { worker, numberOfInputs: 4, numberOfOutputs: [ 1, 2 ] });
-      const node3 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
-      const node4 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      const node3 = new AudioNode(context, { inputs: [ 1 ] });
+      const node4 = new AudioNode(context, { inputs: [ 1 ] });
 
       node1.getOutput(0).enable();
       node2.getOutput(0).enable();

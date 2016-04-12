@@ -1,8 +1,8 @@
 "use strict";
 
-const assert = require("power-assert");
-const config = require("../_config");
-const util = require("../_util");
+const assert = require("assert");
+const config = require("../config");
+const util = require("../util");
 const EventTarget = require("./EventTarget");
 const AudioDestinationNode = require("./AudioDestinationNode");
 const AudioListener = require("./AudioListener");

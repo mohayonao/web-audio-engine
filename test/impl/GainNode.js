@@ -43,9 +43,9 @@ describe("GainNode", () => {
 
   describe("channel configuration", () => {
     it("should synchronize with the input", () => {
-      const node1 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 4 ] });
+      const node1 = new AudioNode(context, { outputs: [ 4 ] });
       const node2 = new GainNode(context);
-      const node3 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      const node3 = new AudioNode(context, { inputs: [ 1 ] });
 
       node1.getOutput(0).enable();
       node2.getOutput(0).enable();
@@ -69,7 +69,7 @@ describe("GainNode", () => {
         context.reset();
         context.resume();
 
-        node1 = new AudioNode(context, { inputs:[], outputs: [ 1 ] });
+        node1 = new AudioNode(context, { outputs: [ 1 ] });
         node2 = new GainNode(context);
         node1.enableOutputsIfNecessary();
         node1.connect(node2);
@@ -155,7 +155,7 @@ describe("GainNode", () => {
           context.reset();
           context.resume();
 
-          node1 = new AudioNode(context, { inputs:[], outputs: [ 2 ] });
+          node1 = new AudioNode(context, { outputs: [ 2 ] });
           node2 = new GainNode(context);
           node1.enableOutputsIfNecessary();
           node1.connect(node2);
@@ -265,7 +265,7 @@ describe("GainNode", () => {
           context.reset();
           context.resume();
 
-          node1 = new AudioNode(context, { inputs:[], outputs: [ 4 ] });
+          node1 = new AudioNode(context, { outputs: [ 4 ] });
           node2 = new GainNode(context);
           node1.enableOutputsIfNecessary();
           node1.connect(node2);

@@ -1,6 +1,6 @@
 "use strict";
 
-const util = require("../_util");
+const util = require("../util");
 const AudioSourceNode = require("./AudioSourceNode");
 const AudioBuffer = require("./AudioBuffer");
 const AudioBufferSourceNodeDSP = require("./dsp/AudioBufferSourceNode");

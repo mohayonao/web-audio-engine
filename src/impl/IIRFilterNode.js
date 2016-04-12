@@ -4,6 +4,8 @@ const AudioNode = require("./AudioNode");
 
 class IIRFilterNode extends AudioNode {
   constructor(context, opts) {
+    opts = opts || /* istanbul ignore next */ {};
+
     let feedforward = opts.feedforward;
     let feedback = opts.feedback;
 

@@ -1,3 +1,11 @@
+-----
+
+# STATE: WORK IN PROGRESS
+
+:godmode::godmode::godmode::godmode::godmode::godmode::goberserk::goberserk::goberserk::goberserk: _60%_
+
+-----
+
 # web-audio-engine
 [![Build Status](http://img.shields.io/travis/mohayonao/web-audio-engine.svg?style=flat-square)](https://travis-ci.org/mohayonao/web-audio-engine)
 [![NPM Version](http://img.shields.io/npm/v/web-audio-engine.svg?style=flat-square)](https://www.npmjs.org/package/web-audio-engine)
@@ -111,6 +119,7 @@ context.resume();
 $ git clone git@github.com:mohayonao/web-audio-engine.git
 $ cd web-audio-engine
 $ npm install .
+$ npm run build
 $ cd demo
 $ npm install .
 $ node . --help
@@ -126,6 +135,12 @@ Play demo with ALSA `aplay` command (recommended for linux user).
 
 ```
 $ node . sines | aplay -f cd
+```
+
+Rendering and export to the wav file.
+
+```
+$ node . -o out.wav sines
 ```
 
 ## License

@@ -1,6 +1,6 @@
 "use strict";
 
-const assert = require("power-assert");
+const assert = require("assert");
 
 const SET_VALUE_AT_TIME = 1;
 const LINEAR_RAMP_TO_VALUE_AT_TIME = 2;

@@ -1,6 +1,6 @@
 "use strict";
 
-const util = require("../_util");
+const util = require("../util");
 const AudioSourceNode = require("./AudioSourceNode");
 const PeriodicWave = require("./PeriodicWave");
 const OscillatorNodeDSP = require("./dsp/OscillatorNode");

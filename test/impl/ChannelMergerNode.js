@@ -69,9 +69,9 @@ describe("ChannelMergerNode", () => {
 
   describe("channel configuration", () => {
     it("should be kept by the initial configuration", () => {
-      const node1 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 4 ] });
+      const node1 = new AudioNode(context, { outputs: [ 4 ] });
       const node2 = new ChannelMergerNode(context, { numberOfInputs: 6 });
-      const node3 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      const node3 = new AudioNode(context, { inputs: [ 1 ] });
 
       node1.getOutput(0).enable();
       node2.getOutput(0).enable();
@@ -89,8 +89,8 @@ describe("ChannelMergerNode", () => {
 
   describe("enable/disable", () => {
     it("always enabled", () => {
-      const node1 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
-      const node2 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      const node1 = new AudioNode(context, { outputs: [ 1 ] });
+      const node2 = new AudioNode(context, { outputs: [ 1 ] });
       const node3 = new ChannelMergerNode(context, { numberOfInputs: 4 });
 
       node1.connect(node3, 0, 0);

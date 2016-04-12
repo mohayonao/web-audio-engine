@@ -1,6 +1,6 @@
 "use strict";
 
-const assert = require("power-assert");
+const assert = require("assert");
 const AudioNode = require("../AudioNode");
 
 const LOWPASS = 0;

@@ -1,10 +1,12 @@
 "use strict";
 
-const util = require("../_util");
+const util = require("../util");
 const AudioData = require("./core/AudioData");
 
 class AudioBuffer {
   constructor(context, opts) {
+    opts = opts || /* istanbul ignore next */ {};
+
     let numberOfChannels = opts.numberOfChannels;
     let length = opts.length;
     let sampleRate = opts.sampleRate;

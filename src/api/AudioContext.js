@@ -22,7 +22,7 @@ const ChannelMergerNode = require("./ChannelMergerNode");
 const DynamicsCompressorNode = require("./DynamicsCompressorNode");
 const OscillatorNode = require("./OscillatorNode");
 const PeriodicWave = require("./PeriodicWave");
-const decodeAudioData = require("../_util/decodeAudioDataAPI").decodeAudioData;
+const decodeAudioData = require("../util/decodeAudioDataAPI").decodeAudioData;
 
 class AudioContext extends EventTarget {
   constructor(opts) {
@@ -81,7 +81,7 @@ class AudioContext extends EventTarget {
 
   decodeAudioData(audioData, successCallback, errorCallback) {
     const promise = decodeAudioData(audioData, this.sampleRate).then((audioData) => {
-      const audioBuffer = new AudioBuffer(this, {});
+      const audioBuffer = new AudioBuffer(this);
       const implAudioData = audioBuffer._impl.getAudioData();
 
       implAudioData.numberOfChannels = audioData.numberOfChannels;

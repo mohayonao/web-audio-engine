@@ -1,6 +1,7 @@
 "use strict";
 
-const assert = require("power-assert");
+const assert = require("assert");
+const util = require("../util");
 const EventTarget = require("./EventTarget");
 const AudioNodeInput = require("./core/AudioNodeInput");
 const AudioNodeOutput = require("./core/AudioNodeOutput");
@@ -8,10 +9,12 @@ const AudioParam = require("./AudioParam");
 
 class AudioNode extends EventTarget {
   constructor(context, opts) {
-    let inputs = opts.inputs;
-    let outputs = opts.outputs;
-    let channelCount = opts.channelCount;
-    let channelCountMode = opts.channelCountMode;
+    opts = opts || /* istanbul ignore next */ {};
+
+    let inputs = util.defaults(opts.inputs, []);
+    let outputs = util.defaults(opts.outputs, []);
+    let channelCount = util.defaults(opts.channelCount, 1);
+    let channelCountMode = util.defaults(opts.channelCountMode, "max");
 
     super();
 
@@ -24,9 +27,6 @@ class AudioNode extends EventTarget {
     this._params = [];
     this._enabled = false;
     this._lastProcessingTime = -1;
-
-    channelCount = channelCount || 1;
-    channelCountMode = channelCountMode || "max";
 
     inputs.forEach((numberOfChannels) => {
       this.addInput(numberOfChannels, channelCount, channelCountMode);

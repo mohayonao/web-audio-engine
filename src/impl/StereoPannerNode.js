@@ -1,6 +1,6 @@
 "use strict";
 
-const util = require("../_util");
+const util = require("../util");
 const BasePannerNode = require("./BasePannerNode");
 const StereoPannerNodeDSP = require("./dsp/StereoPannerNode");
 
