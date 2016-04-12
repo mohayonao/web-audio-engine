@@ -1,6 +1,6 @@
 "use strict";
 
-const assert = require("power-assert");
+const assert = require("assert");
 const config = require("../config");
 const util = require("../util");
 const EventTarget = require("./EventTarget");

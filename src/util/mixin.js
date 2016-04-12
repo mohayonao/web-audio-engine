@@ -1,12 +1,12 @@
 "use strict";
 
-const assert = require("power-assert");
+const assert = require("assert");
 
 function mixin(targetKlass, partialKlass) {
   const partialProto = partialKlass.prototype;
   const targetProto = targetKlass.prototype;
 
-  assert(Object.getPrototypeOf(partialProto) === Object.getPrototypeOf(targetProto));
+  assert.equal(Object.getPrototypeOf(partialProto), Object.getPrototypeOf(targetProto), "SuperClasses aren't matched");
 
   Object.getOwnPropertyNames(partialProto).forEach((methodName) => {
     if (methodName !== "constructor") {

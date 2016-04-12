@@ -1,6 +1,6 @@
 "use strict";
 
-const assert = require("power-assert");
+const assert = require("assert");
 const util = require("../util");
 const AudioNode = require("./AudioNode");
 const BiquadFilterNodeDSP = require("./dsp/BiquadFilterNode");
