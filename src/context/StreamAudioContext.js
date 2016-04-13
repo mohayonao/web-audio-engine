@@ -21,10 +21,10 @@ class StreamAudioContext extends AudioContext {
 
     const blockSize = this._impl.processingSizeInFrames;
 
-    this._encoder = createEncoder(numberOfChannels, blockSize, bitDepth, floatingPoint);
-    this._blockSize = blockSize;
-    this._stream = { write: () => true };
-    this._isPlaying = false;
+    util.defineProp(this, "_encoder", createEncoder(numberOfChannels, blockSize, bitDepth, floatingPoint));
+    util.defineProp(this, "_blockSize", blockSize);
+    util.defineProp(this, "_stream", { write: () => true });
+    util.defineProp(this, "_isPlaying", false);
   }
 
   pipe(stream) {

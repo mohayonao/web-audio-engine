@@ -1,6 +1,7 @@
 "use strict";
 
 const impl = require("../impl");
+const util = require("../util");
 const EventTarget = require("./EventTarget");
 const AudioDestinationNode = require("./AudioDestinationNode");
 const AudioListener = require("./AudioListener");
@@ -28,7 +29,8 @@ class AudioContext extends EventTarget {
   constructor(opts) {
     super();
 
-    this._impl = new impl.AudioContext(opts);
+    util.defineProp(this, "_impl", new impl.AudioContext(opts));
+
     this._impl.$destination = new AudioDestinationNode(this, this._impl.getDestination());
     this._impl.$listener = new AudioListener(this, this._impl.getListener());
     this._impl.$onstatechange = null;

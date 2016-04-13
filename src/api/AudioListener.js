@@ -1,8 +1,10 @@
 "use strict";
 
+const util = require("../util");
+
 class AudioListener {
   constructor(context, impl) {
-    this._impl = impl;
+    util.defineProp(this, "_impl", impl);
   }
 
   setPosition(x, y, z) {

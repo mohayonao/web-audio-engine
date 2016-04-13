@@ -1,10 +1,11 @@
 "use strict";
 
+const util = require("../util");
 const impl = require("../impl");
 
 class AudioBuffer {
   constructor(context, opts) {
-    this._impl = new impl.AudioBuffer(context._impl, opts);
+    util.defineProp(this, "_impl", new impl.AudioBuffer(context._impl, opts));
   }
 
   get sampleRate() {

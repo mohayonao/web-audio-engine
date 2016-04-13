@@ -20,8 +20,8 @@ class RenderingAudioContext extends AudioContext {
 
     super({ sampleRate, numberOfChannels });
 
-    this._format = { sampleRate, numberOfChannels, bitDepth, floatingPoint };
-    this._rendered = [];
+    util.defineProp(this, "_format", { sampleRate, numberOfChannels, bitDepth, floatingPoint });
+    util.defineProp(this, "_rendered", []);
 
     this.resume();
   }

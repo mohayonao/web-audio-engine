@@ -1,11 +1,13 @@
 "use strict";
 
+const util = require("../util");
 const AudioParam = require("./AudioParam");
 
 class SpatialListener {
   constructor(context, impl) {
-    this._context = context;
-    this._impl = impl;
+    util.defineProp(this, "_context", context);
+    util.defineProp(this, "_impl", impl);
+
     this._impl.$positionX = new AudioParam(context, this._impl.getPositionX());
     this._impl.$positionY = new AudioParam(context, this._impl.getPositionY());
     this._impl.$positionZ = new AudioParam(context, this._impl.getPositionZ());
