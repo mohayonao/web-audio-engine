@@ -60,9 +60,9 @@ module.exports = function(context, util) {
 
     synth(midi, duration).connect(efx.input);
 
-    util.print("counter: " + (counter++) + "; fanOut: " + context.destination._impl.getInput(0).getNumberOfFanOuts());
+    console.log("counter: " + (counter++) + "; fanOut: " + context.destination._impl.getInput(0).getNumberOfFanOuts());
 
-    util.timerAPI.setTimeout(compose, nextTime);
+    setTimeout(compose, nextTime);
   }
 
   efx.output.connect(context.destination);

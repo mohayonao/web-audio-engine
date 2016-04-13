@@ -65,6 +65,6 @@
     "tickable-timer": "^1.0.0"
   },
   "license": "MIT",
-  "main": "index.js",
+  "main": "demo.js",
   "private": true
 }
