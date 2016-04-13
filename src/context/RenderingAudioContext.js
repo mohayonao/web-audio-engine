@@ -2,36 +2,34 @@
 
 const util = require("../util");
 const AudioContext = require("../api/AudioContext");
-const encodeAudioData = require("../util/encodeAudioDataAPI").encodeAudioData;
+const encoder = require("../encoder");
 
 class RenderingAudioContext extends AudioContext {
   constructor(opts) {
     opts = opts || /* istanbul ignore next */ {};
 
-    let sampleRate = opts.sampleRate;
-    let numberOfChannels = opts.channels || opts.numberOfChannels;
-    let bitDepth = opts.bitDepth;
+    let sampleRate = util.defaults(opts.sampleRate, 44100);
+    let numberOfChannels = util.defaults(opts.channels || opts.numberOfChannels, 2);
+    let bitDepth = util.defaults(opts.bitDepth, 16);
     let floatingPoint = opts.float || opts.floatingPoint;
 
-    sampleRate = util.defaults(sampleRate, 44100);
-    numberOfChannels = util.defaults(numberOfChannels, 2);
-    bitDepth = util.defaults(bitDepth, 16);
+    sampleRate = util.toValidSampleRate(sampleRate);
+    numberOfChannels = util.toValidNumberOfChannels(numberOfChannels);
+    bitDepth = util.toValidBitDepth(bitDepth);
     floatingPoint = !!floatingPoint;
 
     super({ sampleRate, numberOfChannels });
 
-    this._format = { sampleRate, numberOfChannels, bitDepth, floatingPoint };
-    this._rendered = [];
-
-    this.resume();
+    util.defineProp(this, "_format", { sampleRate, numberOfChannels, bitDepth, floatingPoint });
+    util.defineProp(this, "_rendered", []);
   }
 
-  get processingSizeInFrames() {
-    return this._impl.processingSizeInFrames;
+  get blockSize() {
+    return this._impl.blockSize;
   }
 
   processTo(time) {
-    time = toAudioTime(time);
+    time = util.toAudioTime(time);
 
     const duration = time - this.currentTime;
 
@@ -40,21 +38,25 @@ class RenderingAudioContext extends AudioContext {
     }
 
     const impl = this._impl;
-    const processingSizeInFrames = impl.processingSizeInFrames;
-    const numberOfProcessing = Math.ceil(duration / processingSizeInFrames);
-    const bufferLength = processingSizeInFrames * numberOfProcessing;
+    const blockSize = impl.blockSize;
+    const numberOfProcessing = Math.ceil(duration / blockSize);
+    const bufferLength = blockSize * numberOfProcessing;
     const numberOfChannels = this._format.numberOfChannels;
     const buffers = new Array(numberOfChannels).fill().map(() => new Float32Array(bufferLength));
+
+    impl.changeState("running");
 
     for (let i = 0; i < numberOfProcessing; i++) {
       const audioData = impl.process();
 
       for (let ch = 0; ch < numberOfChannels; ch++) {
-        buffers[ch].set(audioData.channelData[ch], i * processingSizeInFrames);
+        buffers[ch].set(audioData.channelData[ch], i * blockSize);
       }
     }
 
     this._rendered.push(buffers);
+
+    impl.changeState("suspended");
   }
 
   exportAsAudioData() {
@@ -78,28 +80,8 @@ class RenderingAudioContext extends AudioContext {
 
   encodeAudioData(audioData, opts) {
     opts = Object.assign({}, this._format, opts);
-    return encodeAudioData(audioData, opts);
+    return encoder.encode(audioData, opts);
   }
-}
-
-function toAudioTime(str) {
-  if (Number.isFinite(+str)) {
-    const time = Math.max(0, +str);
-
-    return Number.isFinite(time) ? time : 0;
-  }
-
-  const matched = ("" + str).match(/^(?:(\d\d+):)?(\d\d?):(\d\d?(?:\.\d+)?)$/);
-
-  if (matched) {
-    const hours = +matched[1]|0;
-    const minutes = +matched[2];
-    const seconds = +matched[3];
-
-    return hours * 3600 + minutes * 60 + seconds;
-  }
-
-  return 0;
 }
 
 module.exports = RenderingAudioContext;

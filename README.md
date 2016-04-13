@@ -66,7 +66,7 @@ npm install --save web-audio-engine
   - `time`: e.g. `10` (10 seconds), `"01:30.500"` (convert to 90.5 seconds)
 - `exportAsAudioData(): AudioData`
   - export the rendered data as `AudioData` format
-- `encodeAudioData(audioData: AudioData, opts? object): Promise<ArrayBuffer>`
+- `encodeAudioData(audioData: AudioData, opts?: object): Promise<ArrayBuffer>`
   - encode audio data to the binary format
   - `opts.bitDepth: number` - _default: 16_
   - `opts.float: boolean` - _default: false_
@@ -122,25 +122,25 @@ $ npm install .
 $ npm run build
 $ cd demo
 $ npm install .
-$ node . --help
+$ node demo --help
 ```
 
 Play demo with SoX `play` command (recommended for mac user).
 
 ```
-$ node . sines | play -t s16 -r 44100 -c 2 -
+$ node demo sines | play -t s16 -r 44100 -c 2 -
 ```
 
 Play demo with ALSA `aplay` command (recommended for linux user).
 
 ```
-$ node . sines | aplay -f cd
+$ node demo sines | aplay -f cd
 ```
 
 Rendering and export to the wav file.
 
 ```
-$ node . -o out.wav sines
+$ node demo -o out.wav sines
 ```
 
 ## License

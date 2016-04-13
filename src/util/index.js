@@ -1,6 +1,9 @@
 "use strict";
 
 module.exports.mixin = require("./mixin");
+module.exports.defineProp = require("./defineProp");
+module.exports.toAudioTime = require("./toAudioTime");
+module.exports.toValidBitDepth = require("./toValidBitDepth");
 
 function clip(value, minValue, maxValue) {
   return Math.max(minValue, Math.min(value, maxValue));
@@ -41,13 +44,13 @@ function toValidSampleRate(value) {
 }
 module.exports.toValidSampleRate = toValidSampleRate;
 
-const MIN_PROCESSING_SIZE_IN_FRAMES = 8;
-const MAX_PROCESSING_SIZE_IN_FRAMES = 1024;
+const MIN_BLOCK_SIZE = 8;
+const MAX_BLOCK_SIZE = 1024;
 
-function toValidProcessingSizeInFrames(value) {
-  return clip(toPowerOfTwo(value), MIN_PROCESSING_SIZE_IN_FRAMES, MAX_PROCESSING_SIZE_IN_FRAMES);
+function toValidBlockSize(value) {
+  return clip(toPowerOfTwo(value), MIN_BLOCK_SIZE, MAX_BLOCK_SIZE);
 }
-module.exports.toValidProcessingSizeInFrames = toValidProcessingSizeInFrames;
+module.exports.toValidBlockSize = toValidBlockSize;
 
 const MAX_NUMBER_OF_CHANNELS = 32;
 

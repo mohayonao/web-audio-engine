@@ -7,7 +7,7 @@ const ConvolverNode = require("../../src/impl/ConvolverNode");
 const AudioBuffer = require("../../src/impl/AudioBuffer");
 const AudioNode = require("../../src/impl/AudioNode");
 
-const context = new AudioContext({ sampleRate: 8000, processingSizeInFrames: 16 });
+const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
 const buffer = new AudioBuffer(2, 32, context.sampleRate);
 const testSpec = {};
 

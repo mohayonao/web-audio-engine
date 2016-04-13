@@ -14,7 +14,7 @@ class AudioParam {
     let defaultValue = util.defaults(opts.defaultValue, 0);
 
     this.context = context;
-    this.processingSizeInFrames = context.processingSizeInFrames;
+    this.blockSize = context.blockSize;
     this.sampleRate = context.sampleRate;
     this._rate = this.fromRateName(rate);
     this._defaultValue = util.toNumber(defaultValue);
@@ -30,7 +30,7 @@ class AudioParam {
       })
     ];
     this._outpus = [];
-    this._outputBus = new AudioBus(1, this.processingSizeInFrames, this.sampleRate);
+    this._outputBus = new AudioBus(1, this.blockSize, this.sampleRate);
 
     this.dspInit(this._rate);
   }

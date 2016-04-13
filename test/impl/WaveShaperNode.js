@@ -8,7 +8,7 @@ const AudioContext = require("../../src/impl/AudioContext");
 const WaveShaperNode = require("../../src/impl/WaveShaperNode");
 const AudioNode = require("../../src/impl/AudioNode");
 
-const context = new AudioContext({ sampleRate: 8000, processingSizeInFrames: 16 });
+const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
 const curve = new Float32Array(128);
 const testSpec = {};
 

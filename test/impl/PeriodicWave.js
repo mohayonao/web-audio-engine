@@ -5,7 +5,7 @@ const attrTester = require("../helpers/attrTester");
 const AudioContext = require("../../src/impl/AudioContext");
 const PeriodicWave = require("../../src/impl/PeriodicWave");
 
-const context = new AudioContext({ sampleRate: 8000, processingSizeInFrames: 16 });
+const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
 const real = new Float32Array([ 0, 0 ]);
 const imag = new Float32Array([ 0, 1 ]);
 const testSpec = {};

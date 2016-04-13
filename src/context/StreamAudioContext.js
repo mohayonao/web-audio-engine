@@ -3,28 +3,35 @@
 const util = require("../util");
 const AudioContext = require("../api/AudioContext");
 
+const noopWriter = { write: () => true };
+
 class StreamAudioContext extends AudioContext {
   constructor(opts) {
     opts = opts || /* istanbul ignore next */ {};
 
-    let sampleRate = opts.sampleRate;
-    let numberOfChannels = opts.channels || opts.numberOfChannels;
-    let bitDepth = opts.bitDepth;
+    let sampleRate = util.defaults(opts.sampleRate, 44100);
+    let numberOfChannels = util.defaults(opts.channels || opts.numberOfChannels, 2);
+    let bitDepth = util.defaults(opts.bitDepth, 16);
     let floatingPoint = opts.float || opts.floatingPoint;
 
-    sampleRate = util.defaults(sampleRate, 44100);
-    numberOfChannels = util.defaults(numberOfChannels, 2);
-    bitDepth = util.defaults(bitDepth, 16);
+    sampleRate = util.toValidSampleRate(sampleRate);
+    numberOfChannels = util.toValidNumberOfChannels(numberOfChannels);
+    bitDepth = util.toValidBitDepth(bitDepth);
     floatingPoint = !!floatingPoint;
 
     super({ sampleRate, numberOfChannels });
 
-    const blockSize = this._impl.processingSizeInFrames;
+    const blockSize = this._impl.blockSize;
+    const encoder = createEncoder(numberOfChannels, blockSize, bitDepth, floatingPoint);
 
-    this._encoder = createEncoder(numberOfChannels, blockSize, bitDepth, floatingPoint);
-    this._blockSize = blockSize;
-    this._stream = { write: () => true };
-    this._isPlaying = false;
+    util.defineProp(this, "_encoder", encoder);
+    util.defineProp(this, "_blockSize", blockSize);
+    util.defineProp(this, "_stream", noopWriter);
+    util.defineProp(this, "_isPlaying", false);
+  }
+
+  get blockSize() {
+    return this._impl.blockSize;
   }
 
   pipe(stream) {
@@ -58,7 +65,7 @@ class StreamAudioContext extends AudioContext {
     const timerStartTime = Date.now();
     const encoder = this._encoder;
     const impl = this._impl;
-    const aheadTime = (this._blockSize / this.sampleRate) * 8;
+    const aheadTime = 0.1;
 
     const renderingProcess = () => {
       if (this.state !== "running") {
@@ -78,10 +85,10 @@ class StreamAudioContext extends AudioContext {
         }
       }
 
-      setImmediate(renderingProcess);
+      global.setImmediate(renderingProcess);
     };
     this._isPlaying = true;
-    setImmediate(renderingProcess);
+    global.setImmediate(renderingProcess);
   }
 
   _suspend() {

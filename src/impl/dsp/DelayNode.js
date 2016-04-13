@@ -5,12 +5,12 @@ const AudioBus = require("../core/AudioBus");
 
 class DelayNode extends AudioNode {
   dspInit(maxDelayTime) {
-    const frameToDelay = computeFrameToDelay(maxDelayTime, this.sampleRate, this.processingSizeInFrames);
+    const frameToDelay = computeFrameToDelay(maxDelayTime, this.sampleRate, this.blockSize);
 
     this._delayBus = new AudioBus(1, frameToDelay, this.sampleRate);
     this._delayBusLength = frameToDelay;
     this._delayIndex = 0;
-    this._delayIndexes = new Float32Array(this.processingSizeInFrames);
+    this._delayIndexes = new Float32Array(this.blockSize);
   }
 
   enableOutputsIfNecessary() {
@@ -54,7 +54,7 @@ class DelayNode extends AudioNode {
       this.dspKernelProcess(buffers[ch], outputs[ch], delayIndexes, inNumSamples);
     }
 
-    this._delayIndex += this.processingSizeInFrames;
+    this._delayIndex += this.blockSize;
 
     if (this._delayIndex === this._delayBusLength) {
       this._delayIndex = 0;

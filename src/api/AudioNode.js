@@ -1,13 +1,14 @@
 "use strict";
 
+const util = require("../util");
 const EventTarget = require("./EventTarget");
 
 class AudioNode extends EventTarget {
   constructor(context) {
     super();
 
-    this._context = context;
-    this._impl = null;
+    util.defineProp(this, "_context", context);
+    util.defineProp(this, "_impl", null);
   }
 
   get context() {

@@ -8,7 +8,7 @@ const AudioContext = require("../../src/impl/AudioContext");
 const AudioBuffer = require("../../src/impl/AudioBuffer");
 const AudioData = require("../../src/impl/core/AudioData");
 
-const context = new AudioContext({ sampleRate: 8000, processingSizeInFrames: 16 });
+const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
 const testSpec = {};
 
 testSpec.sampleRate = {
