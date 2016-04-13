@@ -8,22 +8,20 @@ class RenderingAudioContext extends AudioContext {
   constructor(opts) {
     opts = opts || /* istanbul ignore next */ {};
 
-    let sampleRate = opts.sampleRate;
-    let numberOfChannels = opts.channels || opts.numberOfChannels;
-    let bitDepth = opts.bitDepth;
+    let sampleRate = util.defaults(opts.sampleRate, 44100);
+    let numberOfChannels = util.defaults(opts.channels || opts.numberOfChannels, 2);
+    let bitDepth = util.defaults(opts.bitDepth, 16);
     let floatingPoint = opts.float || opts.floatingPoint;
 
-    sampleRate = util.defaults(sampleRate, 44100);
-    numberOfChannels = util.defaults(numberOfChannels, 2);
-    bitDepth = util.defaults(bitDepth, 16);
+    sampleRate = util.toValidSampleRate(sampleRate);
+    numberOfChannels = util.toValidNumberOfChannels(numberOfChannels);
+    bitDepth = util.toValidBitDepth(bitDepth);
     floatingPoint = !!floatingPoint;
 
     super({ sampleRate, numberOfChannels });
 
     util.defineProp(this, "_format", { sampleRate, numberOfChannels, bitDepth, floatingPoint });
     util.defineProp(this, "_rendered", []);
-
-    this.resume();
   }
 
   get blockSize() {
@@ -46,6 +44,8 @@ class RenderingAudioContext extends AudioContext {
     const numberOfChannels = this._format.numberOfChannels;
     const buffers = new Array(numberOfChannels).fill().map(() => new Float32Array(bufferLength));
 
+    impl.changeState("running");
+
     for (let i = 0; i < numberOfProcessing; i++) {
       const audioData = impl.process();
 
@@ -55,6 +55,8 @@ class RenderingAudioContext extends AudioContext {
     }
 
     this._rendered.push(buffers);
+
+    impl.changeState("suspended");
   }
 
   exportAsAudioData() {
