@@ -2,7 +2,7 @@
 
 const util = require("../util");
 const AudioContext = require("../api/AudioContext");
-const encodeAudioData = require("../util/encodeAudioDataAPI").encodeAudioData;
+const encoder = require("../encoder");
 
 class RenderingAudioContext extends AudioContext {
   constructor(opts) {
@@ -78,7 +78,7 @@ class RenderingAudioContext extends AudioContext {
 
   encodeAudioData(audioData, opts) {
     opts = Object.assign({}, this._format, opts);
-    return encodeAudioData(audioData, opts);
+    return encoder.encode(audioData, opts);
   }
 }
 
