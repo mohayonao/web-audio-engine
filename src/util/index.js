@@ -2,6 +2,7 @@
 
 module.exports.mixin = require("./mixin");
 module.exports.defineProp = require("./defineProp");
+module.exports.toAudioTime = require("./toAudioTime");
 
 function clip(value, minValue, maxValue) {
   return Math.max(minValue, Math.min(value, maxValue));
