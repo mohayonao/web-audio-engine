@@ -10,7 +10,7 @@ const AudioParam = require("../../src/impl/AudioParam");
 const AudioNode = require("../../src/impl/AudioNode");
 const GainNode = require("../../src/impl/GainNode")
 
-const context = new AudioContext({ sampleRate: 8000, processingSizeInFrames: 16 });
+const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
 const testSpec = {};
 
 testSpec.context = {
@@ -187,7 +187,7 @@ describe("AudioParam", () => {
     });
 
     function procEvent(times) {
-      const inNumSamples = context.processingSizeInFrames;
+      const inNumSamples = context.blockSize;
       const currentTime = (inNumSamples * times) / 8000;
       const nextCurrentTime = (inNumSamples * (times + 1)) / 8000;
       const sampleRate = context.sampleRate;
@@ -269,7 +269,7 @@ describe("AudioParam", () => {
     });
 
     function procEvent(times) {
-      const inNumSamples = context.processingSizeInFrames;
+      const inNumSamples = context.blockSize;
       const currentTime = (inNumSamples * times) / 8000;
       const nextCurrentTime = (inNumSamples * (times + 1)) / 8000;
       const sampleRate = context.sampleRate;

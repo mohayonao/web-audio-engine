@@ -6,7 +6,7 @@ const AudioContext = require("../../src/impl/AudioContext");
 const BasePannerNode = require("../../src/impl/BasePannerNode");
 const AudioNode = require("../../src/impl/AudioNode");
 
-const context = new AudioContext({ sampleRate: 8000, processingSizeInFrames: 16 });
+const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
 const testSpec = {};
 
 testSpec.numberOfInputs = {

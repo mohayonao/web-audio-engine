@@ -5,7 +5,7 @@ const AudioContext = require("../../src/impl/AudioContext");
 const PannerNode = require("../../src/impl/PannerNode");
 const BasePannerNode = require("../../src/impl/BasePannerNode");
 
-const context = new AudioContext({ sampleRate: 8000, processingSizeInFrames: 16 });
+const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
 
 describe("PannerNode", () => {
   describe("inherits", () => {

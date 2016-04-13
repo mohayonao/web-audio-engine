@@ -14,7 +14,7 @@ class AudioNodeInput {
 
     this.node = node;
     this.index = index|0;
-    this._audioBus = new AudioBus(numberOfChannels, node.processingSizeInFrames, node.sampleRate);
+    this._audioBus = new AudioBus(numberOfChannels, node.blockSize, node.sampleRate);
     this._audioBus.setChannelInterpretation("speakers");
     this._channelCount = channelCount|0;
     this._channelCountMode = channelCountMode;

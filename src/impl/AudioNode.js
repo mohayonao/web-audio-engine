@@ -19,7 +19,7 @@ class AudioNode extends EventTarget {
     super();
 
     this.context = context;
-    this.processingSizeInFrames = context.processingSizeInFrames;
+    this.blockSize = context.blockSize;
     this.sampleRate = context.sampleRate;
 
     this._inputs = [];

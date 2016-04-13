@@ -8,7 +8,7 @@ const AudioDestinationNode = require("../../src/impl/AudioDestinationNode");
 const AudioListener = require("../../src/impl/AudioListener");
 const AudioData = require("../../src/impl/core/AudioData");
 
-const contextOpts = { sampleRate: 8000, processingSizeInFrames: 16 };
+const contextOpts = { sampleRate: 8000, blockSize: 16 };
 const testSpec = {};
 
 testSpec.destination = {

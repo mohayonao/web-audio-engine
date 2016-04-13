@@ -14,11 +14,11 @@ class AudioContext extends EventTarget {
     opts = Object.assign({}, config, opts);
 
     const sampleRate = util.toValidSampleRate(opts.sampleRate);
-    const processingSizeInFrames = util.toValidProcessingSizeInFrames(opts.processingSizeInFrames, sampleRate);
+    const blockSize = util.toValidBlockSize(opts.blockSize, sampleRate);
     const numberOfChannels = util.toValidNumberOfChannels(opts.numberOfChannels);
 
     this.sampleRate = sampleRate;
-    this.processingSizeInFrames = processingSizeInFrames;
+    this.blockSize = blockSize;
     this.numberOfChannels = numberOfChannels;
     this.currentTime = 0;
     this._destination = new AudioDestinationNode(this, { numberOfChannels });
@@ -111,7 +111,7 @@ class AudioContext extends EventTarget {
 
     if (this._state === "running") {
       const sampleRate = this.sampleRate;
-      const inNumSamples = this.processingSizeInFrames;
+      const inNumSamples = this.blockSize;
       const currentTime = this.currentTime;
       const nextCurrentTime = currentTime + (inNumSamples / sampleRate);
       const procItem = { sampleRate, inNumSamples, currentTime, nextCurrentTime };

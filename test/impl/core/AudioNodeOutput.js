@@ -10,7 +10,7 @@ const AudioContext = require("../../../src/impl/AudioContext");
 const AudioNode = require("../../../src/impl/AudioNode");
 const GainNode = require("../../../src/impl/GainNode");
 
-const context = new AudioContext({ sampleRate: 8000, processingSizeInFrames: 16 });
+const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
 const testSpec = {};
 
 testSpec.audioBus = {

@@ -7,7 +7,7 @@ const StereoPannerNode = require("../../src/impl/StereoPannerNode");
 const BasePannerNode = require("../../src/impl/BasePannerNode");
 const AudioParam = require("../../src/impl/AudioParam");
 
-const context = new AudioContext({ sampleRate: 8000, processingSizeInFrames: 16 });
+const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
 const testSpec = {};
 
 testSpec.pan = {

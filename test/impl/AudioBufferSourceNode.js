@@ -9,7 +9,7 @@ const AudioSourceNode = require("../../src/impl/AudioSourceNode");
 const AudioBuffer = require("../../src/impl/AudioBuffer");
 const AudioParam = require("../../src/impl/AudioParam");
 
-const context = new AudioContext({ sampleRate: 8000, processingSizeInFrames: 16 });
+const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
 const testSpec = {};
 
 testSpec.numberOfInputs = {

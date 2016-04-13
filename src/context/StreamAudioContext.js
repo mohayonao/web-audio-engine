@@ -19,7 +19,7 @@ class StreamAudioContext extends AudioContext {
 
     super({ sampleRate, numberOfChannels });
 
-    const blockSize = this._impl.processingSizeInFrames;
+    const blockSize = this._impl.blockSize;
 
     util.defineProp(this, "_encoder", createEncoder(numberOfChannels, blockSize, bitDepth, floatingPoint));
     util.defineProp(this, "_blockSize", blockSize);

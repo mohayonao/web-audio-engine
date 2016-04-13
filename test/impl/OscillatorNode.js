@@ -12,7 +12,7 @@ const AudioSourceNode = require("../../src/impl/AudioSourceNode");
 const PeriodicWave = require("../../src/impl/PeriodicWave");
 const AudioParam = require("../../src/impl/AudioParam");
 
-const context = new AudioContext({ sampleRate: 8000, processingSizeInFrames: 16 });
+const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
 const wave = new PeriodicWave(context, { real: [ 0, 0 ], imag: [ 0, 1 ] });
 const testSpec = {};
 

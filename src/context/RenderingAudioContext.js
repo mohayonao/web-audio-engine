@@ -26,8 +26,8 @@ class RenderingAudioContext extends AudioContext {
     this.resume();
   }
 
-  get processingSizeInFrames() {
-    return this._impl.processingSizeInFrames;
+  get blockSize() {
+    return this._impl.blockSize;
   }
 
   processTo(time) {
@@ -40,9 +40,9 @@ class RenderingAudioContext extends AudioContext {
     }
 
     const impl = this._impl;
-    const processingSizeInFrames = impl.processingSizeInFrames;
-    const numberOfProcessing = Math.ceil(duration / processingSizeInFrames);
-    const bufferLength = processingSizeInFrames * numberOfProcessing;
+    const blockSize = impl.blockSize;
+    const numberOfProcessing = Math.ceil(duration / blockSize);
+    const bufferLength = blockSize * numberOfProcessing;
     const numberOfChannels = this._format.numberOfChannels;
     const buffers = new Array(numberOfChannels).fill().map(() => new Float32Array(bufferLength));
 
@@ -50,7 +50,7 @@ class RenderingAudioContext extends AudioContext {
       const audioData = impl.process();
 
       for (let ch = 0; ch < numberOfChannels; ch++) {
-        buffers[ch].set(audioData.channelData[ch], i * processingSizeInFrames);
+        buffers[ch].set(audioData.channelData[ch], i * blockSize);
       }
     }
 

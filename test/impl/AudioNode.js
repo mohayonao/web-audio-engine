@@ -10,7 +10,7 @@ const AudioNodeInput = require("../../src/impl/core/AudioNodeInput");
 const AudioNodeOutput = require("../../src/impl/core/AudioNodeOutput");
 const GainNode = require("../../src/impl/GainNode");
 
-const context = new AudioContext({ sampleRate: 8000, processingSizeInFrames: 16 });
+const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
 const testSpec = {};
 
 testSpec.context = {
@@ -82,10 +82,10 @@ describe("AudioNode", () => {
 
       assert(node.sampleRate === context.sampleRate);
     });
-    it(".processingSizeInFrames", () => {
+    it(".blockSize", () => {
       const node = new AudioNode(context);
 
-      assert(node.processingSizeInFrames === context.processingSizeInFrames);
+      assert(node.blockSize === context.blockSize);
     });
   });
 
