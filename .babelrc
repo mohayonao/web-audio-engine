@@ -8,9 +8,8 @@
     },
     "development": {
       "only": [ "src", "test" ],
-      "plugins": [
-        [ "babel-plugin-empower-assert" ],
-        [ "babel-plugin-espower" ]
+      "presets": [
+        "babel-preset-power-assert"
       ]
     },
     "coverage": {
