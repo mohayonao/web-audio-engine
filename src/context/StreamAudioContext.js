@@ -2,7 +2,7 @@
 
 const util = require("../util");
 const AudioContext = require("../api/AudioContext");
-
+const setImmediate = global.setImmediate || /* istanbul ignore next */ (fn => setTimeout(fn, 0));
 const noopWriter = { write: () => true };
 
 class StreamAudioContext extends AudioContext {
@@ -10,18 +10,19 @@ class StreamAudioContext extends AudioContext {
     opts = opts || /* istanbul ignore next */ {};
 
     let sampleRate = util.defaults(opts.sampleRate, 44100);
+    let blockSize = util.defaults(opts.blockSize, 128);
     let numberOfChannels = util.defaults(opts.channels || opts.numberOfChannels, 2);
     let bitDepth = util.defaults(opts.bitDepth, 16);
     let floatingPoint = opts.float || opts.floatingPoint;
 
     sampleRate = util.toValidSampleRate(sampleRate);
+    blockSize = util.toValidBlockSize(blockSize);
     numberOfChannels = util.toValidNumberOfChannels(numberOfChannels);
     bitDepth = util.toValidBitDepth(bitDepth);
     floatingPoint = !!floatingPoint;
 
-    super({ sampleRate, numberOfChannels });
+    super({ sampleRate, blockSize, numberOfChannels });
 
-    const blockSize = this._impl.blockSize;
     const encoder = createEncoder(numberOfChannels, blockSize, bitDepth, floatingPoint);
 
     util.defineProp(this, "_encoder", encoder);
@@ -85,10 +86,10 @@ class StreamAudioContext extends AudioContext {
         }
       }
 
-      global.setImmediate(renderingProcess);
+      setImmediate(renderingProcess);
     };
     this._isPlaying = true;
-    global.setImmediate(renderingProcess);
+    setImmediate(renderingProcess);
   }
 
   _suspend() {
