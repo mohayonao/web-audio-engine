@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>web-audio-engine :: benchmark</title>
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/es6-shim/0.35.0/es6-shim.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/setImmediate/1.0.4/setImmediate.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.11.1/lodash.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/platform/1.3.1/platform.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/benchmark/2.1.0/benchmark.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.21/vue.min.js"></script>
+  <script src="../build/web-audio-engine.js"></script>
+  <style>
+  textarea { font-family: 'Courier', monospace }
+  .btn { width: 100px; outline: none !important }
+  #app { margin-top: 15px }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>web-audio-engine :: benchmark</h1>
+      <div>Pure JS implementation of the Web Audio API</div>
+    </div>
+    <div id="app">
+      <div class="form-horizontal">
+        <div class="alert alert-danger" role="alert" style="display: none" id="doesntWork">This benchmark doesn't work in Chrome or Safari, please use Firefox.</div>
+        <div class="form-group">
+          <label class="col-sm-1 control-label"></label>
+          <div class="col-sm-11">
+            <button class="btn" :class="isPlaying ? 'btn-success' : 'btn-default'" v-on:click="run">Run test</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-1 control-label">suite</label>
+          <div class="col-sm-11">
+            <select class="form-control" v-model="selected" v-on:change="loadScript">
+              <option v-for="name in list" v-bind:value="name">{{ name }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-1 control-label">code</label>
+          <div class="col-sm-11">
+            <textarea rows="15" class="form-control">{{ code }}</textarea>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-1 control-label">result</label>
+          <div class="col-sm-11">
+            <textarea rows="10" class="form-control">{{ result }}</textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+  (function() {
+    if (typeof Float32Array.prototype.fill !== "function") {
+      Float32Array.prototype.fill = function(value) {
+        for (var i = 0, imax = this.length; i < imax; i++) {
+          this[i] = value;
+        }
+        return this;
+      };
+    }
+    if (typeof Float32Array.prototype.map !== "function") {
+      Float32Array.prototype.map = function(fn) {
+        var array = new Float32Array(this.length);
+        for (var i = 0, imax = this.length; i < imax; i++) {
+          array[i] = fn(this[i], i);
+        }
+        return array;
+      };
+    }
+  })();
+  window.global = window;
+  window.module = { exports: null };
+  window.OfflineAudioContext = window.OfflineAudioContext || window.webkitOfflineAudioContext;
+  window.addEventListener("DOMContentLoaded", function() {
+    "use strict";
+
+    function fetch(url) {
+      return new Promise(function(resolve, reject) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url);
+        if (/\.(wav|mp3|ogg|aif)$/.test(url)) {
+          xhr.responseType = "arraybuffer";
+        }
+        xhr.onload = function() {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              resolve({
+                text: function() { return xhr.response; },
+                arrayBuffer: function() { return xhr.response; }
+              });
+            } else {
+              reject(new TypeError(xhr.statusText));
+            }
+          }
+        };
+        xhr.onerror = function() { reject(new TypeError(xhr.statusText)); };
+        xhr.send();
+      });
+    }
+
+    function loadScript(name) {
+      return fetch("./suites/" + name + ".js").then(function(res) {
+        return res.text();
+      });
+    }
+
+    function compile(source) {
+      try {
+        return eval(source);
+      } catch (e) {
+        console.error(e);
+        return null;
+      }
+    }
+
+    function runInContext(OfflineAudioContext, func, done) {
+      var context = new OfflineAudioContext(2, 44100, 44100);
+
+      // for web-audio-engine
+      context._renderingIterations = 65536;
+
+      func(context);
+
+      context.oncomplete = function() {
+        done();
+      };
+
+      context.startRendering();
+    }
+
+    function benchmark(func, done) {
+      var suite = new Benchmark.Suite();
+
+      suite.add("web-audio-engine", function(deferred) {
+        runInContext(WebAudioEngine.OfflineAudioContext, func, function() {
+          deferred.resolve();
+        });
+      }, { defer: true });
+
+      suite.add("native Web Audio API", function(deferred) {
+        runInContext(OfflineAudioContext, func, function() {
+          deferred.resolve();
+        });
+      }, { defer: true });
+
+      suite.on("cycle", function(event) {
+        var line = "" + event.target;
+
+        vue.result += line + "\n";
+        console.log(line);
+      });
+
+      suite.on("error", function(e) {
+        console.error(e);
+      });
+
+      suite.on("complete", function() {
+        var line = "Fastest is " + this.filter("fastest").map("name");
+
+        vue.result += line + "\n";
+        console.log(line);
+
+        done(suite);
+      });
+
+      suite.run({ async: true });
+
+      return suite;
+    }
+
+    function run(code, done) {
+      var func = compile(code);
+
+      if (typeof func !== "function") {
+        return done();
+      }
+
+      benchmark(func, function(suite) {
+        done();
+      });
+    }
+
+    var vue = new Vue({
+      el: "#app",
+      data: {
+        isPlaying: false,
+        selected: "simple-sine",
+        list: [ "simple-sine", "simple-gain", "sched-sine" ],
+        code: "",
+        result: ""
+      },
+      methods: {
+        run: function() {
+          var _this = this;
+          if (this.isPlaying) {
+            return;
+          }
+          this.isPlaying = true;
+          this.result = navigator.userAgent + "\n";
+          run(this.code, function() {
+            _this.isPlaying = false;
+          });
+        },
+        loadScript: function() {
+          var _this = this;
+          loadScript(this.selected).then(function(source) {
+            _this.code = source;
+          }).catch(function(e) {
+            console.error(e);
+          });
+        }
+      }
+    });
+
+    if (!/firefox/i.test(navigator.userAgent)) {
+      document.getElementById("doesntWork").style.display = "block";
+    }
+
+    vue.loadScript();
+  });
+  </script>
+</body>
+</html>
