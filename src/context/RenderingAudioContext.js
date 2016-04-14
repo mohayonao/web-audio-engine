@@ -39,14 +39,14 @@ class RenderingAudioContext extends AudioContext {
 
     const impl = this._impl;
     const blockSize = impl.blockSize;
-    const numberOfProcessing = Math.ceil(duration / blockSize);
-    const bufferLength = blockSize * numberOfProcessing;
+    const iterations = Math.ceil(duration * this.sampleRate / blockSize);
+    const bufferLength = blockSize * iterations;
     const numberOfChannels = this._format.numberOfChannels;
     const buffers = new Array(numberOfChannels).fill().map(() => new Float32Array(bufferLength));
 
     impl.changeState("running");
 
-    for (let i = 0; i < numberOfProcessing; i++) {
+    for (let i = 0; i < iterations; i++) {
       const audioData = impl.process();
 
       for (let ch = 0; ch < numberOfChannels; ch++) {
