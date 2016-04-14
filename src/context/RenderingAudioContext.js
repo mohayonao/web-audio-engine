@@ -9,16 +9,18 @@ class RenderingAudioContext extends AudioContext {
     opts = opts || /* istanbul ignore next */ {};
 
     let sampleRate = util.defaults(opts.sampleRate, 44100);
+    let blockSize = util.defaults(opts.blockSize, 128);
     let numberOfChannels = util.defaults(opts.channels || opts.numberOfChannels, 2);
     let bitDepth = util.defaults(opts.bitDepth, 16);
     let floatingPoint = opts.float || opts.floatingPoint;
 
     sampleRate = util.toValidSampleRate(sampleRate);
+    blockSize = util.toValidBlockSize(blockSize);
     numberOfChannels = util.toValidNumberOfChannels(numberOfChannels);
     bitDepth = util.toValidBitDepth(bitDepth);
     floatingPoint = !!floatingPoint;
 
-    super({ sampleRate, numberOfChannels });
+    super({ sampleRate, blockSize, numberOfChannels });
 
     util.defineProp(this, "_format", { sampleRate, numberOfChannels, bitDepth, floatingPoint });
     util.defineProp(this, "_rendered", []);

@@ -11,14 +11,16 @@ class WebAudioContext extends AudioContext {
     let destination = opts.destination || opts.context.destination;
     let context = destination.context;
     let sampleRate = context.sampleRate;
+    let blockSize = util.defaults(opts.blockSize, 128);
     let numberOfChannels = util.defaults(opts.numberOfChannels, 2);
     let bufferSize = util.defaults(bufferSize, 1024);
 
+    blockSize = util.toValidBlockSize(blockSize);
     numberOfChannels = util.toValidNumberOfChannels(numberOfChannels);
     bufferSize = util.toPowerOfTwo(bufferSize);
     bufferSize = Math.max(256, Math.min(bufferSize, 16384));
 
-    super({ sampleRate, numberOfChannels });
+    super({ sampleRate, blockSize, numberOfChannels });
 
     const processor = context.createScriptProcessor(bufferSize, 0, numberOfChannels);
     const dspProcess = DSPAlgorithm[numberOfChannels] || DSPAlgorithm[0];
