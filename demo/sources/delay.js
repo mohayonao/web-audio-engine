@@ -51,7 +51,6 @@ module.exports = function(context, util) {
   }
 
   var efx = createFeedbackDelay();
-  var counter = 0;
 
   function compose() {
     var midi = sample([ 64, 65, 65, 69, 72, 76 ]) + 12;
@@ -59,8 +58,6 @@ module.exports = function(context, util) {
     var nextTime = (duration * 1000) * Math.random();
 
     synth(midi, duration).connect(efx.input);
-
-    console.log("counter: " + (counter++) + "; fanOut: " + context.destination._impl.getInput(0).getNumberOfFanOuts());
 
     setTimeout(compose, nextTime);
   }

@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>web-audio-engine :: demo</title>
+  <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/codemirror.min.css">
+  <script src="//cdnjs.cloudflare.com/ajax/libs/es6-shim/0.35.0/es6-shim.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/setImmediate/1.0.4/setImmediate.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/codemirror.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/mode/javascript/javascript.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.21/vue.min.js"></script>
+  <script src="../build/web-audio-engine.js"></script>
+  <style>
+  .btn { width: 100px; outline: none !important }
+  .CodeMirror { font-family: 'Courier new', monospace; border: solid 1px #ddd; height: 800px }
+  #app { margin-top: 15px }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>web-audio-engine :: demo</h1>
+      <div>Pure JS implementation of the Web Audio API</div>
+    </div>
+    <div id="app">
+      <div class="form-horizontal">
+        <div class="form-group">
+          <label class="col-sm-1 control-label"></label>
+          <div class="col-sm-11">
+            <button class="btn" v-bind:class="isPlaying ? 'btn-success' : 'btn-default'" v-on:click="run">Run</button>
+            <button class="btn btn-default" v-on:click="stop">Stop</button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-1 control-label">api</label>
+          <div class="col-sm-11">
+            <div class="radio-inline">
+              <input type="radio" id="engine" value="web-audio-engine" v-model="engine">
+              <label for="engine">web-audio-engine</label>
+            </div>
+            <div class="radio-inline">
+              <input type="radio" id="native" value="native" v-model="engine">
+              <label for="native">native Web Audio API</label>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-1 control-label">demo</label>
+          <div class="col-sm-11">
+            <select class="form-control" v-model="selected" v-on:change="loadScript">
+              <option v-for="name in list" v-bind:value="name">{{ name }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="col-sm-1 control-label">code</label>
+          <div class="col-sm-11">
+            <textarea id="code"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+  (function() {
+    if (typeof Float32Array.prototype.fill !== "function") {
+      Float32Array.prototype.fill = function(value) {
+        for (var i = 0, imax = this.length; i < imax; i++) {
+          this[i] = value;
+        }
+        return this;
+      };
+    }
+    if (typeof Float32Array.prototype.map !== "function") {
+      Float32Array.prototype.map = function(fn) {
+        var array = new Float32Array(this.length);
+        for (var i = 0, imax = this.length; i < imax; i++) {
+          array[i] = fn(this[i], i);
+        }
+        return array;
+      };
+    }
+  })();
+
+  window.global = window;
+  window.module = { exports: null };
+  window.AudioContext = window.AudioContext || window.webkitAudioContext;
+  window.addEventListener("DOMContentLoaded", function() {
+    "use strict";
+
+    var audioContext = new AudioContext();
+    var destination = audioContext.destination;
+
+    Object.defineProperty(audioContext, "destination", {
+      value: null, enumerate: false, writable: true, configurable: true
+    });
+
+    var timerAPI = { setInterval: setInterval, setTimeout: setTimeout, timerIds: [] };
+
+    timerAPI.reset = function() {
+      timerAPI.timerIds.splice(0).forEach(function(timerId) {
+        clearInterval(timerId);
+        clearTimeout(timerId);
+      })
+    };
+    window.setInterval = function() {
+      timerAPI.timerIds.push(timerAPI.setInterval.apply(window, arguments));
+      return timerAPI.timerIds[timerAPI.timerIds.length - 1];
+    };
+    window.setTimeout = function() {
+      timerAPI.timerIds.push(timerAPI.setTimeout.apply(window, arguments));
+      return timerAPI.timerIds[timerAPI.timerIds.length - 1];
+    };
+
+    function fetch(url) {
+      return new Promise(function(resolve, reject) {
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", url);
+        if (/\.(wav|mp3|ogg|aif)$/.test(url)) {
+          xhr.responseType = "arraybuffer";
+        }
+        xhr.onload = function() {
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              resolve({
+                text: function() { return xhr.response; },
+                arrayBuffer: function() { return xhr.response; }
+              });
+            } else {
+              reject(new TypeError(xhr.statusText));
+            }
+          }
+        };
+        xhr.onerror = function() { reject(new TypeError(xhr.statusText)); };
+        xhr.send();
+      });
+    }
+
+    function loadScript(name) {
+      return fetch("./sources/" + name + ".js").then(function(res) {
+        return res.text();
+      });
+    }
+
+    function fetchAudioBuffer(context, filename) {
+      if (Array.isArray(filename)) {
+        return Promise.all(filename.map(function(filename) {
+          return fetchAudioBuffer(context, filename);
+        }));
+      }
+      return fetch("./assets/sound/" + filename).then(function(res) {
+        return res.arrayBuffer();
+      }).then(function(arrayBuffer) {
+        return new Promise(function(resolve, reject) {
+          context.decodeAudioData(arrayBuffer, resolve, reject);
+        });
+      }).catch(function(e) {
+        console.error(e);
+      });
+    }
+
+    function compile(source) {
+      try {
+        return eval(source);
+      } catch (e) {
+        console.error(e);
+        return null;
+      }
+    }
+
+    function runInContext(engine, code) {
+      var composeFn = compile(code);
+
+      stop();
+
+      if (typeof composeFn !== "function") {
+        return;
+      }
+
+      audioContext.destination = audioContext.createGain();
+      audioContext.destination.connect(destination);
+
+      var context = null;
+
+      if (engine === "web-audio-engine") {
+        context = new WebAudioEngine.WebAudioContext({ destination: audioContext.destination });
+      } else {
+        context = audioContext;
+      }
+
+      var util = { end: vue.stop.bind(vue), fetchAudioBuffer: fetchAudioBuffer.bind(null, context) };
+
+      (composeFn(context, util) || Promise.resolve()).then(function() {
+        context.resume();
+      });
+    }
+
+    function stop() {
+      if (audioContext.destination) {
+        audioContext.destination.disconnect();
+        audioContext.destination = null;
+      }
+      timerAPI.reset();
+    }
+
+    var vue = new Vue({
+      el: "#app",
+      data: {
+        isPlaying: false,
+        engine: "web-audio-engine",
+        selected: "sines",
+        list: [ "sines", "filter", "delay" ]
+      },
+      methods: {
+        run: function() {
+          runInContext(this.engine, editor.getValue());
+          this.isPlaying = true;
+        },
+        stop: function() {
+          stop();
+          this.isPlaying = false;
+        },
+        loadScript: function() {
+          var that = this;
+          loadScript(this.selected).then(function(source) {
+            editor.setValue(source);
+          });
+        }
+      }
+    });
+
+    var editor = CodeMirror.fromTextArea(document.getElementById("code"), {
+      lineNumbers: true, mode: "javascript"
+    });
+
+    vue.loadScript();
+  });
+  </script>
+</body>
+</html>

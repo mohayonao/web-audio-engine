@@ -1,5 +1,7 @@
 "use strict";
 
+const fs = require("fs");
+
 function fetchAudioBuffer(context, filename) {
   if (Array.isArray(filename)) {
     return Promise.all(filename.map(filename => fetchAudioBuffer(context, filename)));

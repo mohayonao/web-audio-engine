@@ -35,16 +35,12 @@ module.exports = function(context, util) {
     gain.connect(context.destination);
   }
 
-  var counter = 0;
-
   function compose() {
     var midi = sample([ 72, 72, 74, 76, 76, 79, 81 ]);
     var duration = sample([ 2, 2, 4, 4, 4, 4, 8 ]);
     var nextTime = (duration * 1000) * Math.random();
 
     synth(midi, duration);
-
-    console.log("counter: " + (counter++) + "; fanOut: " + context.destination._impl.getInput(0).getNumberOfFanOuts());
 
     setTimeout(compose, nextTime);
   }
