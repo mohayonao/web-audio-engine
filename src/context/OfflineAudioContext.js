@@ -4,7 +4,6 @@ const util = require("../util");
 const audioDataUtil = require("../util/audioDataUtil");
 const AudioContext = require("../api/AudioContext");
 const AudioBuffer = require("../api/AudioBuffer");
-const RENDERING_ITERATIONS = 128;
 
 class OfflineAudioContext extends AudioContext {
   constructor(numberOfChannels, length, sampleRate) {
@@ -23,6 +22,7 @@ class OfflineAudioContext extends AudioContext {
     util.defineProp(this, "_suspendResolve", null);
     util.defineProp(this, "_renderingPromise", null);
     util.defineProp(this, "_renderingResolve", null);
+    util.defineProp(this, "_renderingIterations", 128);
     util.defineProp(this, "_audioData", null);
     util.defineProp(this, "_writeIndex", 0);
   }
@@ -123,7 +123,7 @@ function render(impl) {
   const blockSize = impl.blockSize;
 
   const loop = () => {
-    let n = RENDERING_ITERATIONS;
+    let n = this._renderingIterations;
 
     while (n--) {
       if (this._suspendedTime <= this.currentTime) {
