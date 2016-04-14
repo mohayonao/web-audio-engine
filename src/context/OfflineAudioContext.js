@@ -4,6 +4,7 @@ const util = require("../util");
 const audioDataUtil = require("../util/audioDataUtil");
 const AudioContext = require("../api/AudioContext");
 const AudioBuffer = require("../api/AudioBuffer");
+const setImmediate = global.setImmediate || /* istanbul ignore next */ (fn => setTimeout(fn, 0));
 
 class OfflineAudioContext extends AudioContext {
   constructor(numberOfChannels, length, sampleRate) {
@@ -143,12 +144,12 @@ function render(impl) {
       }
     }
 
-    setTimeout(loop, 0);
+    setImmediate(loop);
   };
 
   impl.changeState("running");
 
-  setTimeout(loop, 0);
+  setImmediate(loop);
 }
 
 module.exports = OfflineAudioContext;

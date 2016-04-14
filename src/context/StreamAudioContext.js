@@ -2,7 +2,7 @@
 
 const util = require("../util");
 const AudioContext = require("../api/AudioContext");
-
+const setImmediate = global.setImmediate || /* istanbul ignore next */ (fn => setTimeout(fn, 0));
 const noopWriter = { write: () => true };
 
 class StreamAudioContext extends AudioContext {
@@ -86,10 +86,10 @@ class StreamAudioContext extends AudioContext {
         }
       }
 
-      global.setImmediate(renderingProcess);
+      setImmediate(renderingProcess);
     };
     this._isPlaying = true;
-    global.setImmediate(renderingProcess);
+    setImmediate(renderingProcess);
   }
 
   _suspend() {
