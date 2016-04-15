@@ -16,7 +16,7 @@ module.exports = function(context, util) {
     var freq = mtof(midi);
 
     [ 1, 3/2, 15/8 ].forEach(function(ratio, index) {
-      [ -12, +12 ].forEach((detune) => {
+      [ -12, +12 ].forEach(function(detune) {
         var osc = context.createOscillator();
 
         osc.type = "sawtooth";
@@ -29,7 +29,7 @@ module.exports = function(context, util) {
     });
 
     var curveLength = sample([ 4, 24, 24, 32, 32, 32, 48, 128 ]);
-    var freqCurve = new Float32Array(curveLength).map(() => {
+    var freqCurve = new Float32Array(curveLength).map(function() {
       return freq * sample([ 0.25, 0.5, 1, 2, 2, 4, 4, 4, 6, 6, 8 ]);
     });
 
@@ -38,7 +38,7 @@ module.exports = function(context, util) {
     filter.Q.value = 4;
     filter.connect(pan);
 
-    var panCurve = new Float32Array(curveLength * 8).map(() => {
+    var panCurve = new Float32Array(curveLength * 8).map(function() {
       return sample([ -0.6, -0.4, +0.4, +0.6 ]);
     });
 
