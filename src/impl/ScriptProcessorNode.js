@@ -44,8 +44,8 @@ class ScriptProcessorNode extends AudioNode {
     this.dspSetEventItem(eventItem);
   }
 
-  disableOutputsIfNecessary() {
-    // This node cannot disable.
+  getTailTime() {
+    return Infinity;
   }
 }
 

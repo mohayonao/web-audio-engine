@@ -3,9 +3,9 @@
 const AudioNode = require("../AudioNode");
 
 class WaveShaperNode extends AudioNode {
-  dspProcess(e) {
-    const inputBus = this.getInput(0).getAudioBus();
-    const outputBus = this.getOutput(0).getAudioBus();
+  dspProcess() {
+    const inputBus = this.inputs[0].bus;
+    const outputBus = this.outputs[0].bus;
 
     if (this._curve === null) {
       outputBus.copyFrom(inputBus);
@@ -15,11 +15,11 @@ class WaveShaperNode extends AudioNode {
     const inputs = inputBus.getChannelData();
     const outputs = outputBus.getMutableData();
     const numberOfChannels = outputs.length;
-    const inNumSamples = e.inNumSamples;
+    const blockSize = this.blockSize;
     const curve = this._curve;
 
     for (let ch = 0; ch < numberOfChannels; ch++) {
-      for (let i = 0; i < inNumSamples; i++) {
+      for (let i = 0; i < blockSize; i++) {
         outputs[ch][i] = this.dspApplyCurve(inputs[ch][i], curve);
       }
     }

@@ -1,6 +1,8 @@
 "use strict";
 
+const util = require("../util");
 const AudioNode = require("./AudioNode");
+const IIRFilterNodeDSP = require("./dsp/IIRFilterNode");
 
 class IIRFilterNode extends AudioNode {
   constructor(context, opts) {
@@ -33,15 +35,8 @@ class IIRFilterNode extends AudioNode {
   }
 
   channelDidUpdate(numberOfChannels) {
-    this.getOutput(0).setNumberOfChannels(numberOfChannels);
-  }
-
-  dspProcess() {
-    const inputBus = this.getInput(0).getAudioBus();
-    const outputBus = this.getOutput(0).getAudioBus();
-
-    outputBus.copyFrom(inputBus);
+    this.outputs[0].setNumberOfChannels(numberOfChannels);
   }
 }
 
-module.exports = IIRFilterNode;
+module.exports = util.mixin(IIRFilterNode, IIRFilterNodeDSP);

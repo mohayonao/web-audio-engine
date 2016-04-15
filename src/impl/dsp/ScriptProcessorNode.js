@@ -12,8 +12,8 @@ class ScriptProcessorNode extends AudioNode {
   }
 
   dspSetEventItem(eventItem) {
-    const numberOfInputChannels = this.getInput(0).getNumberOfChannels();
-    const numberOfOutputChannels = this.getOutput(0).getNumberOfChannels();
+    const numberOfInputChannels = this.inputs[0].getNumberOfChannels();
+    const numberOfOutputChannels = this.outputs[0].getNumberOfChannels();
     const inputBuffer = new AudioBuffer(this.context, {
       numberOfChannels: numberOfInputChannels, length: this._bufferSize, sampleRate: this.sampleRate
     });
@@ -30,17 +30,17 @@ class ScriptProcessorNode extends AudioNode {
     this._eventItem = eventItem;
   }
 
-  dspProcess(e) {
-    const inputs = this.getInput(0).getAudioBus().getChannelData();
-    const outputs = this.getOutput(0).getAudioBus().getMutableData();
+  dspProcess(currentSample) {
+    const inputs = this.inputs[0].bus.getChannelData();
+    const outputs = this.outputs[0].bus.getMutableData();
     const inputChannelData = this._inputChannelData;
     const outputChannelData = this._outputChannelData;
     const numberOfInputChannels = inputs.length;
     const numberOfOutputChannels = outputs.length;
-    const inNumSamples = e.inNumSamples;
+    const blockSize = this.blockSize;
     const writeIndex = this._writeIndex;
 
-    for (let i = 0; i < inNumSamples; i++) {
+    for (let i = 0; i < blockSize; i++) {
       for (let ch = 0; ch < numberOfInputChannels; ch++) {
         inputChannelData[ch][i + writeIndex] = inputs[ch][i];
       }
@@ -49,14 +49,16 @@ class ScriptProcessorNode extends AudioNode {
       }
     }
 
-    this._writeIndex += inNumSamples;
+    this._writeIndex += blockSize;
 
     if (this._writeIndex === this._bufferSize) {
+      const playbackTime = (currentSample + blockSize) / this.sampleRate;
+
       this.context.addPostProcess(() => {
         for (let ch = 0; ch < numberOfOutputChannels; ch++) {
           outputChannelData[ch].fill(0);
         }
-        this._eventItem.playbackTime = e.nextCurrentTime;
+        this._eventItem.playbackTime = playbackTime;
         this.dispatchEvent(this._eventItem);
       });
       this._writeIndex = 0;

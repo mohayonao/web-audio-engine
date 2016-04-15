@@ -7,6 +7,7 @@ const attrTester = require("../helpers/attrTester");
 const paramTester = require("../helpers/paramTester");
 const AudioContext = require("../../src/impl/AudioContext");
 const AudioParam = require("../../src/impl/AudioParam");
+const AudioParamDSP = require("../../src/impl/dsp/AudioParam");
 const AudioNode = require("../../src/impl/AudioNode");
 const GainNode = require("../../src/impl/GainNode")
 
@@ -141,6 +142,135 @@ describe("AudioParam", () => {
     });
   });
 
+  describe("timeline", () => {
+    const inf = Infinity;
+
+    function pluck(items) {
+      const list = [];
+
+      [ "type", "startSample", "endSample", "startValue", "endValue" ].forEach((key) => {
+        list.push(items[key]);
+      });
+
+      return list;
+    }
+
+    function fr(value) {
+      return Math.round(value * context.sampleRate);
+    }
+
+    it("setValueAtTime", () => {
+      const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
+
+      param.setValueAtTime(0.0, 0);
+      param.setValueAtTime(0.1, 1);
+      param.setValueAtTime(0.2, 2);
+      param.linearRampToValueAtTime(0.3, 3);
+      param.setValueAtTime(0.4, 4);
+
+      assert.deepEqual(param.getTimeline().map(pluck), [
+        //                                                 startTime, endTime, startValue, endValue
+        [ AudioParamDSP.SET_VALUE_AT_TIME                ,     fr(0),   fr(1),        0.0,      0.0 ],
+        [ AudioParamDSP.SET_VALUE_AT_TIME                ,     fr(1),   fr(2),        0.1,      0.1 ],
+        [ AudioParamDSP.SET_VALUE_AT_TIME                ,     fr(2),   fr(2),        0.2,      0.2 ],
+        [ AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME     ,     fr(2),   fr(3),        0.2,      0.3 ],
+        [ AudioParamDSP.SET_VALUE_AT_TIME                ,     fr(4),     inf,        0.4,      0.4 ]
+      ]);
+    });
+
+    it("linearRampToValueAtTime", () => {
+      const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
+
+      param.linearRampToValueAtTime(0.1, 1);
+      param.linearRampToValueAtTime(0.2, 2);
+      param.setValueAtTime(0.3, 3);
+      param.linearRampToValueAtTime(0.4, 4);
+
+      assert.deepEqual(param.getTimeline().map(pluck), [
+        //                                                 startTime, endTime, startValue, endValue
+        [ AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME     ,     fr(0),   fr(1),        0.0,      0.1 ],
+        [ AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME     ,     fr(1),   fr(2),        0.1,      0.2 ],
+        [ AudioParamDSP.SET_VALUE_AT_TIME                ,     fr(3),   fr(3),        0.3,      0.3 ],
+        [ AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME     ,     fr(3),   fr(4),        0.3,      0.4 ]
+      ]);
+    });
+
+    it("exponentialRampToValueAtTime", () => {
+      const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
+
+      param.exponentialRampToValueAtTime(0.1, 1);
+      param.exponentialRampToValueAtTime(0.2, 2);
+      param.setValueAtTime(0.3, 3);
+      param.exponentialRampToValueAtTime(0.4, 4);
+
+      assert.deepEqual(param.getTimeline().map(pluck), [
+        //                                                 startTime, endTime, startValue, endValue
+        [ AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME,     fr(0),   fr(1),       1e-6,      0.1 ],
+        [ AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME,     fr(1),   fr(2),        0.1,      0.2 ],
+        [ AudioParamDSP.SET_VALUE_AT_TIME                ,     fr(3),   fr(3),        0.3,      0.3 ],
+        [ AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME,     fr(3),   fr(4),        0.3,      0.4 ]
+      ]);
+    });
+
+    it("setTargetAtTime", () => {
+      const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
+
+      param.setTargetAtTime(0.1, 1, 0.5);
+      param.setTargetAtTime(0.2, 2, 0.4);
+      param.setTargetAtTime(0.3, 3, 0.3);
+      param.setValueAtTime(0.4, 4);
+      param.setTargetAtTime(0.5, 5, 0.2);
+      param.linearRampToValueAtTime(0.6, 6);
+      param.setTargetAtTime(0.7, 7, 0.1);
+
+      assert.deepEqual(param.getTimeline().map(pluck), [
+        //                                                 startTime, endTime, startValue, endValue
+        [ AudioParamDSP.SET_TARGET_AT_TIME               ,     fr(1),   fr(2),        0.0,      0.1 ],
+        [ AudioParamDSP.SET_TARGET_AT_TIME               ,     fr(2),   fr(3),        0.0,      0.2 ],
+        [ AudioParamDSP.SET_TARGET_AT_TIME               ,     fr(3),   fr(4),        0.0,      0.3 ],
+        [ AudioParamDSP.SET_VALUE_AT_TIME                ,     fr(4),   fr(5),        0.4,      0.4 ],
+        [ AudioParamDSP.SET_TARGET_AT_TIME               ,     fr(5),   fr(5),        0.4,      0.5 ],
+        [ AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME     ,     fr(5),   fr(6),        0.4,      0.6 ],
+        [ AudioParamDSP.SET_TARGET_AT_TIME               ,     fr(7),     inf,        0.6,      0.7 ]
+      ]);
+    });
+
+    it("setValueCurveAtTime", () => {
+      const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
+      const curve1 = new Float32Array([ 0.1, 0.2, 0.3 ]);
+      const curve2 = new Float32Array([ 0.4, 0.5, 0.6 ]);
+      const f32 = Math.fround;
+
+      param.setValueCurveAtTime(curve1, 0, 1);
+      param.setValueAtTime(0.2, 2);
+      param.setValueCurveAtTime(curve2, 3, 1);
+      param.linearRampToValueAtTime(1.0, 5);
+
+      assert.deepEqual(param.getTimeline().map(pluck), [
+        //                                                 startTime, endTime, startValue, endValue
+        [ AudioParamDSP.SET_VALUE_CURVE_AT_TIME          ,     fr(0),   fr(1),   f32(0.1), f32(0.3) ],
+        [ AudioParamDSP.SET_VALUE_AT_TIME                ,     fr(2),   fr(3),       0.2 ,     0.2  ],
+        [ AudioParamDSP.SET_VALUE_CURVE_AT_TIME          ,     fr(3),   fr(4),   f32(0.4), f32(0.6) ],
+        [ AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME     ,     fr(4),   fr(5),   f32(0.6),     1.0  ]
+      ]);
+    });
+
+    it("cancel", () => {
+      const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
+
+      param.setValueAtTime(0.0, 0);
+      param.setValueAtTime(0.1, 1);
+      param.setValueAtTime(0.2, 2);
+      param.cancelScheduledValues(2);
+
+      assert.deepEqual(param.getTimeline().map(pluck), [
+        //                                                 startTime, endTime, startValue, endValue
+        [ AudioParamDSP.SET_VALUE_AT_TIME                ,     fr(0),   fr(1),        0.0,      0.0 ],
+        [ AudioParamDSP.SET_VALUE_AT_TIME                ,     fr(1),     inf,        0.1,      0.1 ]
+      ]);
+    });
+  });
+
   describe("connection", () => {
     it("basic operation", () => {
       const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
@@ -186,19 +316,10 @@ describe("AudioParam", () => {
       node1.connect(param);
     });
 
-    function procEvent(times) {
-      const inNumSamples = context.blockSize;
-      const currentTime = (inNumSamples * times) / 8000;
-      const nextCurrentTime = (inNumSamples * (times + 1)) / 8000;
-      const sampleRate = context.sampleRate;
-
-      return { currentTime, nextCurrentTime, inNumSamples, sampleRate };
-    }
-
     it("static value", () => {
-      [ 0, 0.25, 0.5, 0.5 ].forEach((value, procIndex) => {
+      [ 0, 0.25, 0.5, 0.5 ].forEach((value, i) => {
         param.setValue(value);
-        param.dspProcess(procEvent(procIndex));
+        param.dspProcess(i * 16);
 
         const expected = new Float32Array(16).fill(value);
         const actual = param.getSampleAccurateValues();
@@ -211,13 +332,13 @@ describe("AudioParam", () => {
     it("input and offset", () => {
       node1.enableOutputsIfNecessary();
 
-      [ 0, 0.25, 0.5, 0.5 ].forEach((value, procIndex) => {
+      [ 0, 0.25, 0.5, 0.5 ].forEach((value, i) => {
         const noise = np.random_sample(16);
 
         node1.getOutput(0).getAudioBus().getMutableData()[0].set(noise);
 
         param.setValue(value);
-        param.dspProcess(procEvent(procIndex));
+        param.dspProcess(i * 16);
 
         const expected = new Float32Array(16).map((_, i) => value + noise[i]);
         const actual = param.getSampleAccurateValues();
@@ -232,7 +353,7 @@ describe("AudioParam", () => {
       param.linearRampToValueAtTime(1, 16/8000);
 
       param.setValue(1);
-      param.dspProcess(procEvent(0));
+      param.dspProcess(0);
 
       const expected = new Float32Array(16).map((_, i) => i / 16);
       const actual = param.getSampleAccurateValues();
@@ -251,7 +372,7 @@ describe("AudioParam", () => {
       param.linearRampToValueAtTime(1, 16/8000);
 
       param.setValue(1);
-      param.dspProcess(procEvent(0));
+      param.dspProcess(0);
 
       const expected = new Float32Array(16).map((_, i) => (i / 16) + noise[i]);
       const actual = param.getSampleAccurateValues();
@@ -262,320 +383,155 @@ describe("AudioParam", () => {
   });
 
   describe("event processing", () => {
-    let param;
-
-    beforeEach(() => {
-      param = new GainNode(context).getGain();
-    });
-
-    function procEvent(times) {
-      const inNumSamples = context.blockSize;
-      const currentTime = (inNumSamples * times) / 8000;
-      const nextCurrentTime = (inNumSamples * (times + 1)) / 8000;
-      const sampleRate = context.sampleRate;
-
-      return { currentTime, nextCurrentTime, inNumSamples, sampleRate };
-    }
-
-    function deepCloseTo(a, b, delta) {
-      assert(a.length === b.length);
-
-      for (let i = 0, imax = a.length; i < imax; i++) {
-        assert(Math.abs(a[i] - b[i]) <= delta, `a[${i}]=${a[i]}, b[${i}]=${b[i]}`);
-      }
-
-      return true;
-    }
-
     describe("setValueAtTime", () => {
-      //|0123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|
-      //|................|...............|...............|...............|...............|
+      //0                16              32              48              64              80              96
+      //|0123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|
+      //|................|...............|...............|...............|...............|...............|
       const expectedValues = paramTester.toValues(`
-        |                |               |            **********************             |
-        |                |               |               |               |               |
-        |                |               |               |               |               |
-        |                |               |               |               |               |
-        |                |      **********************   |               |  *************|
-        |                |               |               |               |               |
-        |                |               |               |               |               |
-        |                |               |               |               |               |
-        |***********************         |               |               |               |
-      `);
-
-      beforeEach(() => {
+        |                |               |               |       ************************|               |
+        |                |               |               |               |               |               |
+        |                |               |               |               |               |               |
+        |                |               |               |               |               |               |
+        |                |       ********************************        |               ****************|
+        |                |               |               |               |               |               |
+        |                |               |               |               |               |               |
+        |                |               |               |               |               |               |
+        |************************        |               |               |               |               |
+      `); //                     ^                               ^                 ^
+      //                         |                               |                 |
+      //                         |                               |                 +-----+
+      //                         |                               |                       |
+      //                         |                               |                       setValueAtTime(0.5, 74/8000)
+      //                         |                               setValueAtTime(1.0, 56/8000)
+      //                         setValueAtTime(0.5, 24/8000)
+      paramTester.makeTests(context, expectedValues, (param) => {
         param.setValue(0);
-        param.setValueAtTime(0.5, 23/8000);
-        param.setValueAtTime(1.0, 45/8000);
-      });
-
-      it("works", () => {
-        for (let i = 0; i < 4; i++) {
-          param.dspProcess(procEvent(i));
-
-          const expected = expectedValues.subarray(i * 16, (i + 1) * 16);
-          const actual = param.getSampleAccurateValues();
-
-          assert(param.hasSampleAccurateValues() === true);
-          assert(deepCloseTo(actual, expected, 0.0625));
-        }
-      });
-
-      it("works partially", () => {
-        param.dspProcess(procEvent(2));
-
-        const expected = expectedValues.subarray(2 * 16, 3 * 16);
-        const actual = param.getSampleAccurateValues();
-
-        assert(param.hasSampleAccurateValues() === true);
-        assert(deepCloseTo(actual, expected, 0.0625));
-      });
-
-      it("works with dynamic insertion", () => {
-        for (let i = 0; i < 4; i++) {
-          param.dspProcess(procEvent(i));
-        }
-        param.setValueAtTime(0.5, 67/8000);
-        param.dspProcess(procEvent(4));
-
-        const expected = expectedValues.subarray(4 * 16, (4 + 1) * 16);
-        const actual = param.getSampleAccurateValues();
-
-        assert(param.hasSampleAccurateValues() === true);
-        assert(deepCloseTo(actual, expected, 0.0625));
+        param.setValueAtTime(0.5, 24/8000);
+        param.setValueAtTime(1.0, 56/8000);
+      }, (param) => {
+        param.setValueAtTime(0.5, 74/8000);
       });
     });
 
     describe("linearRampToValueAtTime", () => {
-      //|0123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|
-      //|................|...............|...............|...............|...............|
+      //0                16              32              48              64              80              96
+      //|0123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|
+      //|................|...............|...............|...............|...............|...............|
       const expectedValues = paramTester.toValues(`
-        |                |               |            ** |               |               |
-        |                |               |         ***  *|               |               |
-        |                |               |     ****      *               |               |
-        |                |               |  ***          |*              |               |
-        |                |               ***             | *             |     **********|
-        |                |            ***|               |  *            | ****          |
-        |                |        ****   |               |   *           **              |
-        |                |     ***       |               |    *          |               |
-        |**********************          |               |     **********|               |
-      `);
-
-      beforeEach(() => {
+        |                |               |               |     ****      |               |               |
+        |                |               |               | ****    **    |               |               |
+        |                |               |             ****          **  |               |               |
+        |                |               |         ****  |             **|               |               |
+        |                |               |      ***      |               ***             |  *************|
+        |                |               | *****         |               |  **           |**             |
+        |                |              ***              |               |    **         *               |
+        |                |          **** |               |               |      **       |               |
+        |***************************     |               |               |        *******|               |
+      `); //                     ^                               ^                 ^        ^
+      //                         |                               |                 |        |
+      //                         |                               |                 |     +--+
+      //                         |                               |                 |     |
+      //                         |                               |                 |     linearRampToValueAtTime(0.5, 84/8000)
+      //                         |                               |                 linearRampToValueAtTime(0, 74/8000)
+      //                         |                               linearRampToValueAtTime(1, 56/8000)
+      //                         param.setValueAtTime(0, 24/8000)
+      paramTester.makeTests(context, expectedValues, (param) => {
         param.setValue(0);
-        param.setValueAtTime(0, 20/8000);
-        param.linearRampToValueAtTime(1, 46/8000);
-        param.linearRampToValueAtTime(0, 54/8000);
-      });
-
-      it("works", () => {
-        for (let i = 0; i < 4; i++) {
-          param.dspProcess(procEvent(i));
-
-          const expected = expectedValues.subarray(i * 16, (i + 1) * 16);
-          const actual = param.getSampleAccurateValues();
-
-          assert(param.hasSampleAccurateValues() === true);
-          assert(deepCloseTo(actual, expected, 0.0625));
-        }
-      });
-
-      it("works partially", () => {
-        param.dspProcess(procEvent(3));
-
-        const expected = expectedValues.subarray(3 * 16, 4 * 16);
-        const actual = param.getSampleAccurateValues();
-
-        assert(param.hasSampleAccurateValues() === true);
-        assert(deepCloseTo(actual, expected, 0.0625));
-      });
-
-      it("works with dynamic insertion", () => {
-        for (let i = 0; i < 4; i++) {
-          param.dspProcess(procEvent(i));
-        }
-        param.linearRampToValueAtTime(0.5, 72/8000);
-        param.dspProcess(procEvent(4));
-
-        const expected = expectedValues.subarray(4 * 16, (4 + 1) * 16);
-        const actual = param.getSampleAccurateValues();
-
-        assert(param.hasSampleAccurateValues() === true);
-        assert(deepCloseTo(actual, expected, 0.0625));
+        param.setValueAtTime(0, 24/8000);
+        param.linearRampToValueAtTime(1, 56/8000);
+        param.linearRampToValueAtTime(0, 74/8000);
+      }, (param) => {
+        param.linearRampToValueAtTime(0.5, 84/8000);
       });
     });
 
     describe("exponentialRampToValueAtTime", () => {
-      //|0123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|
-      //|................|...............|...............|...............|...............|
+      //0                16              32              48              64              80              96
+      //|0123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|
+      //|................|...............|...............|...............|...............|...............|
       const expectedValues = paramTester.toValues(`
-        |                |               |             * |               |               |
-        |                |               |            *  |               |               |
-        |                |               |           *   |               |               |
-        |                |               |          *    |               |               |
-        |                |               |         *    *|               |       ********|
-        |                |               |       **      *               |     **        |
-        |                |               |    ***        |               |   **          |
-        |                |              ******           |**             ****            |
-        |******************************* |               |  *************|               |
-      `);
-
-      beforeEach(() => {
-        param.setValue(0);
+        |                |               |               |       *       |               |               |
+        |                |               |               |      *        |               |               |
+        |                |               |               |     *  *      |               |               |
+        |                |               |               |   **    *     |               |               |
+        |                |               |               | **       *    |               |   ************|
+        |                |               |              ***          *   |               |  *            |
+        |                |               |          **** |            ** |               | *             |
+        |                |               |  ********     |              ****             **              |
+        |***********************************             |               |  *************|               |
+      `); //                 ^                                   ^                  ^         ^
+      //                     |                                   |                  |         |
+      //                     |                                   |                  |    +----+
+      //                     |                                   |                  |    |
+      //                     |                                   |                  |    exponentialRampToValueAtTime(0.5, 84/8000)
+      //                     |                                   |                  exponentialRampToValueAtTime(0.01, 74/8000)
+      //                     setValueAtTime(0.01, 20/8000)       exponentialRampToValueAtTime(1, 56/8000)
+      paramTester.makeTests(context, expectedValues, (param) => {
+        param.setValue(1e-6);
         param.setValueAtTime(0.01, 20/8000);
-        param.exponentialRampToValueAtTime(1, 46/8000);
-        param.exponentialRampToValueAtTime(0.01, 54/8000);
-      });
-
-      it("works", () => {
-        for (let i = 0; i < 4; i++) {
-          param.dspProcess(procEvent(i));
-
-          const expected = expectedValues.subarray(i * 16, (i + 1) * 16);
-          const actual = param.getSampleAccurateValues();
-
-          assert(param.hasSampleAccurateValues() === true);
-          assert(deepCloseTo(actual, expected, 0.0625));
-        }
-      });
-
-      it("works partially", () => {
-        param.dspProcess(procEvent(3));
-
-        const expected = expectedValues.subarray(3 * 16, 4 * 16);
-        const actual = param.getSampleAccurateValues();
-
-        assert(param.hasSampleAccurateValues() === true);
-        assert(deepCloseTo(actual, expected, 0.0625));
-      });
-
-      it("works with dynamic insertion", () => {
-        for (let i = 0; i < 4; i++) {
-          param.dspProcess(procEvent(i));
-        }
-        param.exponentialRampToValueAtTime(0.5, 72/8000);
-        param.dspProcess(procEvent(4));
-
-        const expected = expectedValues.subarray(4 * 16, (4 + 1) * 16);
-        const actual = param.getSampleAccurateValues();
-
-        assert(param.hasSampleAccurateValues() === true);
-        assert(deepCloseTo(actual, expected, 0.0625));
+        param.exponentialRampToValueAtTime(1, 56/8000);
+        param.exponentialRampToValueAtTime(0.01, 74/8000);
+      }, (param) => {
+        param.exponentialRampToValueAtTime(0.5, 84/8000);
       });
     });
 
     describe("setTargetAtTime", () => {
-      //|0123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|
-      //|................|...............|...............|...............|...............|
+      //0                16              32              48              64              80              96
+      //|0123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|
+      //|................|...............|...............|...............|...............|...............|
       const expectedValues = paramTester.toValues(`
-        |                |               |               |               |               |
-        |                |               |               |               |               |
-        |                |             ****              |               |               |
-        |                |          ***  | **            |               |               |
-        |                |        **     |   ***         |               |               |
-        |                |      **       |      ****     |               |             **|
-        |                |     *         |          *******              |          ***  |
-        |                |    *          |               | ************* |        **     |
-        |*********************           |               |              **********       |
-      `);
-
-      beforeEach(() => {
+        |                |               |              **********       |               |               |
+        |                |               |     ********* |        **     |               |               |
+        |                |               | ****          |          **   |               |        *******|
+        |                |              ***              |            ** |               |   *****       |
+        |                |            ** |               |              ***              ****            |
+        |                |          **   |               |               | ****          |               |
+        |                |         *     |               |               |     ******    |               |
+        |                |        *      |               |               |           ****|               |
+        |*************************       |               |               |               |               |
+      `); //                     ^                               ^                 ^
+      //                         |                               |                 |
+      //                         |                               |                 +-----+
+      //                         |                               |                       |
+      //                         |                               |                       setTargetAtTime(1, 74/8000, 16/8000)
+      //                         |                               setTargetAtTime(0, 56/8000, 12/8000)
+      //                         setTargetAtTime(1, 24/8000, 8/8000)
+      paramTester.makeTests(context, expectedValues, (param) => {
         param.setValue(0);
-        param.setTargetAtTime(1, 20/8000, 8/8000);
-        param.setTargetAtTime(0, 32/8000, 12/8000);
-      });
-
-      it("works", () => {
-        for (let i = 0; i < 4; i++) {
-          param.dspProcess(procEvent(i));
-
-          const expected = expectedValues.subarray(i * 16, (i + 1) * 16);
-          const actual = param.getSampleAccurateValues();
-
-          assert(param.hasSampleAccurateValues() === true);
-          assert(deepCloseTo(actual, expected, 0.0625));
-        }
-      });
-
-      it.skip("works partially", () => {
-        param.dspProcess(procEvent(3));
-
-        const expected = expectedValues.subarray(3 * 16, 4 * 16);
-        const actual = param.getSampleAccurateValues();
-
-        assert(param.hasSampleAccurateValues() === true);
-        assert(deepCloseTo(actual, expected, 0.0625));
-      });
-
-      it("works with dynamic insertion", () => {
-        for (let i = 0; i < 4; i++) {
-          param.dspProcess(procEvent(i));
-        }
-        param.setTargetAtTime(1, 72/8000, 16/8000);
-        param.dspProcess(procEvent(4));
-
-        const expected = expectedValues.subarray(4 * 16, (4 + 1) * 16);
-        const actual = param.getSampleAccurateValues();
-
-        assert(param.hasSampleAccurateValues() === true);
-        assert(deepCloseTo(actual, expected, 0.0625));
+        param.setTargetAtTime(1, 24/8000, 8/8000);
+        param.setTargetAtTime(0, 56/8000, 12/8000);
+      }, (param) => {
+        param.setTargetAtTime(1, 74/8000, 16/8000);
       });
     });
 
     describe("setValueCurveAtTime", () => {
-      //|0123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|
-      //|................|...............|...............|...............|...............|
+      //0                16              32              48              64              80              96
+      //|0123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|123456789abcdef|
+      //|................|...............|...............|...............|...............|...............|
       const expectedValues = paramTester.toValues(`
-        |                |               |               |      *****************        |
-        |                |               |               |    **         |               |
-        |                |               |   ****        | ***           |            * *|
-        |                |               | **    *****   **              |               |
-        |                |****          ***           ***|               |           * * |
-        |              ***    ****    ** |               |               |        **     |
-        |            **  |        ****   |               |               |          *    |
-        |          **    |               |               |               |               |
-        |**********      |               |               |               |       *       |
-      `);
+        |                |               |               |      *************************|             **|
+        |                |               |               |    **         |               |            *  |
+        |                |               |   ****        | ***           |               |     **    *   |
+        |                |               | **    *****   **              |               |    *  ** *    |
+        |                |****          ***           ***|               |               |   *     *     |
+        |              ***    ****    ** |               |               |               *  *            |
+        |            **  |        ****   |               |               |               |**             |
+        |          **    |               |               |               |               |               |
+        |**********      |               |               |               |               |               |
+      `); //     ^==============================================^                  ^==================^
+      //         |                                                                 |
+      //         |                                                                 +-----+
+      //         |                                                                       |
+      //         setValueCurveAtTime(curve, 8/8000, 48/8000)                             setValueCurveAtTime(curve, 74/8000, 20/8000)
       const curve = new Float32Array([ 0, 0.5, 0.25, 0.75, 0.5, 1 ]);
 
-      beforeEach(() => {
+      paramTester.makeTests(context, expectedValues, (param) => {
         param.setValue(0);
         param.setValueCurveAtTime(curve, 8/8000, 48/8000);
-      });
-
-      it("works", () => {
-        for (let i = 0; i < 4; i++) {
-          param.dspProcess(procEvent(i));
-
-          const expected = expectedValues.subarray(i * 16, (i + 1) * 16);
-          const actual = param.getSampleAccurateValues();
-
-          assert(param.hasSampleAccurateValues() === true);
-          assert(deepCloseTo(actual, expected, 0.0625));
-        }
-      });
-
-      it("works partially", () => {
-        param.dspProcess(procEvent(3));
-
-        const expected = expectedValues.subarray(3 * 16, 4 * 16);
-        const actual = param.getSampleAccurateValues();
-
-        assert(param.hasSampleAccurateValues() === true);
-        assert(deepCloseTo(actual, expected, 0.0625));
-      });
-
-      it("works with dynamic insertion", () => {
-        for (let i = 0; i < 4; i++) {
-          param.dspProcess(procEvent(i));
-        }
-        param.setValueCurveAtTime(curve, 72/8000, 8/8000);
-        param.dspProcess(procEvent(4));
-
-        const expected = expectedValues.subarray(4 * 16, (4 + 1) * 16);
-        const actual = param.getSampleAccurateValues();
-
-        assert(param.hasSampleAccurateValues() === true);
-        assert(deepCloseTo(actual, expected, 0.0625));
+      }, (param) => {
+        param.setValueCurveAtTime(curve, 74/8000, 20/8000);
       });
     });
   });

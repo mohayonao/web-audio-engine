@@ -1,6 +1,8 @@
 "use strict";
 
+const util = require("../util");
 const AudioNode = require("./AudioNode");
+const DynamicsCompressorNodeDSP = require("./dsp/DynamicsCompressorNode");
 
 class DynamicsCompressorNode extends AudioNode {
   constructor(context) {
@@ -41,14 +43,6 @@ class DynamicsCompressorNode extends AudioNode {
   getRelease() {
     return this._release;
   }
-
-  dspProcess() {
-    const inputBus = this.getInput(0).getAudioBus();
-    const outputBus = this.getOutput(0).getAudioBus();
-
-    outputBus.zeros();
-    outputBus.sumFrom(inputBus);
-  }
 }
 
-module.exports = DynamicsCompressorNode;
+module.exports = util.mixin(DynamicsCompressorNode, DynamicsCompressorNodeDSP);

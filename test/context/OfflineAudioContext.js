@@ -4,7 +4,7 @@ const assert = require("power-assert");
 const OfflineAudioContext = require("../../src/context/OfflineAudioContext");
 const AudioBuffer = require("../../src/api/AudioBuffer");
 
-describe("constructor", () => {
+describe("OfflineAudioContext", () => {
   it("should return an OfflineAudioContext instance", () => {
     const context = new OfflineAudioContext(2, 128, 44100);
 

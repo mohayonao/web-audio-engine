@@ -13,30 +13,13 @@ class DelayNode extends AudioNode {
     this._delayIndexes = new Float32Array(this.blockSize);
   }
 
-  enableOutputsIfNecessary() {
-    this._disabledTime = Infinity;
-    super.enableOutputsIfNecessary();
-  }
-
-  disableOutputsIfNecessary() {
-    this._disabledTime = this.context.currentTime + this._maxDelayTime;
-  }
-
   dspSetNumberOfChannels(numberOfChannels) {
     this._delayBus.setNumberOfChannels(numberOfChannels);
   }
 
-  dspProcess(e) {
-    if (this._disabledTime <= e.currentTime) {
-      this.getOutput(0).zeros();
-      this.context.addPostProcess(() => {
-        super.disableOutputsIfNecessary();
-      });
-      return;
-    }
-
+  dspProcess() {
     const delayBus = this._delayBus;
-    const inputBus = this.getInput(0).getAudioBus();
+    const inputBus = this.inputs[0].bus;
 
     delayBus.copyFromWithOffset(inputBus, this._delayIndex);
 
@@ -45,9 +28,9 @@ class DelayNode extends AudioNode {
     this.dspUpdateDelayIndexes(delayTimeValues);
 
     const buffers = delayBus.getChannelData();
-    const outputs = this.getOutput(0).getAudioBus().getMutableData();
+    const outputs = this.outputs[0].bus.getMutableData();
     const numberOfChannels = outputs.length;
-    const inNumSamples = e.inNumSamples;
+    const inNumSamples = this.blockSize;
     const delayIndexes = this._delayIndexes;
 
     for (let ch = 0; ch < numberOfChannels; ch++) {

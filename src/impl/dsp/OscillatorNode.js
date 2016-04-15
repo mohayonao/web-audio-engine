@@ -1,52 +1,51 @@
 "use strict";
 
-const AudioSourceNode = require("../AudioSourceNode");
+const AudioScheduledSourceNode = require("../AudioScheduledSourceNode");
 
-class OscillatorNode extends AudioSourceNode {
+class OscillatorNode extends AudioScheduledSourceNode {
   dspInit() {
     this._phase = 0;
   }
 
-  dspProcess(e) {
-    const currentTime = e.currentTime;
-    const nextCurrentTime = e.nextCurrentTime;
+  dspProcess(currentSample) {
+    const nextSample = currentSample + this.blockSize;
 
-    if (nextCurrentTime < this._startTime) {
+    if (nextSample < this._startSample) {
       return;
     }
 
-    if (this._stopTime <= currentTime) {
+    if (this._stopSample <= currentSample) {
       return;
     }
 
-    const sampleRate = e.sampleRate;
-    const inNumSamples = e.inNumSamples;
-    const frameOffset = Math.max(0, Math.round((this._startTime - currentTime) * sampleRate));
-    const fillToTime = Math.min(nextCurrentTime, this._stopTime);
-    const fillToFrame = Math.round((fillToTime - currentTime) * sampleRate)|0;
-    const output = this.getOutput(0).getAudioBus().getMutableData()[0];
+    const sampleRate = this.sampleRate;
+    const blockSize = this.blockSize;
+    const sampleOffset = Math.max(0, this._startSample - currentSample);
+    const endSample = Math.min(nextSample, this._stopSample);
+    const fillToFrame = endSample - currentSample;
+    const output = this.outputs[0].bus.getMutableData()[0];
 
     let writeIndex = 0;
 
     if (this._type === "sine") {
-      writeIndex = this.dspSine(output, frameOffset, fillToFrame, sampleRate);
+      writeIndex = this.dspSine(output, sampleOffset, fillToFrame, sampleRate);
     } else {
-      writeIndex = this.dspWave(output, frameOffset, fillToFrame, sampleRate);
+      writeIndex = this.dspWave(output, sampleOffset, fillToFrame, sampleRate);
     }
 
-    if (writeIndex < inNumSamples) {
-      while (writeIndex < inNumSamples) {
+    if (writeIndex < blockSize) {
+      while (writeIndex < blockSize) {
         output[writeIndex++] = 0;
       }
       this.context.addPostProcess(() => {
-        this.getOutput(0).getAudioBus().zeros();
-        this.getOutput(0).disable();
+        this.outputs[0].bus.zeros();
+        this.outputs[0].disable();
         this.dispatchEvent({ type: "ended" });
       });
     }
   }
 
-  dspSine(output, writeIndex, inNumSamples, sampleRate) {
+  dspSine(output, writeIndex, blockSize, sampleRate) {
     const frequency = this._frequency;
     const detune = this._detune;
     const algorithm = frequency.hasSampleAccurateValues() * 2 + detune.hasSampleAccurateValues();
@@ -60,7 +59,7 @@ class OscillatorNode extends AudioSourceNode {
       const computedFrequency = frequencyValue * Math.pow(2, detuneValue / 1200);
       const phaseIncr = frequencyToPhaseIncr * computedFrequency;
 
-      while (writeIndex < inNumSamples) {
+      while (writeIndex < blockSize) {
         output[writeIndex++] = Math.sin(phase);
         phase += phaseIncr;
       }
@@ -68,7 +67,7 @@ class OscillatorNode extends AudioSourceNode {
       const frequencyValues = frequency.getSampleAccurateValues();
       const detuneValues = detune.getSampleAccurateValues();
 
-      while (writeIndex < inNumSamples) {
+      while (writeIndex < blockSize) {
         const frequencyValue = frequencyValues[writeIndex];
         const detuneValue = detuneValues[writeIndex];
         const computedFrequency = frequencyValue * Math.pow(2, detuneValue / 1200);
@@ -83,7 +82,7 @@ class OscillatorNode extends AudioSourceNode {
     return writeIndex;
   }
 
-  dspWave(output, writeIndex, inNumSamples, sampleRate) {
+  dspWave(output, writeIndex, blockSize, sampleRate) {
     const frequency = this._frequency;
     const detune = this._detune;
     const algorithm = frequency.hasSampleAccurateValues() * 2 + detune.hasSampleAccurateValues();
@@ -99,7 +98,7 @@ class OscillatorNode extends AudioSourceNode {
       const computedFrequency = frequencyValue * Math.pow(2, detuneValue / 1200);
       const phaseIncr = frequencyToPhaseIncr * computedFrequency;
 
-      while (writeIndex < inNumSamples) {
+      while (writeIndex < blockSize) {
         const idx = (phase * waveTableLength) % waveTableLength;
         const v0 = waveTable[(idx|0)];
         const v1 = waveTable[(idx|0) + 1];
@@ -111,7 +110,7 @@ class OscillatorNode extends AudioSourceNode {
       const frequencyValues = frequency.getSampleAccurateValues();
       const detuneValues = detune.getSampleAccurateValues();
 
-      while (writeIndex < inNumSamples) {
+      while (writeIndex < blockSize) {
         const frequencyValue = frequencyValues[writeIndex];
         const detuneValue = detuneValues[writeIndex];
         const computedFrequency = frequencyValue * Math.pow(2, detuneValue / 1200);

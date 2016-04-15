@@ -240,7 +240,6 @@ describe("AudioNodeInput", () => {
       const node2 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
       const noise1 = np.random_sample(16);
       const noise2 = np.random_sample(16);
-      const e = {};
 
       node1.getOutput(0).enable();
       node1.connect(node2);
@@ -250,7 +249,7 @@ describe("AudioNodeInput", () => {
 
       const input = node2.getInput(0);
 
-      input.pull(e);
+      input.pull(0);
 
       const actual = input.getAudioBus().getChannelData()[0];
       const expected = noise1;
@@ -264,7 +263,6 @@ describe("AudioNodeInput", () => {
       const noise1 = np.random_sample(16);
       const noise2 = np.random_sample(16);
       const noise3 = np.random_sample(16);
-      const e = {};
 
       node1.getOutput(0).enable();
       node2.getOutput(0).enable();
@@ -277,7 +275,7 @@ describe("AudioNodeInput", () => {
 
       const input = node3.getInput(0);
 
-      input.pull(e);
+      input.pull(0);
 
       const actual = input.getAudioBus().getChannelData()[0];
       const expected = noise1.map((_, i) => noise1[i] + noise2[i]);

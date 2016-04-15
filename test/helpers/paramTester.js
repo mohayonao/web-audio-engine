@@ -1,5 +1,60 @@
 "use strict";
 
+const assert = require("power-assert");
+const AudioParam = require("../../src/impl/AudioParam");
+
+function makeTests(context, expectedValues, sched1, sched2) {
+  it("works", () => {
+    const param = new AudioParam(context, { rate: "audio", defaultValue: 0 });
+
+    sched1(param);
+
+    for (let i = 0; i < 5; i++) {
+      param.dspProcess(i * 16);
+
+      const expected = expectedValues.subarray(i * 16, (i + 1) * 16);
+      const actual = param.getSampleAccurateValues();
+
+      assert(param.hasSampleAccurateValues() === true);
+      assert(deepCloseTo(actual, expected, 0.0625));
+    }
+  });
+
+  it("works partially", () => {
+    const param = new AudioParam(context, { rate: "audio", defaultValue: 0 });
+
+    sched1(param);
+
+    for (let i = 1; i < 5; i += 2) {
+      param.dspProcess(i * 16);
+
+      const expected = expectedValues.subarray(i * 16, (i + 1) * 16);
+      const actual = param.getSampleAccurateValues();
+
+      assert(param.hasSampleAccurateValues() === true);
+      assert(deepCloseTo(actual, expected, 0.0625));
+    }
+  });
+
+  it("works with dynamic insertion", () => {
+    const param = new AudioParam(context, { rate: "audio", defaultValue: 0 });
+
+    sched1(param);
+
+    for (let i = 0; i < 5; i++) {
+      param.dspProcess(i * 16);
+    }
+    sched2(param);
+    param.dspProcess(5 * 16);
+
+    const expected = expectedValues.subarray(5 * 16, (5 + 1) * 16);
+    const actual = param.getSampleAccurateValues();
+
+    assert(param.hasSampleAccurateValues() === true);
+    assert(deepCloseTo(actual, expected, 0.0625));
+  });
+}
+
 function toValues(str) {
   str = str.replace(/^\s*\|/gm, "").trimRight();
 
@@ -30,4 +85,18 @@ function findIndexes(str, ch) {
   return result;
 }
 
-module.exports = { toValues };
+function closeTo(a, b ,delta) {
+  return Math.abs(a - b) <= delta;
+}
+
+function deepCloseTo(a, b, delta) {
+  assert(a.length === b.length);
+
+  for (let i = 0, imax = a.length; i < imax; i++) {
+    assert(closeTo(a[i], b[i], delta), `a[${i}]=${a[i]}, b[${i}]=${b[i]}`);
+  }
+
+  return true;
+}
+
+module.exports = { makeTests, toValues };

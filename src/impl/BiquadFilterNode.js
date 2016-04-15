@@ -58,7 +58,11 @@ class BiquadFilterNode extends AudioNode {
 
   channelDidUpdate(numberOfChannels) {
     this.dspSetNumberOfChannels(numberOfChannels);
-    this.getOutput(0).setNumberOfChannels(numberOfChannels);
+    this.outputs[0].setNumberOfChannels(numberOfChannels);
+  }
+
+  getTailTime() {
+    return 0.2;
   }
 
   fromFilterTypeName(value) {

@@ -3,6 +3,7 @@
 const util = require("../util");
 const AudioNode = require("./AudioNode");
 const AudioNodeOutput = require("./core/AudioNodeOutput");
+const AudioDestinationNodeDSP = require("./dsp/AudioDestinationNode");
 
 class AudioDestinationNode extends AudioNode {
   constructor(context, opts) {
@@ -20,10 +21,10 @@ class AudioDestinationNode extends AudioNode {
     });
 
     this._numberOfChannels = numberOfChannels;
-    this._output = new AudioNodeOutput({ node: this, index: 0, numberOfChannels: numberOfChannels });
-    this._outputBus = this._output.getAudioBus();
-    this._outputBus.setChannelInterpretation("speakers");
-    this._output.enable();
+    this.output = new AudioNodeOutput({ node: this, index: 0, numberOfChannels: numberOfChannels });
+    this.outputBus = this.output.bus;
+    this.outputBus.setChannelInterpretation("speakers");
+    this.output.enable();
   }
 
   getMaxChannelCount() {
@@ -36,15 +37,8 @@ class AudioDestinationNode extends AudioNode {
   }
 
   getOutput() {
-    return this._output;
-  }
-
-  dspProcess() {
-    const inputBus = this.getInput(0).getAudioBus();
-    const outputBus = this._outputBus;
-
-    outputBus.copyFrom(inputBus);
+    return this.output;
   }
 }
 
-module.exports = AudioDestinationNode;
+module.exports = util.mixin(AudioDestinationNode, AudioDestinationNodeDSP);

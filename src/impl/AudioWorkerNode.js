@@ -22,7 +22,7 @@ class AudioWorkerNode extends AudioNode {
     });
     this._maxChannelCount = inputs.reduce((maxValue, numberOfChannels) => Math.max(maxValue, numberOfChannels), 0);
     this._worker = worker;
-    this._inputs.forEach((input, index) => {
+    this.inputs.forEach((input, index) => {
       input.setChannelCount(inputs[index]);
     });
     this.enableOutputsIfNecessary();
@@ -45,11 +45,11 @@ class AudioWorkerNode extends AudioNode {
   }
 
   getChannelInterpretation() {
-    return this._inputs[0].getChannelInterpretation();
+    return this.inputs[0].getChannelInterpretation();
   }
 
   setChannelInterpretation(value) {
-    this._inputs.forEach((input) => {
+    this.inputs.forEach((input) => {
       input.setChannelInterpretation(value);
     });
   }
@@ -63,8 +63,8 @@ class AudioWorkerNode extends AudioNode {
     return this._worker;
   }
 
-  disableOutputsIfNecessary() {
-    // This node cannot disable.
+  getTailTime() {
+    return Infinity;
   }
 }
 

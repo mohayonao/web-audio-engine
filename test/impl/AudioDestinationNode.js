@@ -76,7 +76,7 @@ describe("AudioDestinationNode", () => {
 
       outputBus.getMutableData();
 
-      node2.processIfNecessary({ currentTime: 0, nextCurrentTime: 16 / 8000 });
+      node2.processIfNecessary(0);
 
       assert(outputBus.isSilent() === true);
       assert(deepEqual(outputBus.getChannelData()[0], np.zeros(16)));
@@ -94,7 +94,7 @@ describe("AudioDestinationNode", () => {
       node1.enableOutputsIfNecessary();
       node1.connect(node2);
 
-      node2.processIfNecessary({ currentTime: 0, nextCurrentTime: 16 / 8000 });
+      node2.processIfNecessary(0);
 
       assert(outputBus.isSilent() === false);
       assert(deepEqual(outputBus.getChannelData()[0], noise1));
