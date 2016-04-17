@@ -10,6 +10,7 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/codemirror.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/mode/javascript/javascript.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.21/vue.min.js"></script>
+  <script src="//mohayonao.github.io/web-audio-scheduler/build/web-audio-scheduler.min.js"></script>
   <script src="../build/web-audio-engine.js"></script>
   <style>
   .btn { width: 100px; outline: none !important }
@@ -189,7 +190,11 @@
         context = audioContext;
       }
 
-      var util = { end: vue.stop.bind(vue), fetchAudioBuffer: fetchAudioBuffer.bind(null, context) };
+      var util = {};
+
+      util.WebAudioScheduler = window.WebAudioScheduler;
+      util.fetchAudioBuffer = fetchAudioBuffer.bind(null, context);
+      util.end = vue.stop.bind(vue);
 
       (composeFn(context, util) || Promise.resolve()).then(function() {
         context.resume();
@@ -210,7 +215,7 @@
         isPlaying: false,
         engine: "web-audio-engine",
         selected: "sines",
-        list: [ "sines", "filter", "delay" ]
+        list: [ "metronome", "sines", "filter", "delay", "drum" ]
       },
       methods: {
         run: function() {

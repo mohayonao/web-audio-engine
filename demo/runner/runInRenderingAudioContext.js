@@ -3,6 +3,7 @@
 const wae = require("../..");
 const fs = require("fs");
 const tickable = require("tickable-timer");
+const WebAudioScheduler = require("web-audio-scheduler");
 const timerAPI = require("../util/timerAPI");
 const consoleAPI = require("../util/consoleAPI");
 const createContextOptions = require("../util/createContextOptions");
@@ -13,6 +14,7 @@ function runInRenderingAudioContext(func, opts) {
   const context = new AudioContext(createContextOptions(opts));
   const util = {};
 
+  util.WebAudioScheduler = WebAudioScheduler;
   util.fetchAudioBuffer = fetchAudioBuffer.bind(null, context);
   util.end = () => { opts.isEnded = true };
 
