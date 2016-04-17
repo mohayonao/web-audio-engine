@@ -1,14 +1,14 @@
 "use strict";
 
 const util = require("../util");
-const AudioSourceNode = require("./AudioSourceNode");
+const AudioScheduledSourceNode = require("./AudioScheduledSourceNode");
 const PeriodicWave = require("./PeriodicWave");
 const OscillatorNodeDSP = require("./dsp/OscillatorNode");
 
 const OscillatorTypes = PeriodicWave.BasicWaveForms;
 const DefaultPeriodicWaves = {};
 
-class OscillatorNode extends AudioSourceNode {
+class OscillatorNode extends AudioScheduledSourceNode {
   constructor(context) {
     super(context);
     this._frequency = this.addParam("audio", 440);
@@ -16,9 +16,6 @@ class OscillatorNode extends AudioSourceNode {
     this._type = "sine";
     this._periodicWave = this.buildPeriodicWave(this._type);
     this._waveTable = null;
-    this._startTime = Infinity;
-    this._stopTime = Infinity;
-
     this.dspInit();
   }
 
@@ -41,23 +38,6 @@ class OscillatorNode extends AudioSourceNode {
 
   getDetune() {
     return this._detune;
-  }
-
-  start(when) {
-    /* istanbul ignore else */
-    if (this._startTime === Infinity) {
-      when = Math.max(this.context.currentTime, util.toNumber(when));
-      this._startTime = when;
-      this.getOutput(0).enable();
-    }
-  }
-
-  stop(when) {
-    /* istanbul ignore else */
-    if (this._startTime !== Infinity && this._stopTime === Infinity) {
-      when = Math.max(this.context.currentTime, this._startTime, util.toNumber(when));
-      this._stopTime = when;
-    }
   }
 
   setPeriodicWave(periodicWave) {

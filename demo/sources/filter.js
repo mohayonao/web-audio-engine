@@ -9,7 +9,6 @@ module.exports = function(context, util) {
 
   function synth(midi, duration) {
     var filter = context.createBiquadFilter();
-    var pan = context.createStereoPanner();
     var gain = context.createGain();
     var t0 = context.currentTime;
     var t1 = t0 + duration;
@@ -28,24 +27,16 @@ module.exports = function(context, util) {
       });
     });
 
-    var curveLength = sample([ 4, 24, 24, 32, 32, 32, 48, 128 ]);
-    var freqCurve = new Float32Array(curveLength).map(function() {
-      return freq * sample([ 0.25, 0.5, 1, 2, 2, 4, 4, 4, 6, 6, 8 ]);
-    });
+    var cutoff1 = freq * sample([ 0.25, 0.5, 1, 2, 2, 4, 4, 4, 6, 6, 8 ]);
+    var cutoff2 = freq * sample([ 0.25, 0.5, 1, 2, 2, 4, 4, 4, 6, 6, 8 ]);
 
     filter.type = "bandpass";
-    filter.frequency.setValueCurveAtTime(freqCurve, t0, t1 - t0);
+    filter.frequency.setValueAtTime(cutoff1, t0);
+    filter.frequency.exponentialRampToValueAtTime(cutoff2, t1);
     filter.Q.value = 4;
-    filter.connect(pan);
+    filter.connect(gain);
 
-    var panCurve = new Float32Array(curveLength * 8).map(function() {
-      return sample([ -0.6, -0.4, +0.4, +0.6 ]);
-    });
-
-    pan.pan.setValueCurveAtTime(panCurve, t0, t1 - t0);
-    pan.connect(gain);
-
-    gain.gain.setValueAtTime(0.125, t0);
+    gain.gain.setValueAtTime(0.1, t0);
     gain.gain.linearRampToValueAtTime(0, t1);
     gain.connect(context.destination);
   }

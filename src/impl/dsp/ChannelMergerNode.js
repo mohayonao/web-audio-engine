@@ -4,8 +4,8 @@ const AudioNode = require("../AudioNode");
 
 class ChannelMergerNode extends AudioNode {
   dspProcess() {
-    const outputBus = this.getOutput(0).getAudioBus();
-    const inputBuses = this._inputs.map(input => input.getAudioBus());
+    const outputBus = this.outputs[0].bus;
+    const inputBuses = this.inputs.map(input => input.bus);
     const allSilent = inputBuses.every(inputBus => inputBus.isSilent());
 
     outputBus.zeros();

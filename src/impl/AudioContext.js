@@ -24,9 +24,10 @@ class AudioContext extends EventTarget {
     this._destination = new AudioDestinationNode(this, { numberOfChannels });
     this._listener = new AudioListener(this);
     this._state = "suspended";
+    this._scheduledSourceNodes = [];
     this._callbacksForPreProcess = [];
     this._callbacksForPostProcess = null;
-    this._procTicks = 0;
+    this._currentFrameIndex = 0;
   }
 
   getDestination() {
@@ -86,6 +87,24 @@ class AudioContext extends EventTarget {
     });
   }
 
+  addToScheduledSource(node) {
+    const index = this._scheduledSourceNodes.indexOf(node);
+
+    /* istanbul ignore else */
+    if (index === -1) {
+      this._scheduledSourceNodes.push(node);
+    }
+  }
+
+  removeFromScheduledSource(node) {
+    const index = this._scheduledSourceNodes.indexOf(node);
+
+    /* istanbul ignore else */
+    if (index === -1) {
+      this._scheduledSourceNodes.splice(index, 1);
+    }
+  }
+
   addPreProcess(task) {
     assert(typeof task === "function");
     this._callbacksForPreProcess.push(task);
@@ -107,22 +126,27 @@ class AudioContext extends EventTarget {
     this._callbacksForPreProcess = [];
 
     const destination = this._destination;
-    const outputBus = destination.getOutput(0).getAudioBus();
+    const outputBus = destination.outputBus;
 
     if (this._state === "running") {
       const sampleRate = this.sampleRate;
-      const inNumSamples = this.blockSize;
-      const currentTime = this.currentTime;
-      const nextCurrentTime = currentTime + (inNumSamples / sampleRate);
-      const procItem = { sampleRate, inNumSamples, currentTime, nextCurrentTime };
+      const blockSize = this.blockSize;
+      const currentSample = this._currentFrameIndex * blockSize;
+      const scheduledSourceNodes = this._scheduledSourceNodes;
+
+      for (let i = scheduledSourceNodes.length - 1; i >= 0; i--) {
+        if (scheduledSourceNodes[i].checkSchedule(currentSample) === "running") {
+          scheduledSourceNodes.splice(i, 1);
+        }
+      }
 
       this._callbacksForPostProcess = [];
 
-      destination.processIfNecessary(procItem);
+      destination.processIfNecessary(currentSample);
 
       this.callTasks(this._callbacksForPostProcess);
-      this._procTicks += 1;
-      this.currentTime = (this._procTicks * inNumSamples) / sampleRate;
+      this.currentTime = (currentSample + blockSize) / sampleRate;
+      this._currentFrameIndex += 1;
     } else {
       outputBus.zeros();
     }
@@ -137,7 +161,7 @@ class AudioContext extends EventTarget {
     this._state = "suspended";
     this._callbacksForPreProcess = [];
     this._callbacksForPostProcess = null;
-    this._procTicks = 0;
+    this._currentFrameIndex = 0;
   }
 }
 

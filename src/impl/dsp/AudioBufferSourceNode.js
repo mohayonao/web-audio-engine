@@ -1,8 +1,8 @@
 "use strict";
 
-const AudioSourceNode = require("../AudioSourceNode");
+const AudioScheduledSourceNode = require("../AudioScheduledSourceNode");
 
-class AudioBufferSourceNode extends AudioSourceNode {
+class AudioBufferSourceNode extends AudioScheduledSourceNode {
   dspInit() {
     this._phase = 0;
   }
@@ -14,40 +14,39 @@ class AudioBufferSourceNode extends AudioSourceNode {
     this._phase = Math.max(0, Math.min(this._offset, bufferDuration)) * bufferSampleRate;
   }
 
-  dspProcess(e) {
-    const currentTime = e.currentTime;
-    const nextCurrentTime = e.nextCurrentTime;
+  dspProcess(currentSample) {
+    const nextSample = currentSample + this.blockSize;
 
-    if (nextCurrentTime < this._startTime) {
+    if (nextSample < this._startSample) {
       return;
     }
 
-    if (this._implicitStopTime <= currentTime) {
+    if (this._stopSample <= currentSample) {
       return;
     }
 
-    const sampleRate = e.sampleRate;
-    const inNumSamples = e.inNumSamples;
-    const frameOffset = Math.max(0, Math.round((this._startTime - currentTime) * sampleRate));
-    const fillToTime = Math.min(nextCurrentTime, this._implicitStopTime);
-    const fillToFrame = Math.round((fillToTime - currentTime) * sampleRate)|0;
-    const outputs = this.getOutput(0).getAudioBus().getMutableData();
+    const sampleRate = this.sampleRate;
+    const blockSize = this.blockSize;
+    const frameOffset = Math.max(0, this._startSample - currentSample);
+    const endSample = Math.min(nextSample, this._stopSample);
+    const fillToFrame = endSample - currentSample;
+    const outputs = this.outputs[0].bus.getMutableData();
     const numberOfChannels = outputs.length;
 
     let writeIndex = 0;
 
     writeIndex = this.dspBufferRendering(outputs, frameOffset, fillToFrame, sampleRate);
 
-    if (writeIndex < inNumSamples) {
-      while (writeIndex < inNumSamples) {
+    if (writeIndex < blockSize) {
+      while (writeIndex < blockSize) {
         for (let ch = 0; ch < numberOfChannels; ch++) {
           outputs[ch][writeIndex] = 0;
         }
         writeIndex += 1;
       }
       this.context.addPostProcess(() => {
-        this.getOutput(0).getAudioBus().zeros();
-        this.getOutput(0).disable();
+        this.outputs[0].bus.zeros();
+        this.outputs[0].disable();
         this.dispatchEvent({ type: "ended" });
       });
     }

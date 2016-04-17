@@ -14,8 +14,8 @@ class AudioNodeInput {
 
     this.node = node;
     this.index = index|0;
-    this._audioBus = new AudioBus(numberOfChannels, node.blockSize, node.sampleRate);
-    this._audioBus.setChannelInterpretation("speakers");
+    this.bus = new AudioBus(numberOfChannels, node.blockSize, node.sampleRate);
+    this.bus.setChannelInterpretation("speakers");
     this._channelCount = channelCount|0;
     this._channelCountMode = channelCountMode;
     this._outputs = [];
@@ -23,7 +23,7 @@ class AudioNodeInput {
   }
 
   getAudioBus() {
-    return this._audioBus;
+    return this.bus;
   }
 
   getChannelCount() {
@@ -53,15 +53,15 @@ class AudioNodeInput {
   }
 
   getChannelInterpretation() {
-    return this._audioBus.getChannelInterpretation();
+    return this.bus.getChannelInterpretation();
   }
 
   setChannelInterpretation(value) {
-    this._audioBus.setChannelInterpretation(value);
+    this.bus.setChannelInterpretation(value);
   }
 
   getNumberOfChannels() {
-    return this._audioBus.getNumberOfChannels();
+    return this.bus.getNumberOfChannels();
   }
 
   computeNumberOfChannels() {
@@ -84,8 +84,8 @@ class AudioNodeInput {
     const numberOfChannels = this.computeNumberOfChannels();
 
     /* istanbul ignore else */
-    if (numberOfChannels !== this._audioBus.getNumberOfChannels()) {
-      this._audioBus.setNumberOfChannels(numberOfChannels);
+    if (numberOfChannels !== this.bus.getNumberOfChannels()) {
+      this.bus.setNumberOfChannels(numberOfChannels);
       this.node.channelDidUpdate(numberOfChannels);
     }
   }
@@ -169,7 +169,7 @@ class AudioNodeInput {
   }
 
   sumAllConnections(e) {
-    const audioBus = this._audioBus;
+    const audioBus = this.bus;
     const outputs = this._outputs;
 
     audioBus.zeros();
@@ -187,7 +187,7 @@ class AudioNodeInput {
 
       /* istanbul ignore else */
       if (output.getNumberOfChannels() === this.getNumberOfChannels()) {
-        return this._audioBus.copyFrom(output.pull(e));
+        return this.bus.copyFrom(output.pull(e));
       }
     }
 

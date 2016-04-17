@@ -2,6 +2,7 @@
 
 const util = require("../util");
 const AudioNode = require("./AudioNode");
+const AnalyserNodeDSP = require("./dsp/AnalyserNode");
 
 const MaxFFTSize = 32768;
 const MinFFTSize = 32;
@@ -88,15 +89,8 @@ class AnalyserNode extends AudioNode {
   }
 
   channelDidUpdate(numberOfChannels) {
-    this.getOutput(0).setNumberOfChannels(numberOfChannels);
-  }
-
-  dspProcess() {
-    const inputBus = this.getInput(0).getAudioBus();
-    const outputBus = this.getOutput(0).getAudioBus();
-
-    outputBus.copyFrom(inputBus);
+    this.outputs[0].setNumberOfChannels(numberOfChannels);
   }
 }
 
-module.exports = AnalyserNode;
+module.exports = util.mixin(AnalyserNode, AnalyserNodeDSP);

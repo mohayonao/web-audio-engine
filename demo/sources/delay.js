@@ -10,7 +10,7 @@ module.exports = function(context, util) {
   function synth(midi) {
     var osc = context.createOscillator();
     var amp = context.createGain();
-    var delay = context.createDelay(0.25);
+    var delay = context.createDelay(0.1);
     var out = context.createGain();
     var t0 = context.currentTime;
     var t1 = t0 + 0.125;
@@ -26,7 +26,7 @@ module.exports = function(context, util) {
     amp.connect(out);
     amp.connect(delay);
 
-    delay.delayTime.value = 0.0625;
+    delay.delayTime.value = 0.09375;
     delay.connect(out);
 
     return out;
@@ -41,13 +41,13 @@ module.exports = function(context, util) {
     input.connect(delay);
     input.connect(output);
 
-    delay.delayTime.value = 0.25;
+    delay.delayTime.value = 0.125;
     delay.connect(feedback);
 
     feedback.gain.value = 0.925;
     feedback.connect(input);
 
-    return { input: input, output: output };
+    return { input: input, output: output, feedback: feedback.gain };
   }
 
   var efx = createFeedbackDelay();
@@ -55,7 +55,10 @@ module.exports = function(context, util) {
   function compose() {
     var midi = sample([ 64, 65, 65, 69, 72, 76 ]) + 12;
     var duration = sample([ 2, 2, 3, 4 ]);
+    var feedback = sample([ 0.4, 0.6, 0.8, 0.9, 0.975 ]);
     var nextTime = (duration * 1000) * Math.random();
+
+    efx.feedback.setTargetAtTime(feedback, context.currentTime, 1);
 
     synth(midi, duration).connect(efx.input);
 

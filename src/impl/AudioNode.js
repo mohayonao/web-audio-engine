@@ -21,12 +21,13 @@ class AudioNode extends EventTarget {
     this.context = context;
     this.blockSize = context.blockSize;
     this.sampleRate = context.sampleRate;
+    this.inputs = [];
+    this.outputs = [];
 
-    this._inputs = [];
-    this._outputs = [];
     this._params = [];
     this._enabled = false;
-    this._lastProcessingTime = -1;
+    this._lastProcessingSample = -1;
+    this._disableSample = Infinity;
 
     inputs.forEach((numberOfChannels) => {
       this.addInput(numberOfChannels, channelCount, channelCountMode);
@@ -41,45 +42,45 @@ class AudioNode extends EventTarget {
   }
 
   getNumberOfInputs() {
-    return this._inputs.length;
+    return this.inputs.length;
   }
 
   getNumberOfOutputs() {
-    return this._outputs.length;
+    return this.outputs.length;
   }
 
   getChannelCount() {
-    assert(this._inputs.length === 1);
-    return this._inputs[0].getChannelCount();
+    assert(this.inputs.length === 1);
+    return this.inputs[0].getChannelCount();
   }
 
   setChannelCount(value) {
-    assert(this._inputs.length === 1);
-    this._inputs[0].setChannelCount(value);
+    assert(this.inputs.length === 1);
+    this.inputs[0].setChannelCount(value);
   }
 
   getChannelCountMode() {
-    assert(this._inputs.length === 1);
-    return this._inputs[0].getChannelCountMode();
+    assert(this.inputs.length === 1);
+    return this.inputs[0].getChannelCountMode();
   }
 
   setChannelCountMode(value) {
-    assert(this._inputs.length === 1);
-    this._inputs[0].setChannelCountMode(value);
+    assert(this.inputs.length === 1);
+    this.inputs[0].setChannelCountMode(value);
   }
 
   getChannelInterpretation() {
-    assert(this._inputs.length === 1);
-    return this._inputs[0].getChannelInterpretation();
+    assert(this.inputs.length === 1);
+    return this.inputs[0].getChannelInterpretation();
   }
 
   setChannelInterpretation(value) {
-    assert(this._inputs.length === 1);
-    this._inputs[0].setChannelInterpretation(value);
+    assert(this.inputs.length === 1);
+    this.inputs[0].setChannelInterpretation(value);
   }
 
   connect(destination, output, input) {
-    this._outputs[output|0].connect(destination, input|0);
+    this.outputs[output|0].connect(destination, input|0);
   }
 
   disconnect() {
@@ -99,20 +100,20 @@ class AudioNode extends EventTarget {
 
   addInput(numberOfChannels, channelCount, channelCountMode) {
     const node = this;
-    const index = this._inputs.length;
+    const index = this.inputs.length;
     const input = new AudioNodeInput({ node, index, numberOfChannels, channelCount, channelCountMode });
 
-    this._inputs.push(input);
+    this.inputs.push(input);
 
     return input;
   }
 
   addOutput(numberOfChannels) {
     const node = this;
-    const index = this._outputs.length;
+    const index = this.outputs.length;
     const output = new AudioNodeOutput({ node, index, numberOfChannels });
 
-    this._outputs.push(output);
+    this.outputs.push(output);
 
     return output;
   }
@@ -126,32 +127,48 @@ class AudioNode extends EventTarget {
   }
 
   getInput(channel) {
-    assert(0 <= channel && channel < this._inputs.length);
-    return this._inputs[channel|0];
+    assert(0 <= channel && channel < this.inputs.length);
+    return this.inputs[channel|0];
   }
 
   getOutput(channel) {
-    assert(0 <= channel && channel < this._outputs.length);
-    return this._outputs[channel|0];
+    assert(0 <= channel && channel < this.outputs.length);
+    return this.outputs[channel|0];
   }
 
   isEnabled() {
     return this._enabled;
   }
 
+  getTailTime() {
+    return 0;
+  }
+
   enableOutputsIfNecessary() {
     if (!this._enabled) {
+      this._disableSample = Infinity;
       this._enabled = true;
-      this._outputs.forEach((output) => {
+      this.outputs.forEach((output) => {
         output.enable();
       });
     }
   }
 
   disableOutputsIfNecessary() {
+    const currentTime = this.context.currentTime;
+    const disableTime = currentTime + this.getTailTime();
+
+    if (disableTime === currentTime) {
+      this._disableOutputsIfNecessary();
+    } else if (disableTime !== Infinity) {
+      this._disableSample = Math.round(disableTime * this.sampleRate);
+    }
+  }
+
+  _disableOutputsIfNecessary() {
     if (this._enabled) {
       this._enabled = false;
-      this._outputs.forEach((output) => {
+      this.outputs.forEach((output) => {
         output.disable();
       });
     }
@@ -160,38 +177,38 @@ class AudioNode extends EventTarget {
   channelDidUpdate() {}
 
   disconnectAll() {
-    this._outputs.forEach((output) => {
+    this.outputs.forEach((output) => {
       output.disconnect();
     });
   }
 
   disconnectAllFromOutput(output) {
-    this._outputs[output|0].disconnect();
+    this.outputs[output|0].disconnect();
   }
 
   disconnectIfConnected(destination) {
-    this._outputs.forEach((output) => {
+    this.outputs.forEach((output) => {
       output.disconnect(destination);
     });
   }
 
   disconnectFromOutputIfConnected(output, destination, input) {
-    this._outputs[output|0].disconnect(destination, input|0);
+    this.outputs[output|0].disconnect(destination, input|0);
   }
 
   isConnectedTo() {
     const args = Array.from(arguments);
 
     if (args.length === 1) {
-      return this._outputs.some((output) => {
+      return this.outputs.some((output) => {
         return output.isConnectedTo(args[0]);
       });
     }
 
     const output = args.splice(1, 1)[0]|0;
 
-    if (this._outputs[output]) {
-      return this._outputs[output].isConnectedTo.apply(this._outputs[output], args);
+    if (this.outputs[output]) {
+      return this.outputs[output].isConnectedTo.apply(this.outputs[output], args);
     }
 
     return false;
@@ -207,25 +224,38 @@ class AudioNode extends EventTarget {
     return false;
   }
 
-  processIfNecessary(e) {
-    if (e.currentTime <= this._lastProcessingTime) {
+  processIfNecessary(currentSample) {
+    if (currentSample <= this._lastProcessingSample) {
       return;
     }
-    this._lastProcessingTime = e.currentTime;
+    this._lastProcessingSample = currentSample;
 
-    const inputs = this._inputs;
+    if (this._disableSample <= currentSample) {
+      const outputs = this.outputs;
+
+      for (let i = 0, imax = outputs.length; i < imax; i++) {
+        outputs[i].zeros();
+      }
+
+      this.context.addPostProcess(() => {
+        this._disableOutputsIfNecessary();
+      });
+      return;
+    }
+
+    const inputs = this.inputs;
 
     for (let i = 0, imax = inputs.length; i < imax; i++) {
-      inputs[i].pull(e);
+      inputs[i].pull(currentSample);
     }
 
     const params = this._params;
 
     for (let i = 0, imax = params.length; i < imax; i++) {
-      params[i].dspProcess(e);
+      params[i].dspProcess(currentSample);
     }
 
-    this.dspProcess(e);
+    this.dspProcess(currentSample);
   }
 
   dspInit() {}

@@ -24,16 +24,6 @@ class BiquadFilterNode extends AudioNode {
     this._prevDetune = 0;
     this._prevQ = 0;
     this._prevGain = 0;
-    this._disabledTime = Infinity;
-  }
-
-  enableOutputsIfNecessary() {
-    this._disabledTime = Infinity;
-    super.enableOutputsIfNecessary();
-  }
-
-  disableOutputsIfNecessary() {
-    this._disabledTime = this.context.currentTime + 0.2;
   }
 
   dspSetNumberOfChannels(numberOfChannels) {
@@ -47,20 +37,12 @@ class BiquadFilterNode extends AudioNode {
     assert(numberOfChannels === this._kernels.length);
   }
 
-  dspProcess(e) {
-    if (this._disabledTime <= e.currentTime) {
-      this.getOutput(0).zeros();
-      this.context.addPostProcess(() => {
-        super.disableOutputsIfNecessary();
-      });
-      return;
-    }
-
-    const inputs = this.getInput(0).getAudioBus().getChannelData();
-    const outputs = this.getOutput(0).getAudioBus().getMutableData();
+  dspProcess() {
+    const inputs = this.inputs[0].bus.getChannelData();
+    const outputs = this.outputs[0].bus.getMutableData();
     const isCoefficientsUpdated = this.dspUpdateCoefficients();
     const kernels = this._kernels;
-    const inNumSamples = e.inNumSamples;
+    const inNumSamples = this.blockSize;
 
     if (!this._initCoefficients) {
       for (let i = 0, imax = kernels.length; i < imax; i++) {

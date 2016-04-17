@@ -11,17 +11,17 @@ class AudioNodeOutput {
 
     this.node = node;
     this.index = index|0;
-    this._audioBus = new AudioBus(numberOfChannels, node.blockSize, node.sampleRate);
+    this.bus = new AudioBus(numberOfChannels, node.blockSize, node.sampleRate);
     this._inputs = [];
     this._enabled = !!enabled;
   }
 
   getAudioBus() {
-    return this._audioBus;
+    return this.bus;
   }
 
   getNumberOfChannels() {
-    return this._audioBus.getNumberOfChannels();
+    return this.bus.getNumberOfChannels();
   }
 
   setNumberOfChannels(numberOfChannels) {
@@ -29,7 +29,7 @@ class AudioNodeOutput {
     if (numberOfChannels !== this.getNumberOfChannels()) {
       const channelInterpretation = this.node.getChannelInterpretation();
 
-      this._audioBus.setNumberOfChannels(numberOfChannels, channelInterpretation);
+      this.bus.setNumberOfChannels(numberOfChannels, channelInterpretation);
 
       this._inputs.forEach((input) => {
         input.updateNumberOfChannels();
@@ -66,7 +66,7 @@ class AudioNodeOutput {
   }
 
   zeros() {
-    this._audioBus.zeros();
+    this.bus.zeros();
   }
 
   connect(destination, input) {
@@ -110,7 +110,7 @@ class AudioNodeOutput {
 
   pull(e) {
     this.node.processIfNecessary(e);
-    return this._audioBus;
+    return this.bus;
   }
 }
 

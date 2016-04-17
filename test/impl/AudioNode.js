@@ -232,7 +232,6 @@ describe("AudioNode", () => {
       const node2 = new GainNode(context);
       const node3 = new GainNode(context);
       const param = node1.getGain();
-      const procItem = { currentTime: 0, nextCurrentTime: 16 / 8000 };
 
       node1.getOutput(0).enable();
       node2.getOutput(0).enable();
@@ -242,17 +241,16 @@ describe("AudioNode", () => {
       node1.dspProcess = sinon.spy();
       param.dspProcess = sinon.spy();
 
-      node3.processIfNecessary(procItem);
+      node3.processIfNecessary(0);
 
-      assert(node1.dspProcess.calledWith(procItem));
-      assert(param.dspProcess.calledWith(procItem));
+      assert(node1.dspProcess.calledWith(0));
+      assert(param.dspProcess.calledWith(0));
     });
 
     it("feedback loop", () => {
       const node1 = new GainNode(context);
       const node2 = new GainNode(context);
       const node3 = new GainNode(context);
-      const procItem = { currentTime: 0, nextCurrentTime: 16 / 8000 };
 
       node1.getOutput(0).enable();
       node2.getOutput(0).enable();
@@ -262,10 +260,10 @@ describe("AudioNode", () => {
 
       node1.dspProcess = sinon.spy();
 
-      node3.processIfNecessary(procItem);
+      node3.processIfNecessary(0);
 
       assert(node1.dspProcess.callCount === 1);
-      assert(node1.dspProcess.calledWith(procItem));
+      assert(node1.dspProcess.calledWith(0));
     });
   });
 });

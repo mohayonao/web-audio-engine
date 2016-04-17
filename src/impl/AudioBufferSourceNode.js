@@ -1,11 +1,11 @@
 "use strict";
 
 const util = require("../util");
-const AudioSourceNode = require("./AudioSourceNode");
+const AudioScheduledSourceNode = require("./AudioScheduledSourceNode");
 const AudioBuffer = require("./AudioBuffer");
 const AudioBufferSourceNodeDSP = require("./dsp/AudioBufferSourceNode");
 
-class AudioBufferSourceNode extends AudioSourceNode {
+class AudioBufferSourceNode extends AudioScheduledSourceNode {
   constructor(context) {
     super(context);
     this._buffer = null;
@@ -16,9 +16,6 @@ class AudioBufferSourceNode extends AudioSourceNode {
     this._loopStart = 0;
     this._loopEnd = 0;
     this._offset = 0;
-    this._startTime = Infinity;
-    this._stopTime = Infinity;
-    this._implicitStopTime = Infinity;
   }
 
   getBuffer() {
@@ -32,7 +29,7 @@ class AudioBufferSourceNode extends AudioSourceNode {
     if (value instanceof AudioBuffer) {
       this._buffer = value;
       this._audioData = this._buffer.getAudioData();
-      this.getOutput(0).setNumberOfChannels(this._audioData.numberOfChannels);
+      this.outputs[0].setNumberOfChannels(this._audioData.numberOfChannels);
     }
   }
 
@@ -72,26 +69,14 @@ class AudioBufferSourceNode extends AudioSourceNode {
 
   start(when, offset, duration) {
     /* istanbul ignore else */
-    if (this._startTime === Infinity && this._audioData !== null) {
-      when = Math.max(this.context.currentTime, util.toNumber(when));
+    if (super.start(when)) {
       offset = offset|0;
-      this._startTime = when;
       this._offset = offset;
       if (typeof duration !== "undefined") {
         duration = Math.max(0, util.toNumber(duration));
-        this._implicitStopTime = when + duration;
+        this._stopSample = Math.round((this._startTime + duration) * this.sampleRate);
       }
       this.dspStart();
-      this.getOutput(0).enable();
-    }
-  }
-
-  stop(when) {
-    /* istanbul ignore else */
-    if (this._startTime !== Infinity && this._stopTime === Infinity) {
-      when = Math.max(this.context.currentTime, this._startTime, util.toNumber(when));
-      this._stopTime = when;
-      this._implicitStopTime = Math.min(this._implicitStopTime, when);
     }
   }
 }

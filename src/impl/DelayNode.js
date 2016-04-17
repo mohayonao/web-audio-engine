@@ -32,7 +32,11 @@ class DelayNode extends AudioNode {
 
   channelDidUpdate(numberOfChannels) {
     this.dspSetNumberOfChannels(numberOfChannels);
-    this.getOutput(0).setNumberOfChannels(numberOfChannels);
+    this.outputs[0].setNumberOfChannels(numberOfChannels);
+  }
+
+  getTailTime() {
+    return this._maxDelayTime;
   }
 }
 

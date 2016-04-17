@@ -37,11 +37,11 @@ class ChannelMergerNode extends AudioNode {
   }
 
   getChannelInterpretation() {
-    return this._inputs[0].getChannelInterpretation();
+    return this.inputs[0].getChannelInterpretation();
   }
 
   setChannelInterpretation(value) {
-    this._inputs.forEach((input) => {
+    this.inputs.forEach((input) => {
       input.setChannelInterpretation(value);
     });
   }
@@ -51,10 +51,10 @@ class ChannelMergerNode extends AudioNode {
 
     /* istanbul ignore else */
     if (this.isEnabled()) {
-      const numberOfInputs = this.getNumberOfInputs();
+      const inputs = this.inputs;
 
-      for (let i = 0; i < numberOfInputs; i++) {
-        if (this.getInput(i).isEnabled()) {
+      for (let i = 0, imax = inputs.length; i < imax; i++) {
+        if (inputs[i].isEnabled()) {
           return;
         }
       }

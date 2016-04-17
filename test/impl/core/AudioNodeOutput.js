@@ -213,14 +213,13 @@ describe("AudioNodeOutput", () => {
     it("pull", () => {
       const node = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
       const output = node.getOutput(0);
-      const e = {};
 
       node.dspProcess = sinon.spy();
 
-      const retVal = output.pull(e);
+      const retVal = output.pull(0);
 
       assert(node.dspProcess.callCount === 1);
-      assert(node.dspProcess.calledWith(e));
+      assert(node.dspProcess.calledWith(0));
       assert(retVal instanceof AudioBus);
     });
   });

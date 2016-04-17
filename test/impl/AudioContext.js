@@ -114,10 +114,7 @@ describe("AudioContext", () => {
     it("1: time advances", () => {
       assert(context.getCurrentTime() === 0);
       destination.dspProcess = sinon.spy((e) => {
-        assert(e.sampleRate === 8000);
-        assert(e.inNumSamples === 16);
-        assert(e.currentTime === 0);
-        assert(e.nextCurrentTime === 16 / 8000);
+        assert(e === 0);
       });
 
       const retVal = context.process();

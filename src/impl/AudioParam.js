@@ -16,11 +16,7 @@ class AudioParam {
     this.context = context;
     this.blockSize = context.blockSize;
     this.sampleRate = context.sampleRate;
-    this._rate = this.fromRateName(rate);
-    this._defaultValue = util.toNumber(defaultValue);
-    this._value = this._defaultValue;
-    this._timeline = [];
-    this._inputs = [
+    this.inputs = [
       new AudioNodeInput({
         node: this,
         index: 0,
@@ -29,8 +25,13 @@ class AudioParam {
         channelCountMode: "explicit"
       })
     ];
-    this._outpus = [];
-    this._outputBus = new AudioBus(1, this.blockSize, this.sampleRate);
+    this.outputBus = new AudioBus(1, this.blockSize, this.sampleRate);
+
+    this._rate = this.fromRateName(rate);
+    this._defaultValue = util.toNumber(defaultValue);
+    this._value = this._defaultValue;
+    this._userValue = this._value;
+    this._timeline = [];
 
     this.dspInit(this._rate);
   }
@@ -40,7 +41,7 @@ class AudioParam {
   }
 
   setValue(value) {
-    this._value = util.toNumber(value);
+    this._value = this._userValue = util.toNumber(value);
   }
 
   getDefaultValue() {
@@ -51,33 +52,143 @@ class AudioParam {
     value = util.toNumber(value);
     startTime = Math.max(0, util.toNumber(startTime));
 
-    this.insertEvent({
+    const eventItem = {
       type: AudioParamDSP.SET_VALUE_AT_TIME,
       time: startTime,
-      args: [ value, startTime ]
-    });
+      args: [ value, startTime ],
+      startSample: Math.round(startTime * this.sampleRate),
+      endSample: Infinity,
+      startValue: value,
+      endValue: value
+    };
+    const index = this.insertEvent(eventItem);
+    const prevEventItem = this._timeline[index - 1];
+    const nextEventItem = this._timeline[index + 1];
+
+    if (prevEventItem) {
+      switch (prevEventItem.type) {
+      case AudioParamDSP.SET_VALUE_AT_TIME:
+      case AudioParamDSP.SET_TARGET_AT_TIME:
+        prevEventItem.endSample = eventItem.startSample;
+        break;
+      }
+    }
+
+    if (nextEventItem) {
+      switch (nextEventItem.type) {
+      case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
+      case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
+        nextEventItem.startSample = eventItem.startSample;
+        nextEventItem.startValue = eventItem.startValue;
+        break;
+      }
+      eventItem.endSample = nextEventItem.startSample;
+    }
+
+    if (index <= this._currentEventIndex) {
+      this._currentEventIndex = index;
+      this._remainSamples = 0;
+    }
   }
 
   linearRampToValueAtTime(value, endTime) {
     value = util.toNumber(value);
     endTime = Math.max(0, util.toNumber(endTime));
 
-    this.insertEvent({
+    const eventItem = {
       type: AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME,
       time: endTime,
-      args: [ value, endTime ]
-    });
+      args: [ value, endTime ],
+      startSample: 0,
+      endSample: Math.round(endTime * this.sampleRate),
+      startValue: this._defaultValue,
+      endValue: value
+    };
+    const index = this.insertEvent(eventItem);
+    const prevEventItem = this._timeline[index - 1];
+    const nextEventItem = this._timeline[index + 1];
+
+    if (prevEventItem) {
+      switch (prevEventItem.type) {
+      case AudioParamDSP.SET_VALUE_AT_TIME:
+      case AudioParamDSP.SET_TARGET_AT_TIME:
+        eventItem.startSample = prevEventItem.startSample;
+        eventItem.startValue = prevEventItem.startValue;
+        prevEventItem.endSample = eventItem.startSample;
+        break;
+      case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
+      case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
+      case AudioParamDSP.SET_VALUE_CURVE_AT_TIME:
+        eventItem.startSample = prevEventItem.endSample;
+        eventItem.startValue = prevEventItem.endValue;
+        break;
+      }
+    }
+
+    if (nextEventItem) {
+      switch (nextEventItem.type) {
+      case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
+      case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
+        nextEventItem.startSample = eventItem.endSample;
+        nextEventItem.startValue = eventItem.endValue;
+        break;
+      }
+    }
+
+    if (index <= this._currentEventIndex) {
+      this._currentEventIndex = index;
+      this._remainSamples = 0;
+    }
   }
 
   exponentialRampToValueAtTime(value, endTime) {
     value = Math.max(1e-6, util.toNumber(value));
     endTime = Math.max(0, util.toNumber(endTime));
 
-    this.insertEvent({
+    const eventItem = {
       type: AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME,
       time: endTime,
-      args: [ value, endTime ]
-    });
+      args: [ value, endTime ],
+      startSample: 0,
+      endSample: Math.round(endTime * this.sampleRate),
+      startValue: Math.max(1e-6, this._defaultValue),
+      endValue: value
+    };
+    const index = this.insertEvent(eventItem);
+    const prevEventItem = this._timeline[index - 1];
+    const nextEventItem = this._timeline[index + 1];
+
+    if (prevEventItem) {
+      switch (prevEventItem.type) {
+      case AudioParamDSP.SET_VALUE_AT_TIME:
+      case AudioParamDSP.SET_TARGET_AT_TIME:
+        eventItem.startSample = prevEventItem.startSample;
+        eventItem.startValue = prevEventItem.startValue;
+        prevEventItem.endSample = eventItem.startSample;
+        break;
+      case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
+      case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
+      case AudioParamDSP.SET_VALUE_CURVE_AT_TIME:
+        eventItem.startSample = prevEventItem.endSample;
+        eventItem.startValue = prevEventItem.endValue;
+        break;
+      }
+    }
+
+    if (nextEventItem) {
+      switch (nextEventItem.type) {
+      case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
+      case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
+        nextEventItem.startSample = eventItem.endSample;
+        nextEventItem.startValue = eventItem.endValue;
+        break;
+      }
+    }
+
+    if (index <= this._currentEventIndex) {
+      this._currentEventIndex = index;
+      this._remainSamples = 0;
+    }
   }
 
   setTargetAtTime(target, startTime, timeConstant) {
@@ -85,28 +196,121 @@ class AudioParam {
     startTime = Math.max(0, util.toNumber(startTime));
     timeConstant = Math.max(0, util.toNumber(timeConstant));
 
-    this.insertEvent({
+    const eventItem = {
       type: AudioParamDSP.SET_TARGET_AT_TIME,
       time: startTime,
-      args: [ target, startTime, timeConstant ]
-    });
+      args: [ target, startTime, timeConstant ],
+      startSample: Math.round(startTime * this.sampleRate),
+      endSample: Infinity,
+      startValue: 0,
+      endValue: target
+    };
+    const index = this.insertEvent(eventItem);
+    const prevEventItem = this._timeline[index - 1];
+    const nextEventItem = this._timeline[index + 1];
+
+    if (prevEventItem) {
+      switch (prevEventItem.type) {
+      case AudioParamDSP.SET_VALUE_AT_TIME:
+        eventItem.startValue = prevEventItem.endValue;
+        prevEventItem.endSample = eventItem.startSample;
+        break;
+      case AudioParamDSP.SET_TARGET_AT_TIME:
+        eventItem.startValue = 0;
+        prevEventItem.endSample = eventItem.startSample;
+        break;
+      case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
+      case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
+      case AudioParamDSP.SET_VALUE_CURVE_AT_TIME:
+        eventItem.startValue = prevEventItem.endValue;
+        break;
+      }
+    }
+
+    if (nextEventItem) {
+      switch (nextEventItem.type) {
+      case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
+      case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
+        nextEventItem.startSample = eventItem.startSample;
+        nextEventItem.startValue = eventItem.startValue;
+        break;
+      }
+      eventItem.endSample = nextEventItem.startSample;
+    }
+
+    if (index <= this._currentEventIndex) {
+      this._currentEventIndex = index;
+      this._remainSamples = 0;
+    }
   }
 
   setValueCurveAtTime(values, startTime, duration) {
     startTime = Math.max(0, util.toNumber(startTime));
     duration = Math.max(0, util.toNumber(duration));
 
-    this.insertEvent({
+    if (values.length === 0 || duration === 0) {
+      return;
+    }
+
+    const eventItem = {
       type: AudioParamDSP.SET_VALUE_CURVE_AT_TIME,
       time: startTime,
-      args: [ values, startTime, duration ]
-    });
+      args: [ values, startTime, duration ],
+      startSample: Math.round(startTime * this.sampleRate),
+      endSample: Math.round((startTime + duration) * this.sampleRate),
+      startValue: values[0],
+      endValue: values[values.length - 1]
+    };
+    const index = this.insertEvent(eventItem);
+    const prevEventItem = this._timeline[index - 1];
+    const nextEventItem = this._timeline[index + 1];
+
+    if (prevEventItem) {
+      switch (prevEventItem.type) {
+      case AudioParamDSP.SET_VALUE_AT_TIME:
+      case AudioParamDSP.SET_TARGET_AT_TIME:
+        prevEventItem.endSample = eventItem.startSample;
+        break;
+      }
+    }
+
+    if (nextEventItem) {
+      switch (nextEventItem.type) {
+      case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
+      case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
+        nextEventItem.startSample = eventItem.startSample;
+        nextEventItem.startValue = eventItem.endValue;
+        break;
+      }
+    }
+
+    if (index <= this._currentEventIndex) {
+      this._currentEventIndex = index;
+      this._remainSamples = 0;
+    }
   }
 
   cancelScheduledValues(startTime) {
     startTime = Math.max(0, util.toNumber(startTime));
 
     this._timeline = this._timeline.filter(eventItem => eventItem.time < startTime);
+
+    const index = this._timeline.length - 1;
+    const lastEventItem = this._timeline[index];
+
+    if (lastEventItem) {
+      switch (lastEventItem.type) {
+      case AudioParamDSP.SET_VALUE_AT_TIME:
+      case AudioParamDSP.SET_TARGET_AT_TIME:
+        lastEventItem.endSample = Infinity;
+        break;
+      }
+    }
+
+    if (index <= this._currentEventIndex) {
+      this._currentEventIndex = index;
+      this._remainSamples = 0;
+    }
   }
 
   getContext() {
@@ -114,7 +318,7 @@ class AudioParam {
   }
 
   getInput(channel) {
-    return this._inputs[channel|0];
+    return this.inputs[channel|0];
   }
 
   getRate() {
@@ -126,13 +330,11 @@ class AudioParam {
   }
 
   getSampleAccurateValues() {
-    return this._outputBus.getChannelData()[0];
+    return this.outputBus.getChannelData()[0];
   }
 
-  /* istanbul ignore next */
   enableOutputsIfNecessary() {}
 
-  /* istanbul ignore next */
   disableOutputsIfNecessary() {}
 
   isConnectedFrom() {
@@ -143,6 +345,10 @@ class AudioParam {
     }
 
     return false;
+  }
+
+  getTimeline() {
+    return this._timeline;
   }
 
   getEvents() {
@@ -157,28 +363,30 @@ class AudioParam {
 
   insertEvent(eventItem) {
     const time = eventItem.time;
-    const events = this._timeline;
+    const timeline = this._timeline;
 
-    if (events.length === 0 || events[events.length - 1].time < time) {
-      events.push(eventItem);
-      return;
+    if (timeline.length === 0 || timeline[timeline.length - 1].time < time) {
+      timeline.push(eventItem);
+      return timeline.length - 1;
     }
 
     let pos = 0;
     let replace = 0;
 
-    while (pos < events.length) {
-      if (events[pos].time === time && events[pos].type === eventItem.type) {
+    while (pos < timeline.length) {
+      if (timeline[pos].time === time && timeline[pos].type === eventItem.type) {
         replace = 1;
         break;
       }
-      if (time < events[pos].time) {
+      if (time < timeline[pos].time) {
         break;
       }
       pos += 1;
     }
 
-    events.splice(pos, replace, eventItem);
+    timeline.splice(pos, replace, eventItem);
+
+    return pos
   }
 
   fromRateName(value) {

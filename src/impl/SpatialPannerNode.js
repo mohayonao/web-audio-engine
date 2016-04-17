@@ -1,6 +1,8 @@
 "use strict";
 
+const util = require("../util");
 const BasePannerNode = require("./BasePannerNode");
+const SpatialPannerNodeDSP = require("./dsp/SpatialPannerNode");
 
 class SpatialPannerNode extends BasePannerNode {
   constructor(context) {
@@ -36,14 +38,6 @@ class SpatialPannerNode extends BasePannerNode {
   getOrientationZ() {
     return this._positionZ;
   }
-
-  dspProcess() {
-    const inputBus = this.getInput(0).getAudioBus();
-    const outputBus = this.getOutput(0).getAudioBus();
-
-    outputBus.zeros();
-    outputBus.sumFrom(inputBus);
-  }
 }
 
-module.exports = SpatialPannerNode;
+module.exports = util.mixin(SpatialPannerNode, SpatialPannerNodeDSP);

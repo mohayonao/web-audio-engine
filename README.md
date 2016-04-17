@@ -1,11 +1,3 @@
------
-
-# STATE: WORK IN PROGRESS
-
-:godmode::godmode::godmode::godmode::godmode::godmode::godmode::goberserk::goberserk::goberserk: _70%_
-
------
-
 # web-audio-engine
 [![Build Status](http://img.shields.io/travis/mohayonao/web-audio-engine.svg?style=flat-square)](https://travis-ci.org/mohayonao/web-audio-engine)
 [![NPM Version](http://img.shields.io/npm/v/web-audio-engine.svg?style=flat-square)](https://www.npmjs.org/package/web-audio-engine)

@@ -3,6 +3,7 @@
 const util = require("../util");
 const AudioNode = require("./AudioNode");
 const AudioBuffer = require("./AudioBuffer");
+const ConvolverNodeDSP = require("./dsp/ConvolverNode");
 
 class ConvolverNode extends AudioNode {
   constructor(context) {
@@ -54,16 +55,8 @@ class ConvolverNode extends AudioNode {
   channelDidUpdate(numberOfChannels) {
     numberOfChannels = Math.min(numberOfChannels, 2);
 
-    this.getOutput(0).setNumberOfChannels(numberOfChannels);
-  }
-
-  dspProcess() {
-    const inputBus = this.getInput(0).getAudioBus();
-    const outputBus = this.getOutput(0).getAudioBus();
-
-    outputBus.zeros();
-    outputBus.sumFrom(inputBus);
+    this.outputs[0].setNumberOfChannels(numberOfChannels);
   }
 }
 
-module.exports = ConvolverNode;
+module.exports = util.mixin(ConvolverNode, ConvolverNodeDSP);
