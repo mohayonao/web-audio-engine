@@ -111,7 +111,7 @@ class AudioNodeOutput {
    * @param {number}               index
    */
   connect(destination, input) {
-    const target = destination.getInput(input);
+    const target = destination.inputs[input|0];
 
     if (this._inputs.indexOf(target) === -1) {
       this._inputs.push(target);

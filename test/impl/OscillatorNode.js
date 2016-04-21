@@ -72,7 +72,7 @@ describe("OscillatorNode", () => {
 
       node1.connect(node2);
 
-      assert(node2.getInput(0).getNumberOfChannels() === 1);
+      assert(node2.inputs[0].getNumberOfChannels() === 1);
     });
   });
 

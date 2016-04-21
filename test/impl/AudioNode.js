@@ -93,9 +93,9 @@ describe("AudioNode", () => {
     it("inputs/outputs", () => {
       const node = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
 
-      assert(node.getInput(0) instanceof AudioNodeInput);
-      assert(node.getInput(1) instanceof AudioNodeInput);
-      assert(node.getInput(0) !== node.getInput(1));
+      assert(node.inputs[0] instanceof AudioNodeInput);
+      assert(node.inputs[1] instanceof AudioNodeInput);
+      assert(node.inputs[0] !== node.inputs[1]);
       assert(node.getOutput(0) instanceof AudioNodeOutput);
       assert(node.getOutput(1) instanceof AudioNodeOutput);
       assert(node.getOutput(0) !== node.getOutput(1));

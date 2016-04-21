@@ -192,16 +192,6 @@ class AudioNode extends EventTarget {
 
   /**
    * @param {number} channel
-   * @return {AudioNodeInput}
-   * @deprecated use `.inputs[channel]` directly
-   */
-  getInput(channel) {
-    assert(0 <= channel && channel < this.inputs.length);
-    return this.inputs[channel|0];
-  }
-
-  /**
-   * @param {number} channel
    * @return {AudioNodeOutput}
    * @deprecated use `.outputs[channel]` directly
    */

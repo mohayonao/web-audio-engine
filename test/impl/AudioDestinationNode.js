@@ -56,11 +56,11 @@ describe("AudioDestinationNode", () => {
       const node2 = new AudioDestinationNode(context, { numberOfChannels: 2 });
 
       node1.getOutput(0).enable();
-      assert(node2.getInput(0).getNumberOfChannels() === 2);
+      assert(node2.inputs[0].getNumberOfChannels() === 2);
 
       node1.connect(node2);
 
-      assert(node2.getInput(0).getNumberOfChannels() === 2);
+      assert(node2.inputs[0].getNumberOfChannels() === 2);
     });
   });
 

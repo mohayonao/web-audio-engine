@@ -56,12 +56,12 @@ describe("AudioNodeOutput", () => {
       node2.connect(node3);
 
       assert(node1.getOutput(0).getNumberOfChannels() === 1);
-      assert(node2.getInput(0).getNumberOfChannels() === 1);
+      assert(node2.inputs[0].getNumberOfChannels() === 1);
 
       node1.getOutput(0).setNumberOfChannels(4);
 
       assert(node1.getOutput(0).getNumberOfChannels() === 4);
-      assert(node2.getInput(0).getNumberOfChannels() === 4);
+      assert(node2.inputs[0].getNumberOfChannels() === 4);
     });
   });
 
@@ -78,46 +78,46 @@ describe("AudioNodeOutput", () => {
       node1.connect(node2);
       node2.connect(node3);
 
-      assert(node2.getInput(0).getNumberOfConnections() === 1);
-      assert(node2.getInput(0).getNumberOfFanOuts() === 0);
-      assert(node2.getInput(0).isEnabled() === false);
+      assert(node2.inputs[0].getNumberOfConnections() === 1);
+      assert(node2.inputs[0].getNumberOfFanOuts() === 0);
+      assert(node2.inputs[0].isEnabled() === false);
       assert(node2.getOutput(0).isEnabled() === false);
-      assert(node3.getInput(0).isEnabled() === false);
+      assert(node3.inputs[0].isEnabled() === false);
     });
     it("should be enabled to synchronize with the input", () => {
       node1.getOutput(0).enable();
 
-      assert(node2.getInput(0).getNumberOfConnections() === 1);
-      assert(node2.getInput(0).getNumberOfFanOuts() === 1);
-      assert(node2.getInput(0).isEnabled() === true);
+      assert(node2.inputs[0].getNumberOfConnections() === 1);
+      assert(node2.inputs[0].getNumberOfFanOuts() === 1);
+      assert(node2.inputs[0].isEnabled() === true);
       assert(node2.getOutput(0).isEnabled() === true);
-      assert(node3.getInput(0).isEnabled() === true);
+      assert(node3.inputs[0].isEnabled() === true);
     });
     it("should be disabled to synchronize with the input", () => {
       node1.getOutput(0).disable();
 
-      assert(node2.getInput(0).getNumberOfConnections() === 1);
-      assert(node2.getInput(0).getNumberOfFanOuts() === 0);
-      assert(node2.getInput(0).isEnabled() === false);
+      assert(node2.inputs[0].getNumberOfConnections() === 1);
+      assert(node2.inputs[0].getNumberOfFanOuts() === 0);
+      assert(node2.inputs[0].isEnabled() === false);
       assert(node2.getOutput(0).isEnabled() === false);
-      assert(node3.getInput(0).isEnabled() === false);
+      assert(node3.inputs[0].isEnabled() === false);
     });
     it("should be disabled when disconnected", () => {
       node1.getOutput(0).enable();
 
-      assert(node2.getInput(0).getNumberOfConnections() === 1);
-      assert(node2.getInput(0).getNumberOfFanOuts() === 1);
-      assert(node2.getInput(0).isEnabled() === true);
+      assert(node2.inputs[0].getNumberOfConnections() === 1);
+      assert(node2.inputs[0].getNumberOfFanOuts() === 1);
+      assert(node2.inputs[0].isEnabled() === true);
       assert(node2.getOutput(0).isEnabled() === true);
-      assert(node3.getInput(0).isEnabled() === true);
+      assert(node3.inputs[0].isEnabled() === true);
 
       node1.disconnect();
 
-      assert(node2.getInput(0).getNumberOfConnections() === 0);
-      assert(node2.getInput(0).getNumberOfFanOuts() === 0);
-      assert(node2.getInput(0).isEnabled() === false);
+      assert(node2.inputs[0].getNumberOfConnections() === 0);
+      assert(node2.inputs[0].getNumberOfFanOuts() === 0);
+      assert(node2.inputs[0].isEnabled() === false);
       assert(node2.getOutput(0).isEnabled() === false);
-      assert(node3.getInput(0).isEnabled() === false);
+      assert(node3.inputs[0].isEnabled() === false);
     });
   });
 

@@ -123,13 +123,13 @@ describe("BasePannerNode", () => {
       node2.getOutput(0).enable();
       node2.connect(node3);
 
-      assert(node2.getInput(0).getNumberOfChannels() === 1);
-      assert(node3.getInput(0).getNumberOfChannels() === 2);
+      assert(node2.inputs[0].getNumberOfChannels() === 1);
+      assert(node3.inputs[0].getNumberOfChannels() === 2);
 
       node1.connect(node2);
 
-      assert(node2.getInput(0).getNumberOfChannels() === 2);
-      assert(node3.getInput(0).getNumberOfChannels() === 2);
+      assert(node2.inputs[0].getNumberOfChannels() === 2);
+      assert(node3.inputs[0].getNumberOfChannels() === 2);
     });
   });
 });

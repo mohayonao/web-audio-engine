@@ -367,14 +367,6 @@ class AudioParam {
   }
 
   /**
-   * @param {number} channel
-   * @return {AudioNodeInput}
-   */
-  getInput(channel) {
-    return this.inputs[channel|0];
-  }
-
-  /**
    * @return {string}
    */
   getRate() {

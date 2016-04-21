@@ -49,7 +49,7 @@ describe("AudioNodeInput", () => {
   describe("basic attributes", () => {
     attrTester.makeTests(context, {
       class: AudioNodeInput,
-      create: context => new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] }).getInput(0),
+      create: context => new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] }).inputs[0],
       testSpec
     });
   });
@@ -60,7 +60,7 @@ describe("AudioNodeInput", () => {
     beforeEach(() => {
       node1 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
       node2 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
-      input = node2.getInput(0);
+      input = node2.inputs[0];
       node1.connect(node2);
       node1.getOutput(0).enable();
     });
@@ -97,7 +97,7 @@ describe("AudioNodeInput", () => {
     it("connect", () => {
       const node1 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
       const node2 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const input = node2.getInput(0);
+      const input = node2.inputs[0];
 
       assert(input.getNumberOfConnections() === 0);
 
@@ -113,7 +113,7 @@ describe("AudioNodeInput", () => {
     it("disconnect", () => {
       const node1 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
       const node2 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const input = node2.getInput(0);
+      const input = node2.inputs[0];
 
       node1.connect(node2);
       assert(input.isConnectedFrom(node1) === true);
@@ -128,7 +128,7 @@ describe("AudioNodeInput", () => {
       const node1 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
       const node2 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
       const node3 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const input = node2.getInput(0);
+      const input = node2.inputs[0];
 
       node1.connect(node2);
       assert(input.isConnectedFrom(node1) === true);
@@ -150,7 +150,7 @@ describe("AudioNodeInput", () => {
       const node1 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
       const node2 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
       const node3 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const input = node2.getInput(0);
+      const input = node2.inputs[0];
 
       node1.connect(node2);
       assert(input.isConnectedFrom(node1, 0) === true);
@@ -191,7 +191,7 @@ describe("AudioNodeInput", () => {
       const node2 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
       const node3 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
       const node4 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
-      const input = node4.getInput(0);
+      const input = node4.inputs[0];
 
       node1.connect(node2);
       node2.connect(node4);
@@ -228,7 +228,7 @@ describe("AudioNodeInput", () => {
 
     it("misc", () => {
       const node = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
-      const input = node.getInput(0);
+      const input = node.inputs[0];
 
       assert(input.isConnectedFrom() === false);
     });
@@ -245,9 +245,9 @@ describe("AudioNodeInput", () => {
       node1.connect(node2);
 
       node1.getOutput(0).getAudioBus().getMutableData()[0].set(noise1);
-      node2.getInput(0).getAudioBus().getMutableData()[0].set(noise2);
+      node2.inputs[0].getAudioBus().getMutableData()[0].set(noise2);
 
-      const input = node2.getInput(0);
+      const input = node2.inputs[0];
 
       input.pull(0);
 
@@ -271,9 +271,9 @@ describe("AudioNodeInput", () => {
 
       node1.getOutput(0).getAudioBus().getMutableData()[0].set(noise1);
       node2.getOutput(0).getAudioBus().getMutableData()[0].set(noise2);
-      node3.getInput(0).getAudioBus().getMutableData()[0].set(noise3);
+      node3.inputs[0].getAudioBus().getMutableData()[0].set(noise3);
 
-      const input = node3.getInput(0);
+      const input = node3.inputs[0];
 
       input.pull(0);
 

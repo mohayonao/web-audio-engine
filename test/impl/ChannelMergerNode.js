@@ -56,14 +56,14 @@ describe("ChannelMergerNode", () => {
       const node = new ChannelMergerNode(context, { numberOfInputs: 2 });
 
       assert(node.getChannelInterpretation() === "speakers");
-      assert(node.getInput(0).getChannelInterpretation() === "speakers");
-      assert(node.getInput(1).getChannelInterpretation() === "speakers");
+      assert(node.inputs[0].getChannelInterpretation() === "speakers");
+      assert(node.inputs[1].getChannelInterpretation() === "speakers");
 
       node.setChannelInterpretation("discrete");
 
       assert(node.getChannelInterpretation() === "discrete");
-      assert(node.getInput(0).getChannelInterpretation() === "discrete");
-      assert(node.getInput(1).getChannelInterpretation() === "discrete");
+      assert(node.inputs[0].getChannelInterpretation() === "discrete");
+      assert(node.inputs[1].getChannelInterpretation() === "discrete");
     });
   });
 
@@ -77,13 +77,13 @@ describe("ChannelMergerNode", () => {
       node2.getOutput(0).enable();
       node2.connect(node3);
 
-      assert(node2.getInput(0).getNumberOfChannels() === 1);
-      assert(node3.getInput(0).getNumberOfChannels() === 6);
+      assert(node2.inputs[0].getNumberOfChannels() === 1);
+      assert(node3.inputs[0].getNumberOfChannels() === 6);
 
       node1.connect(node2);
 
-      assert(node2.getInput(0).getNumberOfChannels() === 1);
-      assert(node3.getInput(0).getNumberOfChannels() === 6);
+      assert(node2.inputs[0].getNumberOfChannels() === 1);
+      assert(node3.inputs[0].getNumberOfChannels() === 6);
     });
   });
 
