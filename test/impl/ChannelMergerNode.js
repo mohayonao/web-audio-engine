@@ -126,12 +126,12 @@ describe("ChannelMergerNode", () => {
       node3.connect(context.getDestination());
       node1.enableOutputsIfNecessary();
       node2.enableOutputsIfNecessary();
-      node1.outputs[0].getAudioBus().getMutableData()[0].set(noise1);
-      node2.outputs[0].getAudioBus().getMutableData()[0].set(noise2);
+      node1.outputs[0].bus.getMutableData()[0].set(noise1);
+      node2.outputs[0].bus.getMutableData()[0].set(noise2);
 
       context.process();
 
-      const actual = node3.outputs[0].getAudioBus().getChannelData();
+      const actual = node3.outputs[0].bus.getChannelData();
       const expected = [ noise1, noise2, np.zeros(16), np.zeros(16) ];
 
       assert(deepEqual(actual, expected));

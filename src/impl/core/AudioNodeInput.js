@@ -37,14 +37,6 @@ class AudioNodeInput {
   }
 
   /**
-   * @return {AudioBus}
-   * @deprecated use `.bus` directly
-   */
-  getAudioBus() {
-    return this.bus;
-  }
-
-  /**
    * @return {number}
    */
   getChannelCount() {

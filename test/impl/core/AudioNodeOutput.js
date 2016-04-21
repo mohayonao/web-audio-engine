@@ -13,10 +13,6 @@ const GainNode = require("../../../src/impl/GainNode");
 const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
 const testSpec = {};
 
-testSpec.audioBus = {
-  testCase: [ { expected: value => value instanceof AudioBus } ]
-};
-
 describe("AudioNodeOutput", () => {
   describe("basic attributes", () => {
     attrTester.makeTests(context, {
@@ -32,18 +28,18 @@ describe("AudioNodeOutput", () => {
       const node2 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
       const output = node1.outputs[0];
 
-      output.getAudioBus().getMutableData()[0].set(np.random_sample());
+      output.bus.getMutableData()[0].set(np.random_sample());
 
-      assert(output.getAudioBus().getLength() === 16);
+      assert(output.bus.getLength() === 16);
       assert(output.getNumberOfConnections() === 0);
 
       node1.connect(node2);
 
       assert(output.getNumberOfConnections() === 1);
 
-      assert(output.getAudioBus().isSilent() === false);
+      assert(output.bus.isSilent() === false);
       output.zeros();
-      assert(output.getAudioBus().isSilent() === true);
+      assert(output.bus.isSilent() === true);
     });
 
     it("channel number propagation", () => {

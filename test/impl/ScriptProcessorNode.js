@@ -116,8 +116,8 @@ describe("ScriptProcessorNode", () => {
 
     it("works [000-256]", () => {
       for (let i = 0; i < 16; i++) {
-        node1.outputs[0].getAudioBus().getMutableData()[0].set(noise1.subarray(i * 16, i * 16 + 16));
-        node1.outputs[0].getAudioBus().getMutableData()[1].set(noise2.subarray(i * 16, i * 16 + 16));
+        node1.outputs[0].bus.getMutableData()[0].set(noise1.subarray(i * 16, i * 16 + 16));
+        node1.outputs[0].bus.getMutableData()[1].set(noise2.subarray(i * 16, i * 16 + 16));
         context.process();
       }
 
@@ -133,10 +133,10 @@ describe("ScriptProcessorNode", () => {
       const actual = new Float32Array(256);
 
       for (let i = 0; i < 16; i++) {
-        node1.outputs[0].getAudioBus().getMutableData()[0].set(noise2.subarray(i * 16, i * 16 + 16));
-        node1.outputs[0].getAudioBus().getMutableData()[1].set(noise1.subarray(i * 16, i * 16 + 16));
+        node1.outputs[0].bus.getMutableData()[0].set(noise2.subarray(i * 16, i * 16 + 16));
+        node1.outputs[0].bus.getMutableData()[1].set(noise1.subarray(i * 16, i * 16 + 16));
         context.process();
-        actual.set(node2.outputs[0].getAudioBus().getChannelData()[0], i * 16);
+        actual.set(node2.outputs[0].bus.getChannelData()[0], i * 16);
       }
       assert(deepEqual(actual, noise3));
     });

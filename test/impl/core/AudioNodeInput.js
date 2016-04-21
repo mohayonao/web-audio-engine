@@ -5,16 +5,11 @@ const deepEqual = require("deep-equal");
 const np = require("../../helpers/np");
 const attrTester = require("../../helpers/attrTester");
 const AudioNodeInput = require("../../../src/impl/core/AudioNodeInput");
-const AudioBus = require("../../../src/impl/core/AudioBus");
 const AudioContext = require("../../../src/impl/AudioContext");
 const AudioNode = require("../../../src/impl/AudioNode");
 
 const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
 const testSpec = {};
-
-testSpec.audioBus = {
-  testCase: [ { expected: value => value instanceof AudioBus } ]
-};
 
 testSpec.channelCount = {
   defaultValue: 1,
@@ -244,14 +239,14 @@ describe("AudioNodeInput", () => {
       node1.outputs[0].enable();
       node1.connect(node2);
 
-      node1.outputs[0].getAudioBus().getMutableData()[0].set(noise1);
-      node2.inputs[0].getAudioBus().getMutableData()[0].set(noise2);
+      node1.outputs[0].bus.getMutableData()[0].set(noise1);
+      node2.inputs[0].bus.getMutableData()[0].set(noise2);
 
       const input = node2.inputs[0];
 
       input.pull(0);
 
-      const actual = input.getAudioBus().getChannelData()[0];
+      const actual = input.bus.getChannelData()[0];
       const expected = noise1;
 
       assert(deepEqual(actual, expected));
@@ -269,15 +264,15 @@ describe("AudioNodeInput", () => {
       node1.connect(node3);
       node2.connect(node3);
 
-      node1.outputs[0].getAudioBus().getMutableData()[0].set(noise1);
-      node2.outputs[0].getAudioBus().getMutableData()[0].set(noise2);
-      node3.inputs[0].getAudioBus().getMutableData()[0].set(noise3);
+      node1.outputs[0].bus.getMutableData()[0].set(noise1);
+      node2.outputs[0].bus.getMutableData()[0].set(noise2);
+      node3.inputs[0].bus.getMutableData()[0].set(noise3);
 
       const input = node3.inputs[0];
 
       input.pull(0);
 
-      const actual = input.getAudioBus().getChannelData()[0];
+      const actual = input.bus.getChannelData()[0];
       const expected = noise1.map((_, i) => noise1[i] + noise2[i]);
 
       assert(deepEqual(actual, expected));

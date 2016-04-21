@@ -69,17 +69,17 @@ describe("ChannelSplitterNode", () => {
       node2.connect(context.getDestination());
       node1.enableOutputsIfNecessary();
       [ 0, 1, 2, 3, 4, 5 ].forEach((ch) => {
-        node2.outputs[ch].getAudioBus().getMutableData()[0].set(np.random_sample(16));
+        node2.outputs[ch].bus.getMutableData()[0].set(np.random_sample(16));
       });
-      node1.outputs[0].getAudioBus().getMutableData()[0].set(noise1);
-      node1.outputs[0].getAudioBus().getMutableData()[1].set(noise2);
-      node1.outputs[0].getAudioBus().getMutableData()[2].set(noise1);
-      node1.outputs[0].getAudioBus().getMutableData()[3].set(noise2);
+      node1.outputs[0].bus.getMutableData()[0].set(noise1);
+      node1.outputs[0].bus.getMutableData()[1].set(noise2);
+      node1.outputs[0].bus.getMutableData()[2].set(noise1);
+      node1.outputs[0].bus.getMutableData()[3].set(noise2);
 
       context.process();
 
-      const actual = [ 0, 1, 2, 3, 4, 5 ].map(ch => node2.outputs[ch].getAudioBus().getChannelData()[0]);
-      const isSilent = [ 0, 1, 2, 3, 4, 5 ].map(ch => node2.outputs[ch].getAudioBus().isSilent());
+      const actual = [ 0, 1, 2, 3, 4, 5 ].map(ch => node2.outputs[ch].bus.getChannelData()[0]);
+      const isSilent = [ 0, 1, 2, 3, 4, 5 ].map(ch => node2.outputs[ch].bus.isSilent());
 
       assert(isSilent[0] === false);
       assert(isSilent[1] === false);
@@ -103,13 +103,13 @@ describe("ChannelSplitterNode", () => {
       node2.connect(context.getDestination());
       node1.enableOutputsIfNecessary();
       [ 0, 1, 2, 3, 4, 5 ].forEach((ch) => {
-        node2.outputs[ch].getAudioBus().getMutableData()[0].set(np.random_sample(16));
+        node2.outputs[ch].bus.getMutableData()[0].set(np.random_sample(16));
       });
 
       context.process();
 
-      const actual = [ 0, 1, 2, 3, 4, 5 ].map(ch => node2.outputs[ch].getAudioBus().getChannelData()[0]);
-      const isSilent = [ 0, 1, 2, 3, 4, 5 ].map(ch => node2.outputs[ch].getAudioBus().isSilent());
+      const actual = [ 0, 1, 2, 3, 4, 5 ].map(ch => node2.outputs[ch].bus.getChannelData()[0]);
+      const isSilent = [ 0, 1, 2, 3, 4, 5 ].map(ch => node2.outputs[ch].bus.isSilent());
 
       assert(isSilent[0] === true);
       assert(isSilent[1] === true);
