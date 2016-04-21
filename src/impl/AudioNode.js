@@ -7,7 +7,21 @@ const AudioNodeInput = require("./core/AudioNodeInput");
 const AudioNodeOutput = require("./core/AudioNodeOutput");
 const AudioParam = require("./AudioParam");
 
+/**
+ * @prop {AudioContext}      context
+ * @prop {number}            blockSize
+ * @prop {number}            sampleRate
+ * @prop {AudioNodeInput[]}  inputs
+ * @prop {AudioNodeOutput[]} outputs
+ */
 class AudioNode extends EventTarget {
+  /**
+   * @param {AudioContext} context
+   * @param {number[]}     opts.inputs
+   * @param {number[]}     opts.outputs
+   * @param {number}       opts.channelCount
+   * @param {string}       opts.channelCountMode
+   */
   constructor(context, opts) {
     opts = opts || /* istanbul ignore next */ {};
 
@@ -37,52 +51,87 @@ class AudioNode extends EventTarget {
     });
   }
 
+  /**
+   * @return {AudioContext}
+   */
   getContext() {
     return this.context;
   }
 
+  /**
+   * @return {number}
+   */
   getNumberOfInputs() {
     return this.inputs.length;
   }
 
+  /**
+   * @return {number}
+   */
   getNumberOfOutputs() {
     return this.outputs.length;
   }
 
+  /**
+   * @return {number}
+   */
   getChannelCount() {
     assert(this.inputs.length === 1);
     return this.inputs[0].getChannelCount();
   }
 
+  /**
+   * @param {number} value
+   */
   setChannelCount(value) {
     assert(this.inputs.length === 1);
     this.inputs[0].setChannelCount(value);
   }
 
+  /**
+   * @return {string}
+   */
   getChannelCountMode() {
     assert(this.inputs.length === 1);
     return this.inputs[0].getChannelCountMode();
   }
 
+  /**
+   * @param {string} value
+   */
   setChannelCountMode(value) {
     assert(this.inputs.length === 1);
     this.inputs[0].setChannelCountMode(value);
   }
 
+  /**
+   * @return {string}
+   */
   getChannelInterpretation() {
     assert(this.inputs.length === 1);
     return this.inputs[0].getChannelInterpretation();
   }
 
+  /**
+   * @param {string} value
+   */
   setChannelInterpretation(value) {
     assert(this.inputs.length === 1);
     this.inputs[0].setChannelInterpretation(value);
   }
 
+  /**
+   * @param {AudioNode|AudioParam} destination
+   * @param {number}               output
+   * @param {number}               input
+   */
   connect(destination, output, input) {
     this.outputs[output|0].connect(destination, input|0);
   }
 
+  /**
+   *
+   */
   disconnect() {
     const args = Array.from(arguments);
 
@@ -98,6 +147,12 @@ class AudioNode extends EventTarget {
     return this.disconnectFromOutputIfConnected(args[1]|0, args[0], args[2]|0);
   }
 
+  /**
+   * @param {number} numberOfChannels
+   * @param {number} channelCount
+   * @param {string} channelCountMode
+   * @return {AudioNodeInput}
+   */
   addInput(numberOfChannels, channelCount, channelCountMode) {
     const node = this;
     const index = this.inputs.length;
@@ -108,6 +163,10 @@ class AudioNode extends EventTarget {
     return input;
   }
 
+  /**
+   * @param {number} numberOfChannels
+   * @return {AudioNodeOutput}
+   */
   addOutput(numberOfChannels) {
     const node = this;
     const index = this.outputs.length;
@@ -118,6 +177,11 @@ class AudioNode extends EventTarget {
     return output;
   }
 
+  /**
+   * @param {string} rate - [ "audio", "control" ]
+   * @param {number} defaultValue
+   * @return {AudioParam}
+   */
   addParam(rate, defaultValue) {
     const param = new AudioParam(this, { rate, defaultValue });
 
@@ -126,24 +190,43 @@ class AudioNode extends EventTarget {
     return param;
   }
 
+  /**
+   * @param {number} channel
+   * @return {AudioNodeInput}
+   * @deprecated use `.inputs[channel]` directly
+   */
   getInput(channel) {
     assert(0 <= channel && channel < this.inputs.length);
     return this.inputs[channel|0];
   }
 
+  /**
+   * @param {number} channel
+   * @return {AudioNodeOutput}
+   * @deprecated use `.outputs[channel]` directly
+   */
   getOutput(channel) {
     assert(0 <= channel && channel < this.outputs.length);
     return this.outputs[channel|0];
   }
 
+  /**
+   * @return {boolean}
+   */
   isEnabled() {
     return this._enabled;
   }
 
+  /**
+   * @return {number}
+   */
   getTailTime() {
     return 0;
   }
 
+  /**
+   *
+   */
   enableOutputsIfNecessary() {
     if (!this._enabled) {
       this._disableSample = Infinity;
@@ -154,6 +237,9 @@ class AudioNode extends EventTarget {
     }
   }
 
+  /**
+   *
+   */
   disableOutputsIfNecessary() {
     const currentTime = this.context.currentTime;
     const disableTime = currentTime + this.getTailTime();
@@ -165,6 +251,9 @@ class AudioNode extends EventTarget {
     }
   }
 
+  /**
+   * @private
+   */
   _disableOutputsIfNecessary() {
     if (this._enabled) {
       this._enabled = false;
@@ -174,28 +263,48 @@ class AudioNode extends EventTarget {
     }
   }
 
+  /**
+   *
+   */
   channelDidUpdate() {}
 
+  /**
+   *
+   */
   disconnectAll() {
     this.outputs.forEach((output) => {
       output.disconnect();
     });
   }
 
+  /**
+   * @param {number} output
+   */
   disconnectAllFromOutput(output) {
     this.outputs[output|0].disconnect();
   }
 
+  /**
+   * @param {AudioNode|AudioParam} destination
+   */
   disconnectIfConnected(destination) {
     this.outputs.forEach((output) => {
       output.disconnect(destination);
     });
   }
 
+  /**
+   * @param {number} output
+   * @param {AudioNode|AudioParam} destination
+   * @param {number} output
+   */
   disconnectFromOutputIfConnected(output, destination, input) {
     this.outputs[output|0].disconnect(destination, input|0);
   }
 
+  /**
+   * @return {boolean}
+   */
   isConnectedTo() {
     const args = Array.from(arguments);
 
@@ -214,6 +323,9 @@ class AudioNode extends EventTarget {
     return false;
   }
 
+  /**
+   * @return {boolean}
+   */
   isConnectedFrom() {
     const args = Array.from(arguments);
 
@@ -224,6 +336,9 @@ class AudioNode extends EventTarget {
     return false;
   }
 
+  /**
+   * @param {number} currentSample
+   */
   processIfNecessary(currentSample) {
     if (currentSample <= this._lastProcessingSample) {
       return;

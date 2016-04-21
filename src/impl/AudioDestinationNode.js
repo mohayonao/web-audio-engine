@@ -5,7 +5,16 @@ const AudioNode = require("./AudioNode");
 const AudioNodeOutput = require("./core/AudioNodeOutput");
 const AudioDestinationNodeDSP = require("./dsp/AudioDestinationNode");
 
+/**
+ * @prop {AudioNodeOutput} output
+ * @prop {AudioBus}        outputBus
+ */
 class AudioDestinationNode extends AudioNode {
+  /**
+   * @param {AudioContext} context
+   * @param {object}       opts
+   * @param {number}       opts.numberOfChannels
+   */
   constructor(context, opts) {
     opts = opts || /* istanbul ignore next */ {};
 
@@ -27,15 +36,24 @@ class AudioDestinationNode extends AudioNode {
     this.output.enable();
   }
 
+  /**
+   * @return {number}
+   */
   getMaxChannelCount() {
     return this._numberOfChannels;
   }
 
+  /**
+   * @param {number} value
+   */
   setChannelCount(value) {
     value = util.clip(value|0, 1, this.getMaxChannelCount());
     super.setChannelCount(value);
   }
 
+  /**
+   * @return {AudioNodeOutput}
+   */
   getOutput() {
     return this.output;
   }

@@ -1,5 +1,9 @@
 "use strict";
 
+/**
+ * @param {*} data
+ * @return {boolean}
+ */
 function isAudioData(data) {
   if (!data) {
     return false;
@@ -16,6 +20,10 @@ function isAudioData(data) {
   return true;
 }
 
+/**
+ * @param {object} data
+ * @return {AudioData}
+ */
 function toAudioData(data) {
   if (isAudioData(data)) {
     const numberOfChannels = data.channelData.length;
@@ -36,6 +44,10 @@ function toAudioData(data) {
   return { numberOfChannels: 0, length: 0, sampleRate: 0, channelData: [] };
 }
 
+/**
+ * @param {*} data
+ * @return {boolean}
+ */
 function isAudioBuffer(data) {
   if (!data) {
     return false;
@@ -52,6 +64,11 @@ function isAudioBuffer(data) {
   return true;
 }
 
+/**
+ * @param {object} data
+ * @param {class}  AudioBuffer
+ * @return {AudioBuffer}
+ */
 function toAudioBuffer(data, AudioBuffer) {
   data = toAudioData(data);
 

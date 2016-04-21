@@ -9,6 +9,9 @@ const OscillatorTypes = PeriodicWave.BasicWaveForms;
 const DefaultPeriodicWaves = {};
 
 class OscillatorNode extends AudioScheduledSourceNode {
+  /**
+   * @param {AudioContext} context
+   */
   constructor(context) {
     super(context);
     this._frequency = this.addParam("audio", 440);
@@ -19,10 +22,16 @@ class OscillatorNode extends AudioScheduledSourceNode {
     this.dspInit();
   }
 
+  /**
+   * @return {string}
+   */
   getType() {
     return this._type;
   }
 
+  /**
+   * @param {string} value
+   */
   setType(value) {
     /* istanbul ignore else */
     if (OscillatorTypes.indexOf(value) !== -1) {
@@ -32,14 +41,23 @@ class OscillatorNode extends AudioScheduledSourceNode {
     }
   }
 
+  /**
+   * @param {AudioParam}
+   */
   getFrequency() {
     return this._frequency;
   }
 
+  /**
+   * @param {AudioParam}
+   */
   getDetune() {
     return this._detune;
   }
 
+  /**
+   * @param {PeriodicWave} periodicWave
+   */
   setPeriodicWave(periodicWave) {
     periodicWave = util.toImpl(periodicWave);
 
@@ -51,10 +69,17 @@ class OscillatorNode extends AudioScheduledSourceNode {
     }
   }
 
+  /**
+   * @return {PeriodicWave}
+   */
   getPeriodicWave() {
     return this._periodicWave;
   }
 
+  /**
+   * @param {string} type
+   * @return {PeriodicWave}
+   */
   buildPeriodicWave(type) {
     const sampleRate = this.context.sampleRate
     const key = type + ":" + sampleRate;

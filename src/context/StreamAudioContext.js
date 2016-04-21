@@ -6,6 +6,14 @@ const setImmediate = global.setImmediate || /* istanbul ignore next */ (fn => se
 const noopWriter = { write: () => true };
 
 class StreamAudioContext extends AudioContext {
+  /**
+   * @param {object}  opts
+   * @param {number}  opts.sampleRate
+   * @param {number}  opts.blockSize
+   * @param {number}  opts.numberOfChannels
+   * @param {number}  opts.bitDepth
+   * @param {boolean} opts.floatingPoint
+   */
   constructor(opts) {
     opts = opts || /* istanbul ignore next */ {};
 
@@ -31,15 +39,25 @@ class StreamAudioContext extends AudioContext {
     util.defineProp(this, "_isPlaying", false);
   }
 
+  /**
+   * @return {number}
+   */
   get blockSize() {
     return this._impl.blockSize;
   }
 
+  /**
+   * @param {Writable}
+   * @return {Writable}
+   */
   pipe(stream) {
     this._stream = stream;
     return stream;
   }
 
+  /**
+   * @return {Promise<void>}
+   */
   resume() {
     if (this.state === "suspended") {
       this._resume();
@@ -47,6 +65,9 @@ class StreamAudioContext extends AudioContext {
     return super.resume();
   }
 
+  /**
+   * @return {Promise<void>}
+   */
   suspend() {
     if (this.state === "running") {
       this._suspend();
@@ -54,6 +75,10 @@ class StreamAudioContext extends AudioContext {
     return super.suspend();
   }
 
+
+  /**
+   * @return {Promise<void>}
+   */
   close() {
     if (this.state !== "closed") {
       this._close();

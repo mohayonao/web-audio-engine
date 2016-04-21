@@ -1,5 +1,9 @@
 "use strict";
 
+/**
+ * @param {AudioData} audioData
+ * @param {number}    sampleRate
+ */
 function resample(audioData, sampleRate) {
   if (audioData.sampleRate === sampleRate) {
     return audioData;

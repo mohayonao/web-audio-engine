@@ -5,10 +5,16 @@ const encoderUtil = require("./util/encoderUtil");
 
 let encodeFn = WavEncoder.encode;
 
+/**
+ * @return {function}
+ */
 function get() {
   return encodeFn;
 }
 
+/**
+ * @param {function} fn
+ */
 function set(fn) {
   /* istanbul ignore else */
   if (typeof fn === "function") {
@@ -16,6 +22,11 @@ function set(fn) {
   }
 }
 
+/**
+ * @param {AudioData} audioData
+ * @param {object}    opts
+ * @return {Promise<ArrayBuffer>}
+ */
 function encode(audioData, opts) {
   return encoderUtil.encode(encodeFn, audioData, opts);
 }

@@ -4,7 +4,20 @@ const assert = require("assert");
 const util = require("../../util");
 const AudioBus = require("./AudioBus");
 
+/**
+ * @prop {AudioNode} node
+ * @prop {number}    index
+ * @prop {AudioBus}  bus
+ */
 class AudioNodeInput {
+  /**
+   * @param {object}    opts
+   * @param {AudioNode} opts.node
+   * @param {number}    opts.index
+   * @param {number}    opts.numberOfChannels
+   * @param {number}    opts.channelCount
+   * @param {string}    opts.channelCountMode
+   */
   constructor(opts) {
     let node = opts.node;
     let index = opts.index;
@@ -15,6 +28,7 @@ class AudioNodeInput {
     this.node = node;
     this.index = index|0;
     this.bus = new AudioBus(numberOfChannels, node.blockSize, node.sampleRate);
+
     this.bus.setChannelInterpretation("speakers");
     this._channelCount = channelCount|0;
     this._channelCountMode = channelCountMode;
@@ -22,14 +36,24 @@ class AudioNodeInput {
     this._disabledOutputs = [];
   }
 
+  /**
+   * @return {AudioBus}
+   * @deprecated use `.bus` directly
+   */
   getAudioBus() {
     return this.bus;
   }
 
+  /**
+   * @return {number}
+   */
   getChannelCount() {
     return this._channelCount;
   }
 
+  /**
+   * @param {number} value
+   */
   setChannelCount(value) {
     const channelCount = util.toValidNumberOfChannels(value);
 
@@ -40,10 +64,16 @@ class AudioNodeInput {
     }
   }
 
+  /**
+   * @return {number}
+   */
   getChannelCountMode() {
     return this._channelCountMode;
   }
 
+  /**
+   * @param {number} value
+   */
   setChannelCountMode(value) {
     /* istanbul ignore else */
     if (value !== this._channelCountMode && isValidChannelCountMode(value)) {
@@ -52,18 +82,30 @@ class AudioNodeInput {
     }
   }
 
+  /**
+   * @return {string}
+   */
   getChannelInterpretation() {
     return this.bus.getChannelInterpretation();
   }
 
+  /**
+   * @param {string} value
+   */
   setChannelInterpretation(value) {
     this.bus.setChannelInterpretation(value);
   }
 
+  /**
+   * @return {number}
+   */
   getNumberOfChannels() {
     return this.bus.getNumberOfChannels();
   }
 
+  /**
+   *
+   */
   computeNumberOfChannels() {
     if (this._channelCountMode === "explicit") {
       return this._channelCount;
@@ -80,6 +122,9 @@ class AudioNodeInput {
     return maxChannels;
   }
 
+  /**
+   *
+   */
   updateNumberOfChannels() {
     const numberOfChannels = this.computeNumberOfChannels();
 
@@ -90,18 +135,30 @@ class AudioNodeInput {
     }
   }
 
+  /**
+   * @return {number}
+   */
   getNumberOfConnections() {
     return this._outputs.length + this._disabledOutputs.length;
   }
 
+  /**
+   * @return {number}
+   */
   getNumberOfFanOuts() {
     return this._outputs.length;
   }
 
+  /**
+   * @return {boolean}
+   */
   isEnabled() {
     return this._outputs.length !== 0;
   }
 
+  /**
+   * @param {AudioNodeOutput} output
+   */
   enableFrom(output) {
     /* istanbul ignore else */
     if (moveItem(output, this._disabledOutputs, this._outputs)) {
@@ -109,6 +166,9 @@ class AudioNodeInput {
     }
   }
 
+  /**
+   * @param {AudioNodeOutput} output
+   */
   disableFrom(output) {
     /* istanbul ignore else */
     if (moveItem(output, this._outputs, this._disabledOutputs)) {
@@ -116,6 +176,9 @@ class AudioNodeInput {
     }
   }
 
+  /**
+   * @param {AudioNodeOutput} output
+   */
   connectFrom(output) {
     if (output.isEnabled()) {
       assert(this._disabledOutputs.indexOf(output) === -1);
@@ -129,6 +192,9 @@ class AudioNodeInput {
     }
   }
 
+  /**
+   * @param {AudioNodeOutput} output
+   */
   disconnectFrom(output) {
     if (output.isEnabled()) {
       assert(this._disabledOutputs.indexOf(output) === -1);
@@ -142,6 +208,9 @@ class AudioNodeInput {
     }
   }
 
+  /**
+   *
+   */
   inputDidUpdate() {
     this.updateNumberOfChannels();
     if (this._outputs.length === 0) {
@@ -151,6 +220,9 @@ class AudioNodeInput {
     }
   }
 
+  /**
+   * @return {boolean}
+   */
   isConnectedFrom() {
     const args = Array.from(arguments);
 
@@ -168,6 +240,10 @@ class AudioNodeInput {
     return false;
   }
 
+  /**
+   * @param {*} e
+   * @return {AudioBus}
+   */
   sumAllConnections(e) {
     const audioBus = this.bus;
     const outputs = this._outputs;
@@ -181,6 +257,10 @@ class AudioNodeInput {
     return audioBus;
   }
 
+  /**
+   * @param {*} e
+   * @return {AudioBus}
+   */
   pull(e) {
     if (this._outputs.length === 1) {
       const output = this._outputs[0];

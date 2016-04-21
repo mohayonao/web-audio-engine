@@ -5,6 +5,9 @@ const AudioNode = require("./AudioNode");
 
 /* istanbul ignore next */
 class AudioSourceNode extends AudioNode {
+  /**
+   * @param {AudioContext} context
+   */
   constructor(context) {
     super(context, {
       inputs: [],

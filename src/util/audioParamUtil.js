@@ -6,6 +6,11 @@ const EXPONENTIAL_RAMP_TO_VALUE_AT_TIME = 3;
 const SET_TARGET_AT_TIME = 4;
 const SET_VALUE_CURVE_AT_TIME = 5;
 
+/**
+ * @param {object[]} timeline
+ * @param {number}   time
+ * @param {number}   defaultValue
+ */
 function computeValueAtTime(timeline, time, defaultValue) {
   let value = defaultValue;
 

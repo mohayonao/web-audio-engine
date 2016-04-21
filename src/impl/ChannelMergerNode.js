@@ -5,6 +5,11 @@ const AudioNode = require("./AudioNode");
 const ChannelMergerNodeDSP = require("./dsp/ChannelMergerNode");
 
 class ChannelMergerNode extends AudioNode {
+  /**
+   * @param {AudioContext} context
+   * @param {object}       opts
+   * @param {number}       opts.numberOfInputs
+   */
   constructor(context, opts) {
     opts = opts || /* istanbul ignore next */ {};
 
@@ -40,6 +45,9 @@ class ChannelMergerNode extends AudioNode {
     return this.inputs[0].getChannelInterpretation();
   }
 
+  /**
+   * @param {string} value
+   */
   setChannelInterpretation(value) {
     this.inputs.forEach((input) => {
       input.setChannelInterpretation(value);

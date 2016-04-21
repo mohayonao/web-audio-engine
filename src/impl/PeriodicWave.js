@@ -4,6 +4,13 @@ const util = require("../util");
 const PeriodicWaveDSP = require("./dsp/PeriodicWave");
 
 class PeriodicWave {
+  /**
+   * @param {AudioContext} context
+   * @param {object}       opts
+   * @param {Float32Array} opts.real
+   * @param {Float32Array} opts.imag
+   * @param {boolean}      opts.constraints
+   */
   constructor(context, opts) {
     opts = opts || /* istanbul ignore next */ {};
 
@@ -20,22 +27,37 @@ class PeriodicWave {
     this.dspInit();
   }
 
+  /**
+   * @return {Float32Array}
+   */
   getReal() {
     return this._real;
   }
 
+  /**
+   * @return {Float32Array}
+   */
   getImag() {
     return this._imag;
   }
 
+  /**
+   * @return {booleam}
+   */
   getConstraints() {
     return this._constants;
   }
 
+  /**
+   * @return {string}
+   */
   getName() {
     return this._name;
   }
 
+  /**
+   * @return {Float32Array}
+   */
   getWaveTable() {
     if (!this._waveTable) {
       this._waveTable = this.dspBuildWaveTable();

@@ -5,6 +5,13 @@ const AudioNode = require("./AudioNode");
 const ScriptProcessorNodeDSP = require("./dsp/ScriptProcessorNode");
 
 class ScriptProcessorNode extends AudioNode {
+  /**
+   * @param {AudioContext} context
+   * @param {object}       opts
+   * @param {number}       opts.bufferSize
+   * @param {number}       opts.numberOfInputChannels
+   * @param {number}       opts.numberOfOutputChannels
+   */
   constructor(context, opts) {
     opts = opts || /* istanbul ignore next */ {};
 
@@ -28,6 +35,9 @@ class ScriptProcessorNode extends AudioNode {
     this.dspInit();
   }
 
+  /**
+   * @return {number}
+   */
   getBufferSize() {
     return this._bufferSize;
   }
@@ -40,10 +50,16 @@ class ScriptProcessorNode extends AudioNode {
     // This node's channelCountMode cannot be changed.
   }
 
+  /**
+   * @return {object} eventItem
+   */
   setEventItem(eventItem) {
     this.dspSetEventItem(eventItem);
   }
 
+  /**
+   * @return {number}
+   */
   getTailTime() {
     return Infinity;
   }

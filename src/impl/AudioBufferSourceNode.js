@@ -6,6 +6,9 @@ const AudioBuffer = require("./AudioBuffer");
 const AudioBufferSourceNodeDSP = require("./dsp/AudioBufferSourceNode");
 
 class AudioBufferSourceNode extends AudioScheduledSourceNode {
+  /**
+   * @param {AudioContext} context
+   */
   constructor(context) {
     super(context);
     this._buffer = null;
@@ -18,10 +21,16 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
     this._offset = 0;
   }
 
+  /**
+   * @return {AudioBuffer}
+   */
   getBuffer() {
     return this._buffer;
   }
 
+  /**
+   * @param {AudioBuffer} value
+   */
   setBuffer(value) {
     value = util.toImpl(value);
 
@@ -33,40 +42,69 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
     }
   }
 
+  /**
+   * @return {AudioParam}
+   */
   getPlaybackRate() {
     return this._playbackRate;
   }
 
+  /**
+   * @return {AudioParam}
+   */
   getDetune() {
     return this._detune;
   }
 
+  /**
+   * @return {boolean}
+   */
   getLoop() {
     return this._loop;
   }
 
+  /**
+   * @param {boolean}
+   */
   setLoop(value) {
     this._loop = !!value;
   }
 
+  /**
+   * @return {number}
+   */
   getLoopStart() {
     return this._loopStart;
   }
 
+  /**
+   * @param {number} value
+   */
   setLoopStart(value) {
     value = Math.max(0, util.toNumber(value));
     this._loopStart = value;
   }
 
+  /**
+   * @return {number}
+   */
   getLoopEnd() {
     return this._loopEnd;
   }
 
+  /**
+   * @param {number} value
+   */
   setLoopEnd(value) {
     value = Math.max(0, util.toNumber(value));
     this._loopEnd = value;
   }
 
+  /**
+   * @param {number} when
+   * @param {number} offset
+   * @param {number} duration
+   */
   start(when, offset, duration) {
     /* istanbul ignore else */
     if (super.start(when)) {

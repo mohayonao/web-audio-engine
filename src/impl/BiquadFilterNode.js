@@ -6,6 +6,9 @@ const AudioNode = require("./AudioNode");
 const BiquadFilterNodeDSP = require("./dsp/BiquadFilterNode");
 
 class BiquadFilterNode extends AudioNode {
+  /**
+   * @param {AudioContext} context
+   */
   constructor(context) {
     super(context, {
       inputs: [ 1 ],
@@ -23,10 +26,16 @@ class BiquadFilterNode extends AudioNode {
     this.dspSetNumberOfChannels(1);
   }
 
+  /**
+   * @return {string}
+   */
   getType() {
     return this.toFilterTypeName(this._type);
   }
 
+  /**
+   * @param {string} value
+   */
   setType(value) {
     value = this.fromFilterTypeName(value);
     /* istanbul ignore else */
@@ -35,36 +44,63 @@ class BiquadFilterNode extends AudioNode {
     }
   }
 
+  /**
+   * @return {AudioParam}
+   */
   getFrequency() {
     return this._frequency;
   }
 
+  /**
+   * @return {AudioParam}
+   */
   getDetune() {
     return this._detune;
   }
 
+  /**
+   * @return {AudioParam}
+   */
   getQ() {
     return this._Q;
   }
 
+  /**
+   * @return {AudioParam}
+   */
   getGain() {
     return this._gain;
   }
 
+  /**
+   * @param {Float32Array} frequencyHz
+   * @param {Float32Array} magResponse
+   * @param {Float32Array} phaseResponse
+   */
   /* istanbul ignore next */
   getFrequencyResponse() {
     throw new TypeError("NOT YET IMPLEMENTED");
   }
 
+  /**
+   * @param {number} numberOfChannels
+   */
   channelDidUpdate(numberOfChannels) {
     this.dspSetNumberOfChannels(numberOfChannels);
     this.outputs[0].setNumberOfChannels(numberOfChannels);
   }
 
+  /**
+   * @return {number}
+   */
   getTailTime() {
     return 0.2;
   }
 
+  /**
+   * @param {string} value
+   * @return {number}
+   */
   fromFilterTypeName(value) {
     switch (value) {
     case "lowpass":
@@ -87,6 +123,10 @@ class BiquadFilterNode extends AudioNode {
     return -1;
   }
 
+  /**
+   * @param {number} value
+   * @return {string}
+   */
   toFilterTypeName(value) {
     switch (value) {
     case BiquadFilterNodeDSP.LOWPASS:
