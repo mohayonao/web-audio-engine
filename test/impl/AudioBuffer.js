@@ -39,7 +39,7 @@ describe("AudioBuffer", () => {
   describe("internal data", () => {
     it("audio data", () => {
       const buffer = new AudioBuffer(context, { numberOfChannels: 2, length: 32, sampleRate: 8000 });
-      const audioData = buffer.getAudioData();
+      const audioData = buffer.audioData;
 
       assert(audioData instanceof AudioData);
       assert(audioData.sampleRate === buffer.getSampleRate());

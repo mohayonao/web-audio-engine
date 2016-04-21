@@ -4,6 +4,9 @@ const assert = require("assert");
 const AudioData = require("./AudioData");
 const DSPAlgorithm = {};
 
+/**
+ * @prop {AudioData} audioData
+ */
 class AudioBus {
   /**
    * @param {number} numberOfChannels
@@ -11,16 +14,9 @@ class AudioBus {
    * @param {number} sampleRate
    */
   constructor(numberOfChannels, length, sampleRate) {
-    this._audioData = new AudioData(numberOfChannels, length, sampleRate);
-    this._channelInterpretation = "discrete";
+    this.audioData = new AudioData(numberOfChannels, length, sampleRate);
     this._isSilent = true;
-  }
-
-  /**
-   * @return {AudioData}
-   */
-  getAudioData() {
-    return this._audioData;
+    this._channelInterpretation = "discrete";
   }
 
   /**
@@ -50,7 +46,7 @@ class AudioBus {
    * @return {number}
    */
   getNumberOfChannels() {
-    return this._audioData.numberOfChannels;
+    return this.audioData.numberOfChannels;
   }
 
   /**
@@ -62,28 +58,28 @@ class AudioBus {
     audioBus._channelInterpretation = this._channelInterpretation;
     audioBus.sumFrom(this);
 
-    this._audioData = audioBus._audioData;
+    this.audioData = audioBus.audioData;
   }
 
   /**
    * @return {number}
    */
   getLength() {
-    return this._audioData.length;
+    return this.audioData.length;
   }
 
   /**
    * @return {number}
    */
   getSampleRate() {
-    return this._audioData.sampleRate;
+    return this.audioData.sampleRate;
   }
 
   /**
    * @return {Float32Array[]}
    */
   getChannelData() {
-    return this._audioData.channelData;
+    return this.audioData.channelData;
   }
 
   /**
@@ -91,7 +87,7 @@ class AudioBus {
    */
   getMutableData() {
     this._isSilent = false;
-    return this._audioData.channelData;
+    return this.audioData.channelData;
   }
 
   /**
@@ -100,7 +96,7 @@ class AudioBus {
   zeros() {
     /* istanbul ignore else */
     if (!this._isSilent) {
-      const channelData = this._audioData.channelData;
+      const channelData = this.audioData.channelData;
 
       for (let i = 0, imax = channelData.length; i < imax; i++) {
         channelData[i].fill(0);
@@ -113,13 +109,13 @@ class AudioBus {
    * @param {AudioBus} audioBus
    */
   copyFrom(audioBus) {
-    const source = audioBus._audioData.channelData;
-    const destination = this._audioData.channelData;
+    const source = audioBus.audioData.channelData;
+    const destination = this.audioData.channelData;
     const numberOfChannels = destination.length;
 
     assert(audioBus instanceof AudioBus);
-    assert(audioBus._audioData.numberOfChannels === this._audioData.numberOfChannels);
-    assert(audioBus._audioData.length === this._audioData.length);
+    assert(audioBus.audioData.numberOfChannels === this.audioData.numberOfChannels);
+    assert(audioBus.audioData.length === this.audioData.length);
 
     for (let ch = 0; ch < numberOfChannels; ch++) {
       destination[ch].set(source[ch]);
@@ -133,12 +129,12 @@ class AudioBus {
    * @param {number}   offset
    */
   copyFromWithOffset(audioBus, offset) {
-    const source = audioBus._audioData.channelData;
-    const destination = this._audioData.channelData;
+    const source = audioBus.audioData.channelData;
+    const destination = this.audioData.channelData;
     const numberOfChannels = destination.length;
 
     assert(audioBus instanceof AudioBus);
-    assert(audioBus._audioData.numberOfChannels === this._audioData.numberOfChannels);
+    assert(audioBus.audioData.numberOfChannels === this.audioData.numberOfChannels);
 
     offset = offset|0;
 
@@ -160,8 +156,8 @@ class AudioBus {
       return;
     }
 
-    const source = audioBus._audioData.channelData;
-    const destination = this._audioData.channelData;
+    const source = audioBus.audioData.channelData;
+    const destination = this.audioData.channelData;
 
     this._sumFrom(source, destination, audioBus.getLength());
   }
@@ -180,8 +176,8 @@ class AudioBus {
 
     offset = offset|0;
 
-    const source = audioBus._audioData.channelData;
-    const destination = this._audioData.channelData.map(data => data.subarray(offset))
+    const source = audioBus.audioData.channelData;
+    const destination = this.audioData.channelData.map(data => data.subarray(offset))
 
     this._sumFrom(source, destination, audioBus.getLength());
   }

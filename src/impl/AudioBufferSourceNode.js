@@ -37,7 +37,7 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
     /* istanbul ignore else */
     if (value instanceof AudioBuffer) {
       this._buffer = value;
-      this._audioData = this._buffer.getAudioData();
+      this._audioData = this._buffer.audioData;
       this.outputs[0].setNumberOfChannels(this._audioData.numberOfChannels);
     }
   }

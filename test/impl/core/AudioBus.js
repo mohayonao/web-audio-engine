@@ -36,7 +36,7 @@ describe("AudioBus", () => {
 
     it(".audioData", () => {
       const bus = new AudioBus(2, 128, 44100);
-      const data = bus.getAudioData();
+      const data = bus.audioData;
 
       assert(data instanceof AudioData);
     });

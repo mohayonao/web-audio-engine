@@ -212,7 +212,7 @@ class AudioContext extends EventTarget {
       outputBus.zeros();
     }
 
-    return outputBus.getAudioData();
+    return outputBus.audioData;
   }
 
   /**

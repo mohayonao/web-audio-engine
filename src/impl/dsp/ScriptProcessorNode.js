@@ -24,8 +24,8 @@ class ScriptProcessorNode extends AudioNode {
     eventItem.inputBuffer._impl = inputBuffer;
     eventItem.outputBuffer._impl = outputBuffer
 
-    this._inputChannelData = inputBuffer.getAudioData().channelData;
-    this._outputChannelData = outputBuffer.getAudioData().channelData;
+    this._inputChannelData = inputBuffer.audioData.channelData;
+    this._outputChannelData = outputBuffer.audioData.channelData;
 
     this._eventItem = eventItem;
   }

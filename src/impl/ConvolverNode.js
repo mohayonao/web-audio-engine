@@ -55,7 +55,7 @@ class ConvolverNode extends AudioNode {
     /* istanbul ignore else */
     if (value instanceof AudioBuffer) {
       this._buffer = value;
-      this._audioData = this._buffer.getAudioData();
+      this._audioData = this._buffer.audioData;
     }
   }
 
