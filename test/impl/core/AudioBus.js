@@ -52,14 +52,14 @@ describe("AudioBus", () => {
     it("get data", () => {
       const channelData = bus.getChannelData();
 
-      assert(bus.isSilent() === true);
+      assert(bus.isSilent === true);
       assert(channelData === bus.getChannelData());
     });
 
     it("get data - mutable data", () => {
       const mutableData = bus.getMutableData();
 
-      assert(bus.isSilent() === false);
+      assert(bus.isSilent === false);
       assert(mutableData === bus.getChannelData());
     });
 
@@ -71,7 +71,7 @@ describe("AudioBus", () => {
 
       assert(deepEqual(bus.getChannelData()[0], np.zeros(128)));
       assert(deepEqual(bus.getChannelData()[1], np.zeros(128)));
-      assert(bus.isSilent() === true);
+      assert(bus.isSilent === true);
     });
 
     it("set number of channels", () => {
@@ -99,7 +99,7 @@ describe("AudioBus", () => {
       bus2.copyFrom(bus1);
 
       assert(deepEqual(bus2.getChannelData()[0], noise1));
-      assert(bus2.isSilent() === false);
+      assert(bus2.isSilent === false);
     });
 
     it("copy from the silent", () => {
@@ -107,7 +107,7 @@ describe("AudioBus", () => {
       bus2.copyFrom(bus1);
 
       assert(deepEqual(bus2.getChannelData()[0], np.zeros(128)));
-      assert(bus2.isSilent(), true);
+      assert(bus2.isSilent, true);
     });
 
     it("copy from with the offset; ", () => {
@@ -121,7 +121,7 @@ describe("AudioBus", () => {
 
       assert(deepEqual(bus3.getChannelData()[0].subarray(0, 128), noise1));
       assert(deepEqual(bus3.getChannelData()[0].subarray(128, 256), noise2));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
     });
   });
 
@@ -159,12 +159,12 @@ describe("AudioBus", () => {
       bus3.zeros();
 
       assert(deepEqual(bus3.getChannelData()[0], np.zeros(128)));
-      assert(bus3.isSilent() === true);
+      assert(bus3.isSilent === true);
 
       bus3.sumFrom(bus2);
 
       assert(deepEqual(bus3.getChannelData()[0], np.zeros(128)));
-      assert(bus3.isSilent() === true);
+      assert(bus3.isSilent === true);
     });
 
     it("1->2 - discrete", () => {
@@ -184,7 +184,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
 
       bus3.sumFrom(bus2);
 
@@ -192,7 +192,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), bus2.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
     });
 
     it("2->1 - discrete", () => {
@@ -214,7 +214,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
 
       bus3.sumFrom(bus2);
 
@@ -222,7 +222,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), bus2.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
     });
 
     it("1->1 - speaker", () => {
@@ -242,7 +242,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
 
       bus3.sumFrom(bus2);
 
@@ -250,7 +250,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), bus2.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
     });
 
     it("1->2 - up-mix from mono to stereo", () => {
@@ -270,7 +270,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
 
       bus3.sumFrom(bus2);
 
@@ -278,7 +278,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), bus2.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
     });
 
     it("1->4 - up-mix from mono to quad", () => {
@@ -298,7 +298,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
 
       bus3.sumFrom(bus2);
 
@@ -306,7 +306,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), bus2.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
     });
 
     it("1->5.1 - up-mix from mono to 5.1", () => {
@@ -326,7 +326,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
 
       bus3.sumFrom(bus2);
 
@@ -334,7 +334,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), bus2.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
     });
 
     it("2->2", () => {
@@ -356,7 +356,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
 
       bus3.sumFrom(bus2);
 
@@ -364,7 +364,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), bus2.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
     });
 
     it("2->4 - up-mix from stereo to quad", () => {
@@ -386,7 +386,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
 
       bus3.sumFrom(bus2);
 
@@ -394,7 +394,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), bus2.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
     });
 
     it("2->5.1 - up-mix from stereo to 5.1", () => {
@@ -416,7 +416,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
 
       bus3.sumFrom(bus2);
 
@@ -424,7 +424,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), bus2.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
     });
 
     it("sum from : 4 -> 4", () => {
@@ -450,7 +450,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
 
       bus3.sumFrom(bus2);
 
@@ -458,7 +458,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), bus2.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
     });
 
     it("4->5.1 - up-mix from quad to 5.1", () => {
@@ -484,7 +484,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
 
       bus3.sumFrom(bus2);
 
@@ -492,7 +492,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), bus2.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
     });
 
     it("2->1 - stereo to mono", () => {
@@ -514,7 +514,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
 
       bus3.sumFrom(bus2);
 
@@ -522,7 +522,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), bus2.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
     });
 
     it("4->1 - quad to mono", () => {
@@ -548,7 +548,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
 
       bus3.sumFrom(bus2);
 
@@ -556,7 +556,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), bus2.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
     });
 
     it("5.1->1 - 5.1 to mono", () => {
@@ -586,7 +586,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
 
       bus3.sumFrom(bus2);
 
@@ -594,7 +594,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), bus2.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
     });
 
     it("4->2 - quad to stereo", () => {
@@ -620,7 +620,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
 
       bus3.sumFrom(bus2);
 
@@ -628,7 +628,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), bus2.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
     });
 
     it("5.1->2 - 5.1 to stereo", () => {
@@ -658,7 +658,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
 
       bus3.sumFrom(bus2);
 
@@ -666,7 +666,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), bus2.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
     });
 
     it("5.1->4 - 5.1 to quad", () => {
@@ -696,7 +696,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
 
       bus3.sumFrom(bus2);
 
@@ -704,7 +704,7 @@ describe("AudioBus", () => {
         bus3.getChannelData(),
         mixBy(bus1.getChannelData(), bus2.getChannelData(), mixer)
       ));
-      assert(bus3.isSilent() === false);
+      assert(bus3.isSilent === false);
     });
 
     it("with the offset", () => {
@@ -733,13 +733,13 @@ describe("AudioBus", () => {
         bus5.getChannelData().map(data => data.subarray(0, 128)),
         mixBy(bus1.getChannelData(), mixer)
       ));
-      assert(bus5.isSilent() === false);
+      assert(bus5.isSilent === false);
 
       assert(deepEqual(
         bus5.getChannelData().map(data => data.subarray(128, 256)),
         mixBy(bus2.getChannelData(), mixer)
       ));
-      assert(bus5.isSilent() === false);
+      assert(bus5.isSilent === false);
 
       bus5.sumFromWithOffset(bus3, 0);
       bus5.sumFromWithOffset(bus4, 128);
@@ -748,13 +748,13 @@ describe("AudioBus", () => {
         bus5.getChannelData().map(data => data.subarray(0, 128)),
         mixBy(bus1.getChannelData(), bus3.getChannelData(), mixer)
       ));
-      assert(bus5.isSilent() === false);
+      assert(bus5.isSilent === false);
 
       assert(deepEqual(
         bus5.getChannelData().map(data => data.subarray(128, 256)),
         mixBy(bus2.getChannelData(), bus4.getChannelData(), mixer)
       ));
-      assert(bus5.isSilent() === false);
+      assert(bus5.isSilent === false);
     });
   });
 });

@@ -78,7 +78,7 @@ describe("AudioDestinationNode", () => {
 
       node2.processIfNecessary(0);
 
-      assert(outputBus.isSilent() === true);
+      assert(outputBus.isSilent === true);
       assert(deepEqual(outputBus.getChannelData()[0], np.zeros(16)));
       assert(deepEqual(outputBus.getChannelData()[1], np.zeros(16)));
     });
@@ -96,7 +96,7 @@ describe("AudioDestinationNode", () => {
 
       node2.processIfNecessary(0);
 
-      assert(outputBus.isSilent() === false);
+      assert(outputBus.isSilent === false);
       assert(deepEqual(outputBus.getChannelData()[0], noise1));
       assert(deepEqual(outputBus.getChannelData()[1], noise2));
     });

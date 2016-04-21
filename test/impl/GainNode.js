@@ -86,7 +86,7 @@ describe("GainNode", () => {
           const expected = np.zeros(16);
 
           assert(deepEqual(actual, expected));
-          assert(node2.outputs[0].bus.isSilent() === true);
+          assert(node2.outputs[0].bus.isSilent === true);
         });
 
         it("value: 0", () => {
@@ -100,7 +100,7 @@ describe("GainNode", () => {
           const expected = np.zeros(16);
 
           assert(deepEqual(actual, expected));
-          assert(node2.outputs[0].bus.isSilent() === true);
+          assert(node2.outputs[0].bus.isSilent === true);
         });
 
         it("value: 1", () => {
@@ -114,7 +114,7 @@ describe("GainNode", () => {
           const expected = noise;
 
           assert(deepEqual(actual, expected));
-          assert(node2.outputs[0].bus.isSilent() === false);
+          assert(node2.outputs[0].bus.isSilent === false);
         });
 
         it("value: 2", () => {
@@ -128,7 +128,7 @@ describe("GainNode", () => {
           const expected = noise.map(x => x * 2);
 
           assert(deepEqual(actual, expected));
-          assert(node2.outputs[0].bus.isSilent() === false);
+          assert(node2.outputs[0].bus.isSilent === false);
         });
       });
       describe("hasSampleAccurateValues: true", () => {
@@ -144,7 +144,7 @@ describe("GainNode", () => {
           const expected = noise.map((x, i) => x * (i / 16));
 
           assert(deepEqual(actual, expected));
-          assert(node2.outputs[0].bus.isSilent() === false);
+          assert(node2.outputs[0].bus.isSilent === false);
         });
       });
 
@@ -175,7 +175,7 @@ describe("GainNode", () => {
 
             assert(deepEqual(actualL, expectedL));
             assert(deepEqual(actualR, expectedR));
-            assert(node2.outputs[0].bus.isSilent() === true);
+            assert(node2.outputs[0].bus.isSilent === true);
           });
 
           it("value: 0", () => {
@@ -194,7 +194,7 @@ describe("GainNode", () => {
 
             assert(deepEqual(actualL, expectedL));
             assert(deepEqual(actualR, expectedR));
-            assert(node2.outputs[0].bus.isSilent() === true);
+            assert(node2.outputs[0].bus.isSilent === true);
           });
 
           it("value: 1", () => {
@@ -213,7 +213,7 @@ describe("GainNode", () => {
 
             assert(deepEqual(actualL, expectedL));
             assert(deepEqual(actualR, expectedR));
-            assert(node2.outputs[0].bus.isSilent() === false);
+            assert(node2.outputs[0].bus.isSilent === false);
           });
 
           it("value: 2", () => {
@@ -232,7 +232,7 @@ describe("GainNode", () => {
 
             assert(deepEqual(actualL, expectedL));
             assert(deepEqual(actualR, expectedR));
-            assert(node2.outputs[0].bus.isSilent() === false);
+            assert(node2.outputs[0].bus.isSilent === false);
           });
         });
         describe("hasSampleAccurateValues: true", () => {
@@ -253,7 +253,7 @@ describe("GainNode", () => {
 
             assert(deepEqual(actualL, expectedL));
             assert(deepEqual(actualR, expectedR));
-            assert(node2.outputs[0].bus.isSilent() === false);
+            assert(node2.outputs[0].bus.isSilent === false);
           });
         });
       });
@@ -299,7 +299,7 @@ describe("GainNode", () => {
             assert(deepEqual(actualR, expectedR));
             assert(deepEqual(actualSL, expectedSL));
             assert(deepEqual(actualSR, expectedSR));
-            assert(node2.outputs[0].bus.isSilent() === false);
+            assert(node2.outputs[0].bus.isSilent === false);
           });
         });
         describe("hasSampleAccurateValues: true", () => {
@@ -330,7 +330,7 @@ describe("GainNode", () => {
             assert(deepEqual(actualR, expectedR));
             assert(deepEqual(actualSL, expectedSL));
             assert(deepEqual(actualSR, expectedSR));
-            assert(node2.outputs[0].bus.isSilent() === false);
+            assert(node2.outputs[0].bus.isSilent === false);
           });
         });
       });

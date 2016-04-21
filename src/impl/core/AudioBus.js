@@ -6,6 +6,7 @@ const DSPAlgorithm = {};
 
 /**
  * @prop {AudioData} audioData
+ * @prop {boolean}   isSilent
  */
 class AudioBus {
   /**
@@ -15,7 +16,7 @@ class AudioBus {
    */
   constructor(numberOfChannels, length, sampleRate) {
     this.audioData = new AudioData(numberOfChannels, length, sampleRate);
-    this._isSilent = true;
+    this.isSilent = true;
     this._channelInterpretation = "discrete";
   }
 
@@ -33,13 +34,6 @@ class AudioBus {
     if (value !== this._channelInterpretation && isValidChannelInterpretation(value)) {
       this._channelInterpretation = value;
     }
-  }
-
-  /**
-   * @return {boolean}
-   */
-  isSilent() {
-    return this._isSilent;
   }
 
   /**
@@ -86,7 +80,7 @@ class AudioBus {
    * @return {Float32Array[]}
    */
   getMutableData() {
-    this._isSilent = false;
+    this.isSilent = false;
     return this.audioData.channelData;
   }
 
@@ -95,14 +89,14 @@ class AudioBus {
    */
   zeros() {
     /* istanbul ignore else */
-    if (!this._isSilent) {
+    if (!this.isSilent) {
       const channelData = this.audioData.channelData;
 
       for (let i = 0, imax = channelData.length; i < imax; i++) {
         channelData[i].fill(0);
       }
     }
-    this._isSilent = true;
+    this.isSilent = true;
   }
 
   /**
@@ -121,7 +115,7 @@ class AudioBus {
       destination[ch].set(source[ch]);
     }
 
-    this._isSilent = audioBus._isSilent;
+    this.isSilent = audioBus.isSilent;
   }
 
   /**
@@ -142,7 +136,7 @@ class AudioBus {
       destination[ch].set(source[ch], offset);
     }
 
-    this._isSilent = this._isSilent && audioBus._isSilent;
+    this.isSilent = this.isSilent && audioBus.isSilent;
   }
 
   /**
@@ -152,7 +146,7 @@ class AudioBus {
     assert(audioBus instanceof AudioBus);
 
     /* istanbul ignore next */
-    if (audioBus._isSilent) {
+    if (audioBus.isSilent) {
       return;
     }
 
@@ -170,7 +164,7 @@ class AudioBus {
     assert(audioBus instanceof AudioBus);
 
     /* istanbul ignore next */
-    if (audioBus._isSilent) {
+    if (audioBus.isSilent) {
       return;
     }
 
@@ -197,13 +191,13 @@ class AudioBus {
 
     mixFunction = DSPAlgorithm[algoIndex] || DSPAlgorithm[0];
 
-    if (this._isSilent && mixFunction.set) {
+    if (this.isSilent && mixFunction.set) {
       mixFunction = mixFunction.set;
     }
 
     mixFunction(source, destination, length);
 
-    this._isSilent = false;
+    this.isSilent = false;
   }
 }
 

@@ -37,9 +37,9 @@ describe("AudioNodeOutput", () => {
 
       assert(output.getNumberOfConnections() === 1);
 
-      assert(output.bus.isSilent() === false);
+      assert(output.bus.isSilent === false);
       output.zeros();
-      assert(output.bus.isSilent() === true);
+      assert(output.bus.isSilent === true);
     });
 
     it("channel number propagation", () => {

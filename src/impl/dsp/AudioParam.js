@@ -28,7 +28,7 @@ class AudioParam {
     input.pull(currentSample);
 
     const hasEvents = !!this._timeline.length;
-    const hasInput = !inputBus.isSilent();
+    const hasInput = !inputBus.isSilent;
     const algorithm = hasEvents * 2 + hasInput;
 
     switch (algorithm) {

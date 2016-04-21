@@ -79,7 +79,7 @@ describe("ChannelSplitterNode", () => {
       context.process();
 
       const actual = [ 0, 1, 2, 3, 4, 5 ].map(ch => node2.outputs[ch].bus.getChannelData()[0]);
-      const isSilent = [ 0, 1, 2, 3, 4, 5 ].map(ch => node2.outputs[ch].bus.isSilent());
+      const isSilent = [ 0, 1, 2, 3, 4, 5 ].map(ch => node2.outputs[ch].bus.isSilent);
 
       assert(isSilent[0] === false);
       assert(isSilent[1] === false);
@@ -109,7 +109,7 @@ describe("ChannelSplitterNode", () => {
       context.process();
 
       const actual = [ 0, 1, 2, 3, 4, 5 ].map(ch => node2.outputs[ch].bus.getChannelData()[0]);
-      const isSilent = [ 0, 1, 2, 3, 4, 5 ].map(ch => node2.outputs[ch].bus.isSilent());
+      const isSilent = [ 0, 1, 2, 3, 4, 5 ].map(ch => node2.outputs[ch].bus.isSilent);
 
       assert(isSilent[0] === true);
       assert(isSilent[1] === true);
