@@ -2447,7 +2447,8 @@ module.exports = {
 module.exports = {
   sampleRate: 44100,
   numberOfChannels: 2,
-  blockSize: 128
+  blockSize: 128,
+  bitDepth: 16
 };
 
 },{}],32:[function(require,module,exports){
@@ -2473,6 +2474,12 @@ var setImmediate = global.setImmediate || /* istanbul ignore next */function (fn
 var OfflineAudioContext = function (_AudioContext) {
   _inherits(OfflineAudioContext, _AudioContext);
 
+  /**
+   * @param {number} numberOfChannels
+   * @param {number} length
+   * @param {number} sampleRate
+   */
+
   function OfflineAudioContext(numberOfChannels, length, sampleRate) {
     _classCallCheck(this, OfflineAudioContext);
 
@@ -2497,14 +2504,30 @@ var OfflineAudioContext = function (_AudioContext) {
     return _this;
   }
 
+  /**
+   * @return {function}
+   */
+
+
   _createClass(OfflineAudioContext, [{
     key: "resume",
+
+
+    /**
+     * @return {Promise<void>}
+     */
     value: function resume() {
       if (this.state === "suspended" && this._renderingPromise !== null) {
         render.call(this, this._impl);
       }
       return Promise.resolve();
     }
+
+    /**
+     * @param {number} time
+     * @return {Promise<void>}
+     */
+
   }, {
     key: "suspend",
     value: function suspend(time) {
@@ -2523,6 +2546,9 @@ var OfflineAudioContext = function (_AudioContext) {
       return this._suspendPromise;
     }
 
+    /**
+     * @return {Promise<void>}
+     */
     /* istanbul ignore next */
 
   }, {
@@ -2530,6 +2556,11 @@ var OfflineAudioContext = function (_AudioContext) {
     value: function close() {
       return Promise.reject();
     }
+
+    /**
+     * @return {Promise<AudioBuffer>}
+     */
+
   }, {
     key: "startRendering",
     value: function startRendering() {
@@ -2554,7 +2585,12 @@ var OfflineAudioContext = function (_AudioContext) {
     key: "oncomplete",
     get: function get() {
       return this._impl.$oncomplete;
-    },
+    }
+
+    /**
+     * @param {function} callback
+     */
+    ,
     set: function set(callback) {
       this._impl.replaceEventListener("complete", this._impl.$oncomplete, callback);
       this._impl.$oncomplete = callback;
@@ -2654,21 +2690,31 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var util = require("../util");
+var config = require("../config");
 var AudioContext = require("../api/AudioContext");
 var encoder = require("../encoder");
 
 var RenderingAudioContext = function (_AudioContext) {
   _inherits(RenderingAudioContext, _AudioContext);
 
+  /**
+   * @param {object}  opts
+   * @param {number}  opts.sampleRate
+   * @param {number}  opts.blockSize
+   * @param {number}  opts.numberOfChannels
+   * @param {number}  opts.bitDepth
+   * @param {boolean} opts.floatingPoint
+   */
+
   function RenderingAudioContext(opts) {
     _classCallCheck(this, RenderingAudioContext);
 
     opts = opts || /* istanbul ignore next */{};
 
-    var sampleRate = util.defaults(opts.sampleRate, 44100);
-    var blockSize = util.defaults(opts.blockSize, 128);
-    var numberOfChannels = util.defaults(opts.channels || opts.numberOfChannels, 2);
-    var bitDepth = util.defaults(opts.bitDepth, 16);
+    var sampleRate = util.defaults(opts.sampleRate, config.sampleRate);
+    var blockSize = util.defaults(opts.blockSize, config.blockSize);
+    var numberOfChannels = util.defaults(opts.channels || opts.numberOfChannels, config.numberOfChannels);
+    var bitDepth = util.defaults(opts.bitDepth, config.bitDepth);
     var floatingPoint = opts.float || opts.floatingPoint;
 
     sampleRate = util.toValidSampleRate(sampleRate);
@@ -2684,8 +2730,18 @@ var RenderingAudioContext = function (_AudioContext) {
     return _this;
   }
 
+  /**
+   * @return {number}
+   */
+
+
   _createClass(RenderingAudioContext, [{
     key: "processTo",
+
+
+    /**
+     * @param {number|string} time
+     */
     value: function processTo(time) {
       time = util.toAudioTime(time);
 
@@ -2718,6 +2774,11 @@ var RenderingAudioContext = function (_AudioContext) {
 
       impl.changeState("suspended");
     }
+
+    /**
+     * @return {AudioData}
+     */
+
   }, {
     key: "exportAsAudioData",
     value: function exportAsAudioData() {
@@ -2742,6 +2803,12 @@ var RenderingAudioContext = function (_AudioContext) {
 
       return audioData;
     }
+
+    /**
+     * @param {AudioData} audioData
+     * @param {object}    opts
+     */
+
   }, {
     key: "encodeAudioData",
     value: function encodeAudioData(audioData, opts) {
@@ -2760,7 +2827,7 @@ var RenderingAudioContext = function (_AudioContext) {
 
 module.exports = RenderingAudioContext;
 
-},{"../api/AudioContext":7,"../encoder":37,"../util":95}],34:[function(require,module,exports){
+},{"../api/AudioContext":7,"../config":31,"../encoder":37,"../util":95}],34:[function(require,module,exports){
 (function (global){
 "use strict";
 
@@ -2775,6 +2842,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var util = require("../util");
+var config = require("../config");
 var AudioContext = require("../api/AudioContext");
 var setImmediate = global.setImmediate || /* istanbul ignore next */function (fn) {
   return setTimeout(fn, 0);
@@ -2786,15 +2854,24 @@ var noopWriter = { write: function write() {
 var StreamAudioContext = function (_AudioContext) {
   _inherits(StreamAudioContext, _AudioContext);
 
+  /**
+   * @param {object}  opts
+   * @param {number}  opts.sampleRate
+   * @param {number}  opts.blockSize
+   * @param {number}  opts.numberOfChannels
+   * @param {number}  opts.bitDepth
+   * @param {boolean} opts.floatingPoint
+   */
+
   function StreamAudioContext(opts) {
     _classCallCheck(this, StreamAudioContext);
 
     opts = opts || /* istanbul ignore next */{};
 
-    var sampleRate = util.defaults(opts.sampleRate, 44100);
-    var blockSize = util.defaults(opts.blockSize, 128);
-    var numberOfChannels = util.defaults(opts.channels || opts.numberOfChannels, 2);
-    var bitDepth = util.defaults(opts.bitDepth, 16);
+    var sampleRate = util.defaults(opts.sampleRate, config.sampleRate);
+    var blockSize = util.defaults(opts.blockSize, config.blockSize);
+    var numberOfChannels = util.defaults(opts.channels || opts.numberOfChannels, config.numberOfChannels);
+    var bitDepth = util.defaults(opts.bitDepth, config.bitDepth);
     var floatingPoint = opts.float || opts.floatingPoint;
 
     sampleRate = util.toValidSampleRate(sampleRate);
@@ -2814,12 +2891,28 @@ var StreamAudioContext = function (_AudioContext) {
     return _this;
   }
 
+  /**
+   * @return {number}
+   */
+
+
   _createClass(StreamAudioContext, [{
     key: "pipe",
+
+
+    /**
+     * @param {Writable}
+     * @return {Writable}
+     */
     value: function pipe(stream) {
       this._stream = stream;
       return stream;
     }
+
+    /**
+     * @return {Promise<void>}
+     */
+
   }, {
     key: "resume",
     value: function resume() {
@@ -2828,6 +2921,11 @@ var StreamAudioContext = function (_AudioContext) {
       }
       return _get(Object.getPrototypeOf(StreamAudioContext.prototype), "resume", this).call(this);
     }
+
+    /**
+     * @return {Promise<void>}
+     */
+
   }, {
     key: "suspend",
     value: function suspend() {
@@ -2836,6 +2934,11 @@ var StreamAudioContext = function (_AudioContext) {
       }
       return _get(Object.getPrototypeOf(StreamAudioContext.prototype), "suspend", this).call(this);
     }
+
+    /**
+     * @return {Promise<void>}
+     */
+
   }, {
     key: "close",
     value: function close() {
@@ -2984,7 +3087,7 @@ function createBufferWriter(buffer) {
 module.exports = StreamAudioContext;
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../api/AudioContext":7,"../util":95}],35:[function(require,module,exports){
+},{"../api/AudioContext":7,"../config":31,"../util":95}],35:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2998,11 +3101,21 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
 var util = require("../util");
+var config = require("../config");
 var AudioContext = require("../api/AudioContext");
 var DSPAlgorithm = [];
 
 var WebAudioContext = function (_AudioContext) {
   _inherits(WebAudioContext, _AudioContext);
+
+  /**
+   * @param {object}  opts
+   * @param {AudioContext} opts.context
+   * @param {AudioNode}    opts.destination
+   * @param {number}       opts.blockSize
+   * @param {number}       opts.numberOfChannels
+   * @param {number}       opts.bufferSize
+   */
 
   function WebAudioContext(opts) {
     _classCallCheck(this, WebAudioContext);
@@ -3012,9 +3125,9 @@ var WebAudioContext = function (_AudioContext) {
     var destination = opts.destination || opts.context.destination;
     var context = destination.context;
     var sampleRate = context.sampleRate;
-    var blockSize = util.defaults(opts.blockSize, 128);
-    var numberOfChannels = util.defaults(opts.numberOfChannels, 2);
-    var bufferSize = util.defaults(bufferSize, 1024);
+    var blockSize = util.defaults(opts.blockSize, config.blockSize);
+    var numberOfChannels = util.defaults(opts.numberOfChannels, config.numberOfChannels);
+    var bufferSize = util.defaults(opts.bufferSize, 1024);
 
     blockSize = util.toValidBlockSize(blockSize);
     numberOfChannels = util.toValidNumberOfChannels(numberOfChannels);
@@ -3036,12 +3149,22 @@ var WebAudioContext = function (_AudioContext) {
 
   _createClass(WebAudioContext, [{
     key: "resume",
+
+
+    /**
+     * @return {Promise<void>}
+     */
     value: function resume() {
       if (this._processor) {
         this._processor.connect(this._destination);
       }
       return _get(Object.getPrototypeOf(WebAudioContext.prototype), "resume", this).call(this);
     }
+
+    /**
+     * @return {Promise<void>}
+     */
+
   }, {
     key: "suspend",
     value: function suspend() {
@@ -3050,6 +3173,11 @@ var WebAudioContext = function (_AudioContext) {
       }
       return _get(Object.getPrototypeOf(WebAudioContext.prototype), "suspend", this).call(this);
     }
+
+    /**
+     * @return {Promise<void>}
+     */
+
   }, {
     key: "close",
     value: function close() {
@@ -3122,7 +3250,7 @@ DSPAlgorithm[2] = function (impl, numberOfChannels, bufferSize) {
 
 module.exports = WebAudioContext;
 
-},{"../api/AudioContext":7,"../util":95}],36:[function(require,module,exports){
+},{"../api/AudioContext":7,"../config":31,"../util":95}],36:[function(require,module,exports){
 "use strict";
 
 var WavDecoder = require("wav-decoder");
@@ -3132,10 +3260,16 @@ var AudioBuffer = require("./api/AudioBuffer");
 
 var decodeFn = WavDecoder.decode;
 
+/**
+ * @return {function}
+ */
 function get() {
   return decodeFn;
 }
 
+/**
+ * @param {function} fn
+ */
 function set(fn) {
   /* istanbul ignore else */
   if (typeof fn === "function") {
@@ -3143,6 +3277,11 @@ function set(fn) {
   }
 }
 
+/**
+ * @param {ArrayBuffer} AudioBuffer
+ * @param {object}      opts
+ * @return {Promise<AudioData>}
+ */
 function decode(audioData, opts) {
   return decoderUtil.decode(decodeFn, audioData, opts).then(function (audioData) {
     return audioDataUtil.toAudioBuffer(audioData, AudioBuffer);
@@ -3159,10 +3298,16 @@ var encoderUtil = require("./util/encoderUtil");
 
 var encodeFn = WavEncoder.encode;
 
+/**
+ * @return {function}
+ */
 function get() {
   return encodeFn;
 }
 
+/**
+ * @param {function} fn
+ */
 function set(fn) {
   /* istanbul ignore else */
   if (typeof fn === "function") {
@@ -3170,6 +3315,11 @@ function set(fn) {
   }
 }
 
+/**
+ * @param {AudioData} audioData
+ * @param {object}    opts
+ * @return {Promise<ArrayBuffer>}
+ */
 function encode(audioData, opts) {
   return encoderUtil.encode(encodeFn, audioData, opts);
 }
@@ -3197,6 +3347,10 @@ var MinFFTSize = 32;
 var AnalyserNode = function (_AudioNode) {
   _inherits(AnalyserNode, _AudioNode);
 
+  /**
+   * @param {AudioContext} context
+   */
+
   function AnalyserNode(context) {
     _classCallCheck(this, AnalyserNode);
 
@@ -3214,11 +3368,21 @@ var AnalyserNode = function (_AudioNode) {
     return _this;
   }
 
+  /**
+   * @return {number}
+   */
+
+
   _createClass(AnalyserNode, [{
     key: "getFftSize",
     value: function getFftSize() {
       return this._fftSize;
     }
+
+    /**
+     * @param {number} value
+     */
+
   }, {
     key: "setFftSize",
     value: function setFftSize(value) {
@@ -3226,16 +3390,31 @@ var AnalyserNode = function (_AudioNode) {
       value = util.toPowerOfTwo(value, Math.ceil);
       this._fftSize = value;
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getFrequencyBinCount",
     value: function getFrequencyBinCount() {
       return this._fftSize / 2;
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getMinDecibels",
     value: function getMinDecibels() {
       return this._minDecibels;
     }
+
+    /**
+     * @param {number} value
+     */
+
   }, {
     key: "setMinDecibels",
     value: function setMinDecibels(value) {
@@ -3245,11 +3424,21 @@ var AnalyserNode = function (_AudioNode) {
         this._minDecibels = value;
       }
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getMaxDecibels",
     value: function getMaxDecibels() {
       return this._maxDecibels;
     }
+
+    /**
+     * @param {number} value
+     */
+
   }, {
     key: "setMaxDecibels",
     value: function setMaxDecibels(value) {
@@ -3259,11 +3448,21 @@ var AnalyserNode = function (_AudioNode) {
         this._maxDecibels = value;
       }
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getSmoothingTimeConstant",
     value: function getSmoothingTimeConstant() {
       return this._smoothingTimeConstant;
     }
+
+    /**
+     * @param {number}
+     */
+
   }, {
     key: "setSmoothingTimeConstant",
     value: function setSmoothingTimeConstant(value) {
@@ -3271,6 +3470,9 @@ var AnalyserNode = function (_AudioNode) {
       this._smoothingTimeConstant = value;
     }
 
+    /**
+     * @param {Float32Array} array
+     */
     /* istanbul ignore next */
 
   }, {
@@ -3279,6 +3481,9 @@ var AnalyserNode = function (_AudioNode) {
       throw new TypeError("NOT YET IMPLEMENTED");
     }
 
+    /**
+     * @param {Uint8Array} array
+     */
     /* istanbul ignore next */
 
   }, {
@@ -3287,6 +3492,9 @@ var AnalyserNode = function (_AudioNode) {
       throw new TypeError("NOT YET IMPLEMENTED");
     }
 
+    /**
+     * @param {Float32Array} array
+     */
     /* istanbul ignore next */
 
   }, {
@@ -3295,6 +3503,9 @@ var AnalyserNode = function (_AudioNode) {
       throw new TypeError("NOT YET IMPLEMENTED");
     }
 
+    /**
+     * @param {Uint8Array} array
+     */
     /* istanbul ignore next */
 
   }, {
@@ -3302,6 +3513,11 @@ var AnalyserNode = function (_AudioNode) {
     value: function getByteTimeDomainData() {
       throw new TypeError("NOT YET IMPLEMENTED");
     }
+
+    /**
+     * @param {number} numberOfChannels
+     */
+
   }, {
     key: "channelDidUpdate",
     value: function channelDidUpdate(numberOfChannels) {
@@ -3324,7 +3540,19 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var util = require("../util");
 var AudioData = require("./core/AudioData");
 
+/**
+ * @prop {AudioData} audioData
+ */
+
 var AudioBuffer = function () {
+  /**
+   * @param {AudioContext} context
+   * @param {object}       opts
+   * @param {number}       opts.numberOfChannels
+   * @param {number}       opts.length
+   * @param {number}       opts.sampleRate
+   */
+
   function AudioBuffer(context, opts) {
     _classCallCheck(this, AudioBuffer);
 
@@ -3338,52 +3566,86 @@ var AudioBuffer = function () {
     length = Math.max(0, util.toNumber(length));
     sampleRate = util.toValidSampleRate(sampleRate);
 
-    this._audioData = new AudioData(numberOfChannels, length, sampleRate);
+    this.audioData = new AudioData(numberOfChannels, length, sampleRate);
   }
+
+  /**
+   * @return {number}
+   */
+
 
   _createClass(AudioBuffer, [{
     key: "getSampleRate",
     value: function getSampleRate() {
-      return this._audioData.sampleRate;
+      return this.audioData.sampleRate;
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getLength",
     value: function getLength() {
-      return this._audioData.length;
+      return this.audioData.length;
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getDuration",
     value: function getDuration() {
-      return this._audioData.length / this._audioData.sampleRate;
+      return this.audioData.length / this.audioData.sampleRate;
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getNumberOfChannels",
     value: function getNumberOfChannels() {
-      return this._audioData.numberOfChannels;
+      return this.audioData.numberOfChannels;
     }
-  }, {
-    key: "getAudioData",
-    value: function getAudioData() {
-      return this._audioData;
-    }
+
+    /**
+     * @return {Float32Array}
+     */
+
   }, {
     key: "getChannelData",
     value: function getChannelData(channel) {
-      return this._audioData.channelData[channel | 0];
+      return this.audioData.channelData[channel | 0];
     }
+
+    /**
+     * @param {Float32Array} destination
+     * @param {number}       channelNumber
+     * @param {number}       startInChannel
+     */
+
   }, {
     key: "copyFromChannel",
     value: function copyFromChannel(destination, channelNumber, startInChannel) {
-      var source = this._audioData.channelData[channelNumber | 0];
+      var source = this.audioData.channelData[channelNumber | 0];
 
       startInChannel = startInChannel | 0;
 
       destination.set(source.subarray(startInChannel, startInChannel + destination.length));
     }
+
+    /**
+     * @param {Float32Array} source
+     * @param {number}       channelNumber
+     * @param {number}       startInChannel
+     */
+
   }, {
     key: "copyToChannel",
     value: function copyToChannel(source, channelNumber, startInChannel) {
-      var destination = this._audioData.channelData[channelNumber | 0];
+      var destination = this.audioData.channelData[channelNumber | 0];
 
       startInChannel = startInChannel | 0;
 
@@ -3417,6 +3679,10 @@ var AudioBufferSourceNodeDSP = require("./dsp/AudioBufferSourceNode");
 var AudioBufferSourceNode = function (_AudioScheduledSource) {
   _inherits(AudioBufferSourceNode, _AudioScheduledSource);
 
+  /**
+   * @param {AudioContext} context
+   */
+
   function AudioBufferSourceNode(context) {
     _classCallCheck(this, AudioBufferSourceNode);
 
@@ -3433,11 +3699,21 @@ var AudioBufferSourceNode = function (_AudioScheduledSource) {
     return _this;
   }
 
+  /**
+   * @return {AudioBuffer}
+   */
+
+
   _createClass(AudioBufferSourceNode, [{
     key: "getBuffer",
     value: function getBuffer() {
       return this._buffer;
     }
+
+    /**
+     * @param {AudioBuffer} value
+     */
+
   }, {
     key: "setBuffer",
     value: function setBuffer(value) {
@@ -3446,52 +3722,99 @@ var AudioBufferSourceNode = function (_AudioScheduledSource) {
       /* istanbul ignore else */
       if (value instanceof AudioBuffer) {
         this._buffer = value;
-        this._audioData = this._buffer.getAudioData();
+        this._audioData = this._buffer.audioData;
         this.outputs[0].setNumberOfChannels(this._audioData.numberOfChannels);
       }
     }
+
+    /**
+     * @return {AudioParam}
+     */
+
   }, {
     key: "getPlaybackRate",
     value: function getPlaybackRate() {
       return this._playbackRate;
     }
+
+    /**
+     * @return {AudioParam}
+     */
+
   }, {
     key: "getDetune",
     value: function getDetune() {
       return this._detune;
     }
+
+    /**
+     * @return {boolean}
+     */
+
   }, {
     key: "getLoop",
     value: function getLoop() {
       return this._loop;
     }
+
+    /**
+     * @param {boolean}
+     */
+
   }, {
     key: "setLoop",
     value: function setLoop(value) {
       this._loop = !!value;
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getLoopStart",
     value: function getLoopStart() {
       return this._loopStart;
     }
+
+    /**
+     * @param {number} value
+     */
+
   }, {
     key: "setLoopStart",
     value: function setLoopStart(value) {
       value = Math.max(0, util.toNumber(value));
       this._loopStart = value;
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getLoopEnd",
     value: function getLoopEnd() {
       return this._loopEnd;
     }
+
+    /**
+     * @param {number} value
+     */
+
   }, {
     key: "setLoopEnd",
     value: function setLoopEnd(value) {
       value = Math.max(0, util.toNumber(value));
       this._loopEnd = value;
     }
+
+    /**
+     * @param {number} when
+     * @param {number} offset
+     * @param {number} duration
+     */
+
   }, {
     key: "start",
     value: function start(when, offset, duration) {
@@ -3524,25 +3847,43 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
-var config = require("../config");
 var util = require("../util");
+var config = require("../config");
 var EventTarget = require("./EventTarget");
 var AudioDestinationNode = require("./AudioDestinationNode");
 var AudioListener = require("./AudioListener");
 
+/**
+ * @prop {number} sampleRate
+ * @prop {number} blockSize
+ * @prop {number} numberOfChannels
+ * @prop {number} currentTime
+ */
+
 var AudioContext = function (_EventTarget) {
   _inherits(AudioContext, _EventTarget);
+
+  /**
+   * @param {object} opts
+   * @param {number} opts.sampleRate
+   * @param {number} opts.blockSize
+   * @param {number} opts.numberOfChannels
+   */
 
   function AudioContext(opts) {
     _classCallCheck(this, AudioContext);
 
+    opts = opts || /* istanbul ignore next */{};
+
     var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AudioContext).call(this));
 
-    opts = Object.assign({}, config, opts);
+    var sampleRate = util.defaults(opts.sampleRate, config.sampleRate);
+    var blockSize = util.defaults(opts.blockSize, config.blockSize);
+    var numberOfChannels = util.defaults(opts.channels || opts.numberOfChannels, config.numberOfChannels);
 
-    var sampleRate = util.toValidSampleRate(opts.sampleRate);
-    var blockSize = util.toValidBlockSize(opts.blockSize, sampleRate);
-    var numberOfChannels = util.toValidNumberOfChannels(opts.numberOfChannels);
+    sampleRate = util.toValidSampleRate(opts.sampleRate);
+    blockSize = util.toValidBlockSize(opts.blockSize, sampleRate);
+    numberOfChannels = util.toValidNumberOfChannels(opts.numberOfChannels);
 
     _this.sampleRate = sampleRate;
     _this.blockSize = blockSize;
@@ -3558,31 +3899,61 @@ var AudioContext = function (_EventTarget) {
     return _this;
   }
 
+  /**
+   * @return {AudioDestinationNode}
+   */
+
+
   _createClass(AudioContext, [{
     key: "getDestination",
     value: function getDestination() {
       return this._destination;
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getSampleRate",
     value: function getSampleRate() {
       return this.sampleRate;
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getCurrentTime",
     value: function getCurrentTime() {
       return this.currentTime;
     }
+
+    /**
+     * @return {AudioListener}
+     */
+
   }, {
     key: "getListener",
     value: function getListener() {
       return this._listener;
     }
+
+    /**
+     * @return {string}
+     */
+
   }, {
     key: "getState",
     value: function getState() {
       return this._state;
     }
+
+    /**
+     * @return {Promise<void>}
+     */
+
   }, {
     key: "suspend",
     value: function suspend() {
@@ -3591,6 +3962,11 @@ var AudioContext = function (_EventTarget) {
       }
       return this.notChangeState();
     }
+
+    /**
+     * @return {Promise<void>}
+     */
+
   }, {
     key: "resume",
     value: function resume() {
@@ -3599,6 +3975,11 @@ var AudioContext = function (_EventTarget) {
       }
       return this.notChangeState();
     }
+
+    /**
+     * @return {Promise<void>}
+     */
+
   }, {
     key: "close",
     value: function close() {
@@ -3607,6 +3988,12 @@ var AudioContext = function (_EventTarget) {
       }
       return this.notChangeState();
     }
+
+    /**
+     * @param {string} state
+     * @return {Promise<void>}
+     */
+
   }, {
     key: "changeState",
     value: function changeState(state) {
@@ -3620,6 +4007,11 @@ var AudioContext = function (_EventTarget) {
         });
       });
     }
+
+    /**
+     * @return {Promise<void>}
+     */
+
   }, {
     key: "notChangeState",
     value: function notChangeState() {
@@ -3629,6 +4021,11 @@ var AudioContext = function (_EventTarget) {
         _this3.addPreProcess(resolve);
       });
     }
+
+    /**
+     * @param {AudioNode} node
+     */
+
   }, {
     key: "addToScheduledSource",
     value: function addToScheduledSource(node) {
@@ -3639,6 +4036,11 @@ var AudioContext = function (_EventTarget) {
         this._scheduledSourceNodes.push(node);
       }
     }
+
+    /**
+     * @param {AudioNode} node
+     */
+
   }, {
     key: "removeFromScheduledSource",
     value: function removeFromScheduledSource(node) {
@@ -3649,16 +4051,31 @@ var AudioContext = function (_EventTarget) {
         this._scheduledSourceNodes.splice(index, 1);
       }
     }
+
+    /**
+     * @param {function} task
+     */
+
   }, {
     key: "addPreProcess",
     value: function addPreProcess(task) {
       this._callbacksForPreProcess.push(task);
     }
+
+    /**
+     * @param {function} task
+     */
+
   }, {
     key: "addPostProcess",
     value: function addPostProcess(task) {
       this._callbacksForPostProcess.push(task);
     }
+
+    /**
+     * @param {function[]} tasks
+     */
+
   }, {
     key: "callTasks",
     value: function callTasks(tasks) {
@@ -3666,6 +4083,11 @@ var AudioContext = function (_EventTarget) {
         tasks[i]();
       }
     }
+
+    /**
+     *
+     */
+
   }, {
     key: "process",
     value: function process() {
@@ -3698,8 +4120,13 @@ var AudioContext = function (_EventTarget) {
         outputBus.zeros();
       }
 
-      return outputBus.getAudioData();
+      return outputBus.audioData;
     }
+
+    /**
+     *
+     */
+
   }, {
     key: "reset",
     value: function reset() {
@@ -3736,8 +4163,19 @@ var AudioNode = require("./AudioNode");
 var AudioNodeOutput = require("./core/AudioNodeOutput");
 var AudioDestinationNodeDSP = require("./dsp/AudioDestinationNode");
 
+/**
+ * @prop {AudioNodeOutput} output
+ * @prop {AudioBus}        outputBus
+ */
+
 var AudioDestinationNode = function (_AudioNode) {
   _inherits(AudioDestinationNode, _AudioNode);
+
+  /**
+   * @param {AudioContext} context
+   * @param {object}       opts
+   * @param {number}       opts.numberOfChannels
+   */
 
   function AudioDestinationNode(context, opts) {
     _classCallCheck(this, AudioDestinationNode);
@@ -3763,21 +4201,26 @@ var AudioDestinationNode = function (_AudioNode) {
     return _this;
   }
 
+  /**
+   * @return {number}
+   */
+
+
   _createClass(AudioDestinationNode, [{
     key: "getMaxChannelCount",
     value: function getMaxChannelCount() {
       return this._numberOfChannels;
     }
+
+    /**
+     * @param {number} value
+     */
+
   }, {
     key: "setChannelCount",
     value: function setChannelCount(value) {
       value = util.clip(value | 0, 1, this.getMaxChannelCount());
       _get(Object.getPrototypeOf(AudioDestinationNode.prototype), "setChannelCount", this).call(this, value);
-    }
-  }, {
-    key: "getOutput",
-    value: function getOutput() {
-      return this.output;
     }
   }]);
 
@@ -3794,12 +4237,21 @@ var _createClass = function () { function defineProperties(target, props) { for 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var AudioListener = function () {
+  /**
+   * @param {AudioContext} context
+   */
+
   function AudioListener(context) {
     _classCallCheck(this, AudioListener);
 
     this.context = context;
   }
 
+  /**
+   * @param {number} x
+   * @param {number} y
+   * @param {number} z
+   */
   /* istanbul ignore next */
 
 
@@ -3809,6 +4261,14 @@ var AudioListener = function () {
       throw new TypeError("NOT YET IMPLEMENTED");
     }
 
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} z
+     * @param {number} xUp
+     * @param {number} yUp
+     * @param {number} zUp
+     */
     /* istanbul ignore next */
 
   }, {
@@ -3840,8 +4300,24 @@ var AudioNodeInput = require("./core/AudioNodeInput");
 var AudioNodeOutput = require("./core/AudioNodeOutput");
 var AudioParam = require("./AudioParam");
 
+/**
+ * @prop {AudioContext}      context
+ * @prop {number}            blockSize
+ * @prop {number}            sampleRate
+ * @prop {AudioNodeInput[]}  inputs
+ * @prop {AudioNodeOutput[]} outputs
+ */
+
 var AudioNode = function (_EventTarget) {
   _inherits(AudioNode, _EventTarget);
+
+  /**
+   * @param {AudioContext} context
+   * @param {number[]}     opts.inputs
+   * @param {number[]}     opts.outputs
+   * @param {number}       opts.channelCount
+   * @param {string}       opts.channelCountMode
+   */
 
   function AudioNode(context, opts) {
     _classCallCheck(this, AudioNode);
@@ -3875,56 +4351,103 @@ var AudioNode = function (_EventTarget) {
     return _this;
   }
 
+  /**
+   * @return {number}
+   */
+
+
   _createClass(AudioNode, [{
-    key: "getContext",
-    value: function getContext() {
-      return this.context;
-    }
-  }, {
     key: "getNumberOfInputs",
     value: function getNumberOfInputs() {
       return this.inputs.length;
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getNumberOfOutputs",
     value: function getNumberOfOutputs() {
       return this.outputs.length;
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getChannelCount",
     value: function getChannelCount() {
       return this.inputs[0].getChannelCount();
     }
+
+    /**
+     * @param {number} value
+     */
+
   }, {
     key: "setChannelCount",
     value: function setChannelCount(value) {
       this.inputs[0].setChannelCount(value);
     }
+
+    /**
+     * @return {string}
+     */
+
   }, {
     key: "getChannelCountMode",
     value: function getChannelCountMode() {
       return this.inputs[0].getChannelCountMode();
     }
+
+    /**
+     * @param {string} value
+     */
+
   }, {
     key: "setChannelCountMode",
     value: function setChannelCountMode(value) {
       this.inputs[0].setChannelCountMode(value);
     }
+
+    /**
+     * @return {string}
+     */
+
   }, {
     key: "getChannelInterpretation",
     value: function getChannelInterpretation() {
       return this.inputs[0].getChannelInterpretation();
     }
+
+    /**
+     * @param {string} value
+     */
+
   }, {
     key: "setChannelInterpretation",
     value: function setChannelInterpretation(value) {
       this.inputs[0].setChannelInterpretation(value);
     }
+
+    /**
+     * @param {AudioNode|AudioParam} destination
+     * @param {number}               output
+     * @param {number}               input
+     */
+
   }, {
     key: "connect",
     value: function connect(destination, output, input) {
       this.outputs[output | 0].connect(destination, input | 0);
     }
+
+    /**
+     *
+     */
+
   }, {
     key: "disconnect",
     value: function disconnect() {
@@ -3941,6 +4464,14 @@ var AudioNode = function (_EventTarget) {
       }
       return this.disconnectFromOutputIfConnected(args[1] | 0, args[0], args[2] | 0);
     }
+
+    /**
+     * @param {number} numberOfChannels
+     * @param {number} channelCount
+     * @param {string} channelCountMode
+     * @return {AudioNodeInput}
+     */
+
   }, {
     key: "addInput",
     value: function addInput(numberOfChannels, channelCount, channelCountMode) {
@@ -3952,6 +4483,12 @@ var AudioNode = function (_EventTarget) {
 
       return input;
     }
+
+    /**
+     * @param {number} numberOfChannels
+     * @return {AudioNodeOutput}
+     */
+
   }, {
     key: "addOutput",
     value: function addOutput(numberOfChannels) {
@@ -3963,6 +4500,13 @@ var AudioNode = function (_EventTarget) {
 
       return output;
     }
+
+    /**
+     * @param {string} rate - [ "audio", "control" ]
+     * @param {number} defaultValue
+     * @return {AudioParam}
+     */
+
   }, {
     key: "addParam",
     value: function addParam(rate, defaultValue) {
@@ -3972,26 +4516,31 @@ var AudioNode = function (_EventTarget) {
 
       return param;
     }
-  }, {
-    key: "getInput",
-    value: function getInput(channel) {
-      return this.inputs[channel | 0];
-    }
-  }, {
-    key: "getOutput",
-    value: function getOutput(channel) {
-      return this.outputs[channel | 0];
-    }
+
+    /**
+     * @return {boolean}
+     */
+
   }, {
     key: "isEnabled",
     value: function isEnabled() {
       return this._enabled;
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getTailTime",
     value: function getTailTime() {
       return 0;
     }
+
+    /**
+     *
+     */
+
   }, {
     key: "enableOutputsIfNecessary",
     value: function enableOutputsIfNecessary() {
@@ -4003,6 +4552,11 @@ var AudioNode = function (_EventTarget) {
         });
       }
     }
+
+    /**
+     *
+     */
+
   }, {
     key: "disableOutputsIfNecessary",
     value: function disableOutputsIfNecessary() {
@@ -4015,6 +4569,11 @@ var AudioNode = function (_EventTarget) {
         this._disableSample = Math.round(disableTime * this.sampleRate);
       }
     }
+
+    /**
+     * @private
+     */
+
   }, {
     key: "_disableOutputsIfNecessary",
     value: function _disableOutputsIfNecessary() {
@@ -4025,9 +4584,19 @@ var AudioNode = function (_EventTarget) {
         });
       }
     }
+
+    /**
+     *
+     */
+
   }, {
     key: "channelDidUpdate",
     value: function channelDidUpdate() {}
+
+    /**
+     *
+     */
+
   }, {
     key: "disconnectAll",
     value: function disconnectAll() {
@@ -4035,11 +4604,21 @@ var AudioNode = function (_EventTarget) {
         output.disconnect();
       });
     }
+
+    /**
+     * @param {number} output
+     */
+
   }, {
     key: "disconnectAllFromOutput",
     value: function disconnectAllFromOutput(output) {
       this.outputs[output | 0].disconnect();
     }
+
+    /**
+     * @param {AudioNode|AudioParam} destination
+     */
+
   }, {
     key: "disconnectIfConnected",
     value: function disconnectIfConnected(destination) {
@@ -4047,11 +4626,23 @@ var AudioNode = function (_EventTarget) {
         output.disconnect(destination);
       });
     }
+
+    /**
+     * @param {number} output
+     * @param {AudioNode|AudioParam} destination
+     * @param {number} output
+     */
+
   }, {
     key: "disconnectFromOutputIfConnected",
     value: function disconnectFromOutputIfConnected(output, destination, input) {
       this.outputs[output | 0].disconnect(destination, input | 0);
     }
+
+    /**
+     * @return {boolean}
+     */
+
   }, {
     key: "isConnectedTo",
     value: function isConnectedTo() {
@@ -4071,6 +4662,11 @@ var AudioNode = function (_EventTarget) {
 
       return false;
     }
+
+    /**
+     * @return {boolean}
+     */
+
   }, {
     key: "isConnectedFrom",
     value: function isConnectedFrom() {
@@ -4082,6 +4678,11 @@ var AudioNode = function (_EventTarget) {
 
       return false;
     }
+
+    /**
+     * @param {number} currentSample
+     */
+
   }, {
     key: "processIfNecessary",
     value: function processIfNecessary(currentSample) {
@@ -4144,7 +4745,21 @@ var AudioNodeInput = require("./core/AudioNodeInput");
 var AudioBus = require("./core/AudioBus");
 var AudioParamDSP = require("./dsp/AudioParam");
 
+/**
+ * @prop {AudioContext}      context
+ * @prop {number}            blockSize
+ * @prop {number}            sampleRate
+ * @prop {AudioNodeInput[]}  inputs
+ * @prop {AudioBus}          outputBus
+ */
+
 var AudioParam = function () {
+  /**
+   * @param {AudioContext} context
+   * @param {string}       opts.rate - [ "audio", "control "]
+   * @param {number}       opts.defaultValue
+   */
+
   function AudioParam(context, opts) {
     _classCallCheck(this, AudioParam);
 
@@ -4174,21 +4789,42 @@ var AudioParam = function () {
     this.dspInit(this._rate);
   }
 
+  /**
+   * @return {number}
+   */
+
+
   _createClass(AudioParam, [{
     key: "getValue",
     value: function getValue() {
       return this._value;
     }
+
+    /**
+     * @param {number} value
+     */
+
   }, {
     key: "setValue",
     value: function setValue(value) {
       this._value = this._userValue = util.toNumber(value);
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getDefaultValue",
     value: function getDefaultValue() {
       return this._defaultValue;
     }
+
+    /**
+     * @param {number} value
+     * @param {number} startTime
+     */
+
   }, {
     key: "setValueAtTime",
     value: function setValueAtTime(value, startTime) {
@@ -4233,6 +4869,12 @@ var AudioParam = function () {
         this._remainSamples = 0;
       }
     }
+
+    /**
+     * @param {number} value
+     * @param {number} endTime
+     */
+
   }, {
     key: "linearRampToValueAtTime",
     value: function linearRampToValueAtTime(value, endTime) {
@@ -4284,6 +4926,12 @@ var AudioParam = function () {
         this._remainSamples = 0;
       }
     }
+
+    /**
+     * @param {number} value
+     * @param {number} endTime
+     */
+
   }, {
     key: "exponentialRampToValueAtTime",
     value: function exponentialRampToValueAtTime(value, endTime) {
@@ -4335,6 +4983,13 @@ var AudioParam = function () {
         this._remainSamples = 0;
       }
     }
+
+    /**
+     * @param {number} target
+     * @param {number} startTime
+     * @param {number} timeConstant
+     */
+
   }, {
     key: "setTargetAtTime",
     value: function setTargetAtTime(target, startTime, timeConstant) {
@@ -4389,6 +5044,13 @@ var AudioParam = function () {
         this._remainSamples = 0;
       }
     }
+
+    /**
+     * @param {Float32Array[]} values
+     * @param {number}         startTime
+     * @param {number}         duration
+     */
+
   }, {
     key: "setValueCurveAtTime",
     value: function setValueCurveAtTime(values, startTime, duration) {
@@ -4436,6 +5098,11 @@ var AudioParam = function () {
         this._remainSamples = 0;
       }
     }
+
+    /**
+     * @param {number} startTime
+     */
+
   }, {
     key: "cancelScheduledValues",
     value: function cancelScheduledValues(startTime) {
@@ -4462,37 +5129,57 @@ var AudioParam = function () {
         this._remainSamples = 0;
       }
     }
-  }, {
-    key: "getContext",
-    value: function getContext() {
-      return this.context;
-    }
-  }, {
-    key: "getInput",
-    value: function getInput(channel) {
-      return this.inputs[channel | 0];
-    }
+
+    /**
+     * @return {string}
+     */
+
   }, {
     key: "getRate",
     value: function getRate() {
       return this.toRateName(this._rate);
     }
+
+    /**
+     * @return {boolean}
+     */
+
   }, {
     key: "hasSampleAccurateValues",
     value: function hasSampleAccurateValues() {
       return this._hasSampleAccurateValues;
     }
+
+    /**
+     * @return {Float32Array}
+     */
+
   }, {
     key: "getSampleAccurateValues",
     value: function getSampleAccurateValues() {
       return this.outputBus.getChannelData()[0];
     }
+
+    /**
+     *
+     */
+
   }, {
     key: "enableOutputsIfNecessary",
     value: function enableOutputsIfNecessary() {}
+
+    /**
+     *
+     */
+
   }, {
     key: "disableOutputsIfNecessary",
     value: function disableOutputsIfNecessary() {}
+
+    /**
+     * @return {boolean}
+     */
+
   }, {
     key: "isConnectedFrom",
     value: function isConnectedFrom() {
@@ -4504,11 +5191,21 @@ var AudioParam = function () {
 
       return false;
     }
+
+    /**
+     * @return {object[]}
+     */
+
   }, {
     key: "getTimeline",
     value: function getTimeline() {
       return this._timeline;
     }
+
+    /**
+     * @return {object[]}
+     */
+
   }, {
     key: "getEvents",
     value: function getEvents() {
@@ -4522,6 +5219,12 @@ var AudioParam = function () {
         };
       });
     }
+
+    /**
+     * @param {object}
+     * @return {number}
+     */
+
   }, {
     key: "insertEvent",
     value: function insertEvent(eventItem) {
@@ -4551,6 +5254,12 @@ var AudioParam = function () {
 
       return pos;
     }
+
+    /**
+     * @param {string} value
+     * @return {number}
+     */
+
   }, {
     key: "fromRateName",
     value: function fromRateName(value) {
@@ -4559,6 +5268,12 @@ var AudioParam = function () {
       }
       return AudioParamDSP.CONTROL;
     }
+
+    /**
+     * @param {number} value
+     * @return {string}
+     */
+
   }, {
     key: "toRateName",
     value: function toRateName(value) {
@@ -4567,6 +5282,12 @@ var AudioParam = function () {
       }
       return "control";
     }
+
+    /**
+     * @param {number} value
+     * @return {string}
+     */
+
   }, {
     key: "toMethodName",
     value: function toMethodName(value) {
@@ -4608,6 +5329,10 @@ var AudioSourceNode = require("./AudioSourceNode");
 var AudioScheduledSourceNode = function (_AudioSourceNode) {
   _inherits(AudioScheduledSourceNode, _AudioSourceNode);
 
+  /**
+   * @param {AudioContext} context
+   */
+
   function AudioScheduledSourceNode(context) {
     _classCallCheck(this, AudioScheduledSourceNode);
 
@@ -4620,12 +5345,12 @@ var AudioScheduledSourceNode = function (_AudioSourceNode) {
     return _this;
   }
 
+  /**
+   * @param {number} when
+   */
+
+
   _createClass(AudioScheduledSourceNode, [{
-    key: "getState",
-    value: function getState() {
-      return this._state;
-    }
-  }, {
     key: "start",
     value: function start(when) {
       /* istanbul ignore else */
@@ -4641,6 +5366,11 @@ var AudioScheduledSourceNode = function (_AudioSourceNode) {
 
       return false;
     }
+
+    /**
+     * @param {number} when
+     */
+
   }, {
     key: "stop",
     value: function stop(when) {
@@ -4655,6 +5385,12 @@ var AudioScheduledSourceNode = function (_AudioSourceNode) {
 
       return false;
     }
+
+    /**
+     * @param {number} currentSample
+     * @return {string}
+     */
+
   }, {
     key: "checkSchedule",
     value: function checkSchedule(currentSample) {
@@ -4701,6 +5437,10 @@ var AudioNode = require("./AudioNode");
 
 var AudioSourceNode = function (_AudioNode) {
   _inherits(AudioSourceNode, _AudioNode);
+
+  /**
+   * @param {AudioContext} context
+   */
 
   function AudioSourceNode(context) {
     _classCallCheck(this, AudioSourceNode);
@@ -4765,6 +5505,13 @@ var AudioNode = require("./AudioNode");
 var AudioWorkerNode = function (_AudioNode) {
   _inherits(AudioWorkerNode, _AudioNode);
 
+  /**
+   * @param {AudioContext} context
+   * @param {object}       opts
+   * @param {number}       opts.numberOfInputs
+   * @param {number}       opts.numberOfOutputs
+   */
+
   function AudioWorkerNode(context, opts) {
     _classCallCheck(this, AudioWorkerNode);
 
@@ -4795,6 +5542,11 @@ var AudioWorkerNode = function (_AudioNode) {
     return _this;
   }
 
+  /**
+   * @return {number}
+   */
+
+
   _createClass(AudioWorkerNode, [{
     key: "getChannelCount",
     value: function getChannelCount() {
@@ -4802,9 +5554,14 @@ var AudioWorkerNode = function (_AudioNode) {
     }
   }, {
     key: "setChannelCount",
-    value: function setChannelCount() {
-      // This node's channelCount cannot be changed.
-    }
+    value: function setChannelCount() {}
+    // This node's channelCount cannot be changed.
+
+
+    /**
+     * @return {string}
+     */
+
   }, {
     key: "getChannelCountMode",
     value: function getChannelCountMode() {
@@ -4812,14 +5569,24 @@ var AudioWorkerNode = function (_AudioNode) {
     }
   }, {
     key: "setChannelCountMode",
-    value: function setChannelCountMode() {
-      // This node's channelCountMode cannot be changed.
-    }
+    value: function setChannelCountMode() {}
+    // This node's channelCountMode cannot be changed.
+
+
+    /**
+     * @return {string}
+     */
+
   }, {
     key: "getChannelInterpretation",
     value: function getChannelInterpretation() {
       return this.inputs[0].getChannelInterpretation();
     }
+
+    /**
+     * @param {string} value
+     */
+
   }, {
     key: "setChannelInterpretation",
     value: function setChannelInterpretation(value) {
@@ -4828,6 +5595,9 @@ var AudioWorkerNode = function (_AudioNode) {
       });
     }
 
+    /**
+     * @param {*} message
+     */
     /* istanbul ignore next */
 
   }, {
@@ -4835,11 +5605,21 @@ var AudioWorkerNode = function (_AudioNode) {
     value: function postMessage() {
       throw new TypeError("NOT YET IMPLEMENTED");
     }
+
+    /**
+     * @return {AudioWorker}
+     */
+
   }, {
     key: "getWorker",
     value: function getWorker() {
       return this._worker;
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getTailTime",
     value: function getTailTime() {
@@ -4874,6 +5654,10 @@ var DistanceModelTypes = ["linear", "inverse", "exponential"];
 var BasePannerNode = function (_AudioNode) {
   _inherits(BasePannerNode, _AudioNode);
 
+  /**
+   * @param {AudioContext} context
+   */
+
   function BasePannerNode(context) {
     _classCallCheck(this, BasePannerNode);
 
@@ -4895,12 +5679,22 @@ var BasePannerNode = function (_AudioNode) {
     return _this;
   }
 
+  /**
+   * @param {number} value
+   */
+
+
   _createClass(BasePannerNode, [{
     key: "setChannelCount",
     value: function setChannelCount(value) {
       value = util.clip(value | 0, 1, 2);
       _get(Object.getPrototypeOf(BasePannerNode.prototype), "setChannelCount", this).call(this, value);
     }
+
+    /**
+     * @param {number} value
+     */
+
   }, {
     key: "setChannelCountMode",
     value: function setChannelCountMode(value) {
@@ -4909,11 +5703,21 @@ var BasePannerNode = function (_AudioNode) {
         _get(Object.getPrototypeOf(BasePannerNode.prototype), "setChannelCountMode", this).call(this, value);
       }
     }
+
+    /**
+     * @return {string}
+     */
+
   }, {
     key: "getPanningModel",
     value: function getPanningModel() {
       return this._panningModel;
     }
+
+    /**
+     * @param {string} value
+     */
+
   }, {
     key: "setPanningModel",
     value: function setPanningModel(value) {
@@ -4922,11 +5726,21 @@ var BasePannerNode = function (_AudioNode) {
         this._panningModel = value;
       }
     }
+
+    /**
+     * @return {string}
+     */
+
   }, {
     key: "getDistanceModel",
     value: function getDistanceModel() {
       return this._distanceModel;
     }
+
+    /**
+     * @param {string} value
+     */
+
   }, {
     key: "setDistanceModel",
     value: function setDistanceModel(value) {
@@ -4935,61 +5749,121 @@ var BasePannerNode = function (_AudioNode) {
         this._distanceModel = value;
       }
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getRefDistance",
     value: function getRefDistance() {
       return this._refDistance;
     }
+
+    /**
+     * @param {number} value
+     */
+
   }, {
     key: "setRefDistance",
     value: function setRefDistance(value) {
       this._refDistance = util.toNumber(value);
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getMaxDistance",
     value: function getMaxDistance() {
       return this._maxDistance;
     }
+
+    /**
+     * @param {number} value
+     */
+
   }, {
     key: "setMaxDistance",
     value: function setMaxDistance(value) {
       this._maxDistance = util.toNumber(value);
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getRolloffFactor",
     value: function getRolloffFactor() {
       return this._rolloffFactor;
     }
+
+    /**
+     * @param {number} value
+     */
+
   }, {
     key: "setRolloffFactor",
     value: function setRolloffFactor(value) {
       this._rolloffFactor = util.toNumber(value);
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getConeInnerAngle",
     value: function getConeInnerAngle() {
       return this._coneInnerAngle;
     }
+
+    /**
+     * @param {number} value
+     */
+
   }, {
     key: "setConeInnerAngle",
     value: function setConeInnerAngle(value) {
       this._coneInnerAngle = util.toNumber(value);
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getConeOuterAngle",
     value: function getConeOuterAngle() {
       return this._coneOuterAngle;
     }
+
+    /**
+     * @param {number} value
+     */
+
   }, {
     key: "setConeOuterAngle",
     value: function setConeOuterAngle(value) {
       this._coneOuterAngle = util.toNumber(value);
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getConeOuterGain",
     value: function getConeOuterGain() {
       return this._coneOuterGain;
     }
+
+    /**
+     * @param {number} value
+     */
+
   }, {
     key: "setConeOuterGain",
     value: function setConeOuterGain(value) {
@@ -5020,6 +5894,10 @@ var BiquadFilterNodeDSP = require("./dsp/BiquadFilterNode");
 var BiquadFilterNode = function (_AudioNode) {
   _inherits(BiquadFilterNode, _AudioNode);
 
+  /**
+   * @param {AudioContext} context
+   */
+
   function BiquadFilterNode(context) {
     _classCallCheck(this, BiquadFilterNode);
 
@@ -5041,11 +5919,21 @@ var BiquadFilterNode = function (_AudioNode) {
     return _this;
   }
 
+  /**
+   * @return {string}
+   */
+
+
   _createClass(BiquadFilterNode, [{
     key: "getType",
     value: function getType() {
       return this.toFilterTypeName(this._type);
     }
+
+    /**
+     * @param {string} value
+     */
+
   }, {
     key: "setType",
     value: function setType(value) {
@@ -5055,27 +5943,52 @@ var BiquadFilterNode = function (_AudioNode) {
         this._type = value;
       }
     }
+
+    /**
+     * @return {AudioParam}
+     */
+
   }, {
     key: "getFrequency",
     value: function getFrequency() {
       return this._frequency;
     }
+
+    /**
+     * @return {AudioParam}
+     */
+
   }, {
     key: "getDetune",
     value: function getDetune() {
       return this._detune;
     }
+
+    /**
+     * @return {AudioParam}
+     */
+
   }, {
     key: "getQ",
     value: function getQ() {
       return this._Q;
     }
+
+    /**
+     * @return {AudioParam}
+     */
+
   }, {
     key: "getGain",
     value: function getGain() {
       return this._gain;
     }
 
+    /**
+     * @param {Float32Array} frequencyHz
+     * @param {Float32Array} magResponse
+     * @param {Float32Array} phaseResponse
+     */
     /* istanbul ignore next */
 
   }, {
@@ -5083,17 +5996,33 @@ var BiquadFilterNode = function (_AudioNode) {
     value: function getFrequencyResponse() {
       throw new TypeError("NOT YET IMPLEMENTED");
     }
+
+    /**
+     * @param {number} numberOfChannels
+     */
+
   }, {
     key: "channelDidUpdate",
     value: function channelDidUpdate(numberOfChannels) {
       this.dspSetNumberOfChannels(numberOfChannels);
       this.outputs[0].setNumberOfChannels(numberOfChannels);
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getTailTime",
     value: function getTailTime() {
       return 0.2;
     }
+
+    /**
+     * @param {string} value
+     * @return {number}
+     */
+
   }, {
     key: "fromFilterTypeName",
     value: function fromFilterTypeName(value) {
@@ -5117,6 +6046,12 @@ var BiquadFilterNode = function (_AudioNode) {
       }
       return -1;
     }
+
+    /**
+     * @param {number} value
+     * @return {string}
+     */
+
   }, {
     key: "toFilterTypeName",
     value: function toFilterTypeName(value) {
@@ -5167,6 +6102,12 @@ var ChannelMergerNodeDSP = require("./dsp/ChannelMergerNode");
 var ChannelMergerNode = function (_AudioNode) {
   _inherits(ChannelMergerNode, _AudioNode);
 
+  /**
+   * @param {AudioContext} context
+   * @param {object}       opts
+   * @param {number}       opts.numberOfInputs
+   */
+
   function ChannelMergerNode(context, opts) {
     _classCallCheck(this, ChannelMergerNode);
 
@@ -5209,6 +6150,11 @@ var ChannelMergerNode = function (_AudioNode) {
     value: function getChannelInterpretation() {
       return this.inputs[0].getChannelInterpretation();
     }
+
+    /**
+     * @param {string} value
+     */
+
   }, {
     key: "setChannelInterpretation",
     value: function setChannelInterpretation(value) {
@@ -5257,6 +6203,12 @@ var ChannelSplitterNodeDSP = require("./dsp/ChannelSplitterNode");
 var ChannelSplitterNode = function (_AudioNode) {
   _inherits(ChannelSplitterNode, _AudioNode);
 
+  /**
+   * @param {AudioContext} context
+   * @param {object}       opts
+   * @param {number}       opts.numberOfOutputs
+   */
+
   function ChannelSplitterNode(context, opts) {
     _classCallCheck(this, ChannelSplitterNode);
 
@@ -5300,6 +6252,10 @@ var ConvolverNodeDSP = require("./dsp/ConvolverNode");
 var ConvolverNode = function (_AudioNode) {
   _inherits(ConvolverNode, _AudioNode);
 
+  /**
+   * @param {AudioContext} context
+   */
+
   function ConvolverNode(context) {
     _classCallCheck(this, ConvolverNode);
 
@@ -5316,12 +6272,22 @@ var ConvolverNode = function (_AudioNode) {
     return _this;
   }
 
+  /**
+   * @param {number} value
+   */
+
+
   _createClass(ConvolverNode, [{
     key: "setChannelCount",
     value: function setChannelCount(value) {
       value = util.clip(value | 0, 1, 2);
       _get(Object.getPrototypeOf(ConvolverNode.prototype), "setChannelCount", this).call(this, value);
     }
+
+    /**
+     * @param {string} value
+     */
+
   }, {
     key: "setChannelCountMode",
     value: function setChannelCountMode(value) {
@@ -5330,11 +6296,21 @@ var ConvolverNode = function (_AudioNode) {
         _get(Object.getPrototypeOf(ConvolverNode.prototype), "setChannelCountMode", this).call(this, value);
       }
     }
+
+    /**
+     * @return {AudioBuffer}
+     */
+
   }, {
     key: "getBuffer",
     value: function getBuffer() {
       return this._buffer;
     }
+
+    /**
+     * @param {AudioBuffer} value
+     */
+
   }, {
     key: "setBuffer",
     value: function setBuffer(value) {
@@ -5343,19 +6319,34 @@ var ConvolverNode = function (_AudioNode) {
       /* istanbul ignore else */
       if (value instanceof AudioBuffer) {
         this._buffer = value;
-        this._audioData = this._buffer.getAudioData();
+        this._audioData = this._buffer.audioData;
       }
     }
+
+    /**
+     * @return {boolean}
+     */
+
   }, {
     key: "getNormalize",
     value: function getNormalize() {
       return this._normalize;
     }
+
+    /**
+     * @param {boolean} value
+     */
+
   }, {
     key: "setNormalize",
     value: function setNormalize(value) {
       this._normalize = !!value;
     }
+
+    /**
+     * @param {number} numberOfChannels
+     */
+
   }, {
     key: "channelDidUpdate",
     value: function channelDidUpdate(numberOfChannels) {
@@ -5388,6 +6379,12 @@ var DelayNodeDSP = require("./dsp/DelayNode");
 var DelayNode = function (_AudioNode) {
   _inherits(DelayNode, _AudioNode);
 
+  /**
+   * @param {AudioContext} context
+   * @param {object}       opts
+   * @param {number}       opts.maxDelayTime
+   */
+
   function DelayNode(context, opts) {
     _classCallCheck(this, DelayNode);
 
@@ -5409,22 +6406,42 @@ var DelayNode = function (_AudioNode) {
     return _this;
   }
 
+  /**
+   * @return {number}
+   */
+
+
   _createClass(DelayNode, [{
     key: "getDelayTime",
     value: function getDelayTime() {
       return this._delayTime;
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getMaxDelayTime",
     value: function getMaxDelayTime() {
       return this._maxDelayTime;
     }
+
+    /**
+     * @param {number} numberOfChannels
+     */
+
   }, {
     key: "channelDidUpdate",
     value: function channelDidUpdate(numberOfChannels) {
       this.dspSetNumberOfChannels(numberOfChannels);
       this.outputs[0].setNumberOfChannels(numberOfChannels);
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getTailTime",
     value: function getTailTime() {
@@ -5455,6 +6472,10 @@ var DynamicsCompressorNodeDSP = require("./dsp/DynamicsCompressorNode");
 var DynamicsCompressorNode = function (_AudioNode) {
   _inherits(DynamicsCompressorNode, _AudioNode);
 
+  /**
+   * @param {AudioContext} context
+   */
+
   function DynamicsCompressorNode(context) {
     _classCallCheck(this, DynamicsCompressorNode);
 
@@ -5473,22 +6494,40 @@ var DynamicsCompressorNode = function (_AudioNode) {
     return _this;
   }
 
+  /**
+   * @param {AudioParam}
+   */
+
+
   _createClass(DynamicsCompressorNode, [{
     key: "getThreshold",
     value: function getThreshold() {
       return this._threshold;
     }
+
+    /**
+     * @param {AudioParam}
+     */
+
   }, {
     key: "getKnee",
     value: function getKnee() {
       return this._knee;
     }
+
+    /**
+     * @param {AudioParam}
+     */
+
   }, {
     key: "getRatio",
     value: function getRatio() {
       return this._ratio;
     }
 
+    /**
+     * @return {number}
+     */
     /* istanbul ignore next */
 
   }, {
@@ -5496,11 +6535,21 @@ var DynamicsCompressorNode = function (_AudioNode) {
     value: function getReduction() {
       throw new TypeError("NOT YET IMPLEMENTED");
     }
+
+    /**
+     * @param {AudioParam}
+     */
+
   }, {
     key: "getAttack",
     value: function getAttack() {
       return this._attack;
     }
+
+    /**
+     * @param {AudioParam}
+     */
+
   }, {
     key: "getRelease",
     value: function getRelease() {
@@ -5529,6 +6578,12 @@ var EventTarget = function () {
     this._emitter = new events.EventEmitter();
   }
 
+  /**
+   * @param {string}   type
+   * @param {function} listener
+   */
+
+
   _createClass(EventTarget, [{
     key: "addEventListener",
     value: function addEventListener(type, listener) {
@@ -5537,6 +6592,12 @@ var EventTarget = function () {
         this._emitter.addListener(type, listener);
       }
     }
+
+    /**
+     * @param {string}   type
+     * @param {function} listener
+     */
+
   }, {
     key: "removeEventListener",
     value: function removeEventListener(type, listener) {
@@ -5545,12 +6606,25 @@ var EventTarget = function () {
         this._emitter.removeListener(type, listener);
       }
     }
+
+    /**
+     * @param {string}   type
+     * @param {function} oldListener
+     * @param {function} newListener
+     */
+
   }, {
     key: "replaceEventListener",
     value: function replaceEventListener(type, oldListener, newListener) {
       this.removeEventListener(type, oldListener);
       this.addEventListener(type, newListener);
     }
+
+    /**
+     * @param {object} event
+     * @param {string} event.type
+     */
+
   }, {
     key: "dispatchEvent",
     value: function dispatchEvent(event) {
@@ -5581,6 +6655,10 @@ var GainNodeDSP = require("./dsp/GainNode");
 var GainNode = function (_AudioNode) {
   _inherits(GainNode, _AudioNode);
 
+  /**
+   * @param {AudioContext} context
+   */
+
   function GainNode(context) {
     _classCallCheck(this, GainNode);
 
@@ -5595,11 +6673,21 @@ var GainNode = function (_AudioNode) {
     return _this;
   }
 
+  /**
+   * @return {AudioParam}
+   */
+
+
   _createClass(GainNode, [{
     key: "getGain",
     value: function getGain() {
       return this._gain;
     }
+
+    /**
+     * @param {number} numberOfChannels
+     */
+
   }, {
     key: "channelDidUpdate",
     value: function channelDidUpdate(numberOfChannels) {
@@ -5630,6 +6718,13 @@ var IIRFilterNodeDSP = require("./dsp/IIRFilterNode");
 var IIRFilterNode = function (_AudioNode) {
   _inherits(IIRFilterNode, _AudioNode);
 
+  /**
+   * @param {AudioContext} context
+   * @param {object}       opts
+   * @param {Float32Array} opts.feedforward
+   * @param {Float32Array} opts.feedback
+   */
+
   function IIRFilterNode(context, opts) {
     _classCallCheck(this, IIRFilterNode);
 
@@ -5650,6 +6745,11 @@ var IIRFilterNode = function (_AudioNode) {
     return _this;
   }
 
+  /**
+   * @param {Float32Array} frequencyHz
+   * @param {Float32Array} magResponse
+   * @param {Float32Array} phaseResponse
+   */
   /* istanbul ignore next */
 
 
@@ -5658,16 +6758,31 @@ var IIRFilterNode = function (_AudioNode) {
     value: function getFrequencyResponse() {
       throw new TypeError("NOT YET IMPLEMENTED");
     }
+
+    /**
+     * @return {Float32Array}
+     */
+
   }, {
     key: "getFeedforward",
     value: function getFeedforward() {
       return this._feedforward;
     }
+
+    /**
+     * @return {Float32Array}
+     */
+
   }, {
     key: "getFeedback",
     value: function getFeedback() {
       return this._feedback;
     }
+
+    /**
+     * @param {number} numberOfChannels
+     */
+
   }, {
     key: "channelDidUpdate",
     value: function channelDidUpdate(numberOfChannels) {
@@ -5702,6 +6817,10 @@ var DefaultPeriodicWaves = {};
 var OscillatorNode = function (_AudioScheduledSource) {
   _inherits(OscillatorNode, _AudioScheduledSource);
 
+  /**
+   * @param {AudioContext} context
+   */
+
   function OscillatorNode(context) {
     _classCallCheck(this, OscillatorNode);
 
@@ -5716,11 +6835,21 @@ var OscillatorNode = function (_AudioScheduledSource) {
     return _this;
   }
 
+  /**
+   * @return {string}
+   */
+
+
   _createClass(OscillatorNode, [{
     key: "getType",
     value: function getType() {
       return this._type;
     }
+
+    /**
+     * @param {string} value
+     */
+
   }, {
     key: "setType",
     value: function setType(value) {
@@ -5731,16 +6860,31 @@ var OscillatorNode = function (_AudioScheduledSource) {
         this._waveTable = this._periodicWave.getWaveTable();
       }
     }
+
+    /**
+     * @param {AudioParam}
+     */
+
   }, {
     key: "getFrequency",
     value: function getFrequency() {
       return this._frequency;
     }
+
+    /**
+     * @param {AudioParam}
+     */
+
   }, {
     key: "getDetune",
     value: function getDetune() {
       return this._detune;
     }
+
+    /**
+     * @param {PeriodicWave} periodicWave
+     */
+
   }, {
     key: "setPeriodicWave",
     value: function setPeriodicWave(periodicWave) {
@@ -5753,11 +6897,22 @@ var OscillatorNode = function (_AudioScheduledSource) {
         this._waveTable = this._periodicWave.getWaveTable();
       }
     }
+
+    /**
+     * @return {PeriodicWave}
+     */
+
   }, {
     key: "getPeriodicWave",
     value: function getPeriodicWave() {
       return this._periodicWave;
     }
+
+    /**
+     * @param {string} type
+     * @return {PeriodicWave}
+     */
+
   }, {
     key: "buildPeriodicWave",
     value: function buildPeriodicWave(type) {
@@ -5800,12 +6955,21 @@ var PannerNodeDSP = require("./dsp/PannerNode");
 var PannerNode = function (_BasePannerNode) {
   _inherits(PannerNode, _BasePannerNode);
 
+  /**
+   * @param {AudioContext} context
+   */
+
   function PannerNode(context) {
     _classCallCheck(this, PannerNode);
 
     return _possibleConstructorReturn(this, Object.getPrototypeOf(PannerNode).call(this, context));
   }
 
+  /**
+   * @param {number} x
+   * @param {number} y
+   * @param {number} z
+   */
   /* istanbul ignore next */
 
 
@@ -5815,6 +6979,11 @@ var PannerNode = function (_BasePannerNode) {
       throw new TypeError("NOT YET IMPLEMENTED");
     }
 
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} z
+     */
     /* istanbul ignore next */
 
   }, {
@@ -5823,6 +6992,11 @@ var PannerNode = function (_BasePannerNode) {
       throw new TypeError("NOT YET IMPLEMENTED");
     }
 
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @param {number} z
+     */
     /* istanbul ignore next */
 
   }, {
@@ -5848,6 +7022,14 @@ var util = require("../util");
 var PeriodicWaveDSP = require("./dsp/PeriodicWave");
 
 var PeriodicWave = function () {
+  /**
+   * @param {AudioContext} context
+   * @param {object}       opts
+   * @param {Float32Array} opts.real
+   * @param {Float32Array} opts.imag
+   * @param {boolean}      opts.constraints
+   */
+
   function PeriodicWave(context, opts) {
     _classCallCheck(this, PeriodicWave);
 
@@ -5866,26 +7048,51 @@ var PeriodicWave = function () {
     this.dspInit();
   }
 
+  /**
+   * @return {Float32Array}
+   */
+
+
   _createClass(PeriodicWave, [{
     key: "getReal",
     value: function getReal() {
       return this._real;
     }
+
+    /**
+     * @return {Float32Array}
+     */
+
   }, {
     key: "getImag",
     value: function getImag() {
       return this._imag;
     }
+
+    /**
+     * @return {booleam}
+     */
+
   }, {
     key: "getConstraints",
     value: function getConstraints() {
       return this._constants;
     }
+
+    /**
+     * @return {string}
+     */
+
   }, {
     key: "getName",
     value: function getName() {
       return this._name;
     }
+
+    /**
+     * @return {Float32Array}
+     */
+
   }, {
     key: "getWaveTable",
     value: function getWaveTable() {
@@ -5964,6 +7171,14 @@ var ScriptProcessorNodeDSP = require("./dsp/ScriptProcessorNode");
 var ScriptProcessorNode = function (_AudioNode) {
   _inherits(ScriptProcessorNode, _AudioNode);
 
+  /**
+   * @param {AudioContext} context
+   * @param {object}       opts
+   * @param {number}       opts.bufferSize
+   * @param {number}       opts.numberOfInputChannels
+   * @param {number}       opts.numberOfOutputChannels
+   */
+
   function ScriptProcessorNode(context, opts) {
     _classCallCheck(this, ScriptProcessorNode);
 
@@ -5991,6 +7206,11 @@ var ScriptProcessorNode = function (_AudioNode) {
     return _this;
   }
 
+  /**
+   * @return {number}
+   */
+
+
   _createClass(ScriptProcessorNode, [{
     key: "getBufferSize",
     value: function getBufferSize() {
@@ -6003,14 +7223,24 @@ var ScriptProcessorNode = function (_AudioNode) {
     }
   }, {
     key: "setChannelCountMode",
-    value: function setChannelCountMode() {
-      // This node's channelCountMode cannot be changed.
-    }
+    value: function setChannelCountMode() {}
+    // This node's channelCountMode cannot be changed.
+
+
+    /**
+     * @return {object} eventItem
+     */
+
   }, {
     key: "setEventItem",
     value: function setEventItem(eventItem) {
       this.dspSetEventItem(eventItem);
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getTailTime",
     value: function getTailTime() {
@@ -6041,6 +7271,10 @@ var SpatialPannerNodeDSP = require("./dsp/SpatialPannerNode");
 var SpatialPannerNode = function (_BasePannerNode) {
   _inherits(SpatialPannerNode, _BasePannerNode);
 
+  /**
+   * @param {AudioContext}
+   */
+
   function SpatialPannerNode(context) {
     _classCallCheck(this, SpatialPannerNode);
 
@@ -6055,31 +7289,61 @@ var SpatialPannerNode = function (_BasePannerNode) {
     return _this;
   }
 
+  /**
+   * @param {AudioParam}
+   */
+
+
   _createClass(SpatialPannerNode, [{
     key: "getPositionX",
     value: function getPositionX() {
       return this._positionX;
     }
+
+    /**
+     * @param {AudioParam}
+     */
+
   }, {
     key: "getPositionY",
     value: function getPositionY() {
       return this._positionY;
     }
+
+    /**
+     * @param {AudioParam}
+     */
+
   }, {
     key: "getPositionZ",
     value: function getPositionZ() {
       return this._positionZ;
     }
+
+    /**
+     * @param {AudioParam}
+     */
+
   }, {
     key: "getOrientationX",
     value: function getOrientationX() {
       return this._positionX;
     }
+
+    /**
+     * @param {AudioParam}
+     */
+
   }, {
     key: "getOrientationY",
     value: function getOrientationY() {
       return this._positionY;
     }
+
+    /**
+     * @param {AudioParam}
+     */
+
   }, {
     key: "getOrientationZ",
     value: function getOrientationZ() {
@@ -6110,6 +7374,10 @@ var StereoPannerNodeDSP = require("./dsp/StereoPannerNode");
 var StereoPannerNode = function (_BasePannerNode) {
   _inherits(StereoPannerNode, _BasePannerNode);
 
+  /**
+   * @param {AudioContext} context
+   */
+
   function StereoPannerNode(context) {
     _classCallCheck(this, StereoPannerNode);
 
@@ -6118,6 +7386,11 @@ var StereoPannerNode = function (_BasePannerNode) {
     _this._pan = _this.addParam("audio", 0);
     return _this;
   }
+
+  /**
+   * @param {AudioParam}
+   */
+
 
   _createClass(StereoPannerNode, [{
     key: "getPan",
@@ -6151,6 +7424,10 @@ var OverSampleTypes = ["none", "2x", "4x"];
 var WaveShaperNode = function (_AudioNode) {
   _inherits(WaveShaperNode, _AudioNode);
 
+  /**
+   * @param {AudioContext}
+   */
+
   function WaveShaperNode(context) {
     _classCallCheck(this, WaveShaperNode);
 
@@ -6166,11 +7443,21 @@ var WaveShaperNode = function (_AudioNode) {
     return _this;
   }
 
+  /**
+   * @return {Float32Array}
+   */
+
+
   _createClass(WaveShaperNode, [{
     key: "getCurve",
     value: function getCurve() {
       return this._curve;
     }
+
+    /**
+     * @param {Float32Array} value
+     */
+
   }, {
     key: "setCurve",
     value: function setCurve(value) {
@@ -6179,11 +7466,21 @@ var WaveShaperNode = function (_AudioNode) {
         this._curve = value;
       }
     }
+
+    /**
+     * @return {boolean}
+     */
+
   }, {
     key: "getOversample",
     value: function getOversample() {
       return this._overSample;
     }
+
+    /**
+     * @param {boolean} value
+     */
+
   }, {
     key: "setOversample",
     value: function setOversample(value) {
@@ -6192,6 +7489,11 @@ var WaveShaperNode = function (_AudioNode) {
         this._overSample = value;
       }
     }
+
+    /**
+     * @param {number} numberOfChannels
+     */
+
   }, {
     key: "channelDidUpdate",
     value: function channelDidUpdate(numberOfChannels) {
@@ -6214,25 +7516,41 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var AudioData = require("./AudioData");
 var DSPAlgorithm = {};
 
+/**
+ * @prop {AudioData} audioData
+ * @prop {boolean}   isSilent
+ */
+
 var AudioBus = function () {
+  /**
+   * @param {number} numberOfChannels
+   * @param {number} length
+   * @param {number} sampleRate
+   */
+
   function AudioBus(numberOfChannels, length, sampleRate) {
     _classCallCheck(this, AudioBus);
 
-    this._audioData = new AudioData(numberOfChannels, length, sampleRate);
+    this.audioData = new AudioData(numberOfChannels, length, sampleRate);
+    this.isSilent = true;
     this._channelInterpretation = "discrete";
-    this._isSilent = true;
   }
 
+  /**
+   * @return {string} [ "speakers", "discrete" ]
+   */
+
+
   _createClass(AudioBus, [{
-    key: "getAudioData",
-    value: function getAudioData() {
-      return this._audioData;
-    }
-  }, {
     key: "getChannelInterpretation",
     value: function getChannelInterpretation() {
       return this._channelInterpretation;
     }
+
+    /**
+     * @param {string} value - [ "speakers", "discrete" ]
+     */
+
   }, {
     key: "setChannelInterpretation",
     value: function setChannelInterpretation(value) {
@@ -6240,16 +7558,21 @@ var AudioBus = function () {
         this._channelInterpretation = value;
       }
     }
-  }, {
-    key: "isSilent",
-    value: function isSilent() {
-      return this._isSilent;
-    }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getNumberOfChannels",
     value: function getNumberOfChannels() {
-      return this._audioData.numberOfChannels;
+      return this.audioData.numberOfChannels;
     }
+
+    /**
+     * @param {number} numberOfChannels
+     */
+
   }, {
     key: "setNumberOfChannels",
     value: function setNumberOfChannels(numberOfChannels) {
@@ -6258,60 +7581,96 @@ var AudioBus = function () {
       audioBus._channelInterpretation = this._channelInterpretation;
       audioBus.sumFrom(this);
 
-      this._audioData = audioBus._audioData;
+      this.audioData = audioBus.audioData;
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getLength",
     value: function getLength() {
-      return this._audioData.length;
+      return this.audioData.length;
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getSampleRate",
     value: function getSampleRate() {
-      return this._audioData.sampleRate;
+      return this.audioData.sampleRate;
     }
+
+    /**
+     * @return {Float32Array[]}
+     */
+
   }, {
     key: "getChannelData",
     value: function getChannelData() {
-      return this._audioData.channelData;
+      return this.audioData.channelData;
     }
+
+    /**
+     * @return {Float32Array[]}
+     */
+
   }, {
     key: "getMutableData",
     value: function getMutableData() {
-      this._isSilent = false;
-      return this._audioData.channelData;
+      this.isSilent = false;
+      return this.audioData.channelData;
     }
+
+    /**
+     *
+     */
+
   }, {
     key: "zeros",
     value: function zeros() {
       /* istanbul ignore else */
-      if (!this._isSilent) {
-        var channelData = this._audioData.channelData;
+      if (!this.isSilent) {
+        var channelData = this.audioData.channelData;
 
         for (var i = 0, imax = channelData.length; i < imax; i++) {
           channelData[i].fill(0);
         }
       }
-      this._isSilent = true;
+      this.isSilent = true;
     }
+
+    /**
+     * @param {AudioBus} audioBus
+     */
+
   }, {
     key: "copyFrom",
     value: function copyFrom(audioBus) {
-      var source = audioBus._audioData.channelData;
-      var destination = this._audioData.channelData;
+      var source = audioBus.audioData.channelData;
+      var destination = this.audioData.channelData;
       var numberOfChannels = destination.length;
 
       for (var ch = 0; ch < numberOfChannels; ch++) {
         destination[ch].set(source[ch]);
       }
 
-      this._isSilent = audioBus._isSilent;
+      this.isSilent = audioBus.isSilent;
     }
+
+    /**
+     * @param {AudioBus} audioBus
+     * @param {number}   offset
+     */
+
   }, {
     key: "copyFromWithOffset",
     value: function copyFromWithOffset(audioBus, offset) {
-      var source = audioBus._audioData.channelData;
-      var destination = this._audioData.channelData;
+      var source = audioBus.audioData.channelData;
+      var destination = this.audioData.channelData;
       var numberOfChannels = destination.length;
 
       offset = offset | 0;
@@ -6320,40 +7679,56 @@ var AudioBus = function () {
         destination[ch].set(source[ch], offset);
       }
 
-      this._isSilent = this._isSilent && audioBus._isSilent;
+      this.isSilent = this.isSilent && audioBus.isSilent;
     }
+
+    /**
+     * @param {AudioBus} audioBus
+     */
+
   }, {
     key: "sumFrom",
     value: function sumFrom(audioBus) {
 
       /* istanbul ignore next */
-      if (audioBus._isSilent) {
+      if (audioBus.isSilent) {
         return;
       }
 
-      var source = audioBus._audioData.channelData;
-      var destination = this._audioData.channelData;
+      var source = audioBus.audioData.channelData;
+      var destination = this.audioData.channelData;
 
       this._sumFrom(source, destination, audioBus.getLength());
     }
+
+    /**
+     * @param {AudioBus} audioBus
+     * @param {number}   offset
+     */
+
   }, {
     key: "sumFromWithOffset",
     value: function sumFromWithOffset(audioBus, offset) {
 
       /* istanbul ignore next */
-      if (audioBus._isSilent) {
+      if (audioBus.isSilent) {
         return;
       }
 
       offset = offset | 0;
 
-      var source = audioBus._audioData.channelData;
-      var destination = this._audioData.channelData.map(function (data) {
+      var source = audioBus.audioData.channelData;
+      var destination = this.audioData.channelData.map(function (data) {
         return data.subarray(offset);
       });
 
       this._sumFrom(source, destination, audioBus.getLength());
     }
+
+    /**
+     * @private
+     */
+
   }, {
     key: "_sumFrom",
     value: function _sumFrom(source, destination, length) {
@@ -6368,13 +7743,13 @@ var AudioBus = function () {
 
       mixFunction = DSPAlgorithm[algoIndex] || DSPAlgorithm[0];
 
-      if (this._isSilent && mixFunction.set) {
+      if (this.isSilent && mixFunction.set) {
         mixFunction = mixFunction.set;
       }
 
       mixFunction(source, destination, length);
 
-      this._isSilent = false;
+      this.isSilent = false;
     }
   }]);
 
@@ -6582,9 +7957,25 @@ module.exports = AudioBus;
 },{"./AudioData":67}],67:[function(require,module,exports){
 "use strict";
 
+/**
+ * AudioData is struct like AudioBuffer.
+ * This instance has no methods.
+ * The channel data of this instance are taken via property accessor.
+ * @prop {number}         numberOfChannels
+ * @prop {number}         length
+ * @prop {number}         sampleRate
+ * @prop {Float32Array[]} channelData
+ */
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var AudioData = function AudioData(numberOfChannels, length, sampleRate) {
+var AudioData =
+/**
+ * @param {number} numberOfChannels
+ * @param {number} length
+ * @param {number} sampleRate
+ */
+function AudioData(numberOfChannels, length, sampleRate) {
   var _this = this;
 
   _classCallCheck(this, AudioData);
@@ -6609,7 +8000,22 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var util = require("../../util");
 var AudioBus = require("./AudioBus");
 
+/**
+ * @prop {AudioNode} node
+ * @prop {number}    index
+ * @prop {AudioBus}  bus
+ */
+
 var AudioNodeInput = function () {
+  /**
+   * @param {object}    opts
+   * @param {AudioNode} opts.node
+   * @param {number}    opts.index
+   * @param {number}    opts.numberOfChannels
+   * @param {number}    opts.channelCount
+   * @param {string}    opts.channelCountMode
+   */
+
   function AudioNodeInput(opts) {
     _classCallCheck(this, AudioNodeInput);
 
@@ -6622,6 +8028,7 @@ var AudioNodeInput = function () {
     this.node = node;
     this.index = index | 0;
     this.bus = new AudioBus(numberOfChannels, node.blockSize, node.sampleRate);
+
     this.bus.setChannelInterpretation("speakers");
     this._channelCount = channelCount | 0;
     this._channelCountMode = channelCountMode;
@@ -6629,16 +8036,21 @@ var AudioNodeInput = function () {
     this._disabledOutputs = [];
   }
 
+  /**
+   * @return {number}
+   */
+
+
   _createClass(AudioNodeInput, [{
-    key: "getAudioBus",
-    value: function getAudioBus() {
-      return this.bus;
-    }
-  }, {
     key: "getChannelCount",
     value: function getChannelCount() {
       return this._channelCount;
     }
+
+    /**
+     * @param {number} value
+     */
+
   }, {
     key: "setChannelCount",
     value: function setChannelCount(value) {
@@ -6650,11 +8062,21 @@ var AudioNodeInput = function () {
         this.updateNumberOfChannels();
       }
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getChannelCountMode",
     value: function getChannelCountMode() {
       return this._channelCountMode;
     }
+
+    /**
+     * @param {number} value
+     */
+
   }, {
     key: "setChannelCountMode",
     value: function setChannelCountMode(value) {
@@ -6664,21 +8086,41 @@ var AudioNodeInput = function () {
         this.updateNumberOfChannels();
       }
     }
+
+    /**
+     * @return {string}
+     */
+
   }, {
     key: "getChannelInterpretation",
     value: function getChannelInterpretation() {
       return this.bus.getChannelInterpretation();
     }
+
+    /**
+     * @param {string} value
+     */
+
   }, {
     key: "setChannelInterpretation",
     value: function setChannelInterpretation(value) {
       this.bus.setChannelInterpretation(value);
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getNumberOfChannels",
     value: function getNumberOfChannels() {
       return this.bus.getNumberOfChannels();
     }
+
+    /**
+     *
+     */
+
   }, {
     key: "computeNumberOfChannels",
     value: function computeNumberOfChannels() {
@@ -6696,6 +8138,11 @@ var AudioNodeInput = function () {
 
       return maxChannels;
     }
+
+    /**
+     *
+     */
+
   }, {
     key: "updateNumberOfChannels",
     value: function updateNumberOfChannels() {
@@ -6707,21 +8154,41 @@ var AudioNodeInput = function () {
         this.node.channelDidUpdate(numberOfChannels);
       }
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getNumberOfConnections",
     value: function getNumberOfConnections() {
       return this._outputs.length + this._disabledOutputs.length;
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getNumberOfFanOuts",
     value: function getNumberOfFanOuts() {
       return this._outputs.length;
     }
+
+    /**
+     * @return {boolean}
+     */
+
   }, {
     key: "isEnabled",
     value: function isEnabled() {
       return this._outputs.length !== 0;
     }
+
+    /**
+     * @param {AudioNodeOutput} output
+     */
+
   }, {
     key: "enableFrom",
     value: function enableFrom(output) {
@@ -6730,6 +8197,11 @@ var AudioNodeInput = function () {
         this.inputDidUpdate();
       }
     }
+
+    /**
+     * @param {AudioNodeOutput} output
+     */
+
   }, {
     key: "disableFrom",
     value: function disableFrom(output) {
@@ -6738,6 +8210,11 @@ var AudioNodeInput = function () {
         this.inputDidUpdate();
       }
     }
+
+    /**
+     * @param {AudioNodeOutput} output
+     */
+
   }, {
     key: "connectFrom",
     value: function connectFrom(output) {
@@ -6750,6 +8227,11 @@ var AudioNodeInput = function () {
         addItem(output, this._disabledOutputs);
       }
     }
+
+    /**
+     * @param {AudioNodeOutput} output
+     */
+
   }, {
     key: "disconnectFrom",
     value: function disconnectFrom(output) {
@@ -6762,6 +8244,11 @@ var AudioNodeInput = function () {
         removeItem(output, this._disabledOutputs);
       }
     }
+
+    /**
+     *
+     */
+
   }, {
     key: "inputDidUpdate",
     value: function inputDidUpdate() {
@@ -6772,6 +8259,11 @@ var AudioNodeInput = function () {
         this.node.enableOutputsIfNecessary();
       }
     }
+
+    /**
+     * @return {boolean}
+     */
+
   }, {
     key: "isConnectedFrom",
     value: function isConnectedFrom() {
@@ -6794,6 +8286,12 @@ var AudioNodeInput = function () {
 
       return false;
     }
+
+    /**
+     * @param {*} e
+     * @return {AudioBus}
+     */
+
   }, {
     key: "sumAllConnections",
     value: function sumAllConnections(e) {
@@ -6808,6 +8306,12 @@ var AudioNodeInput = function () {
 
       return audioBus;
     }
+
+    /**
+     * @param {*} e
+     * @return {AudioBus}
+     */
+
   }, {
     key: "pull",
     value: function pull(e) {
@@ -6882,7 +8386,21 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var AudioBus = require("./AudioBus");
 
+/**
+ * @prop {AudioNode} node
+ * @prop {number}    index
+ * @prop {AudioBus}  bus
+ */
+
 var AudioNodeOutput = function () {
+  /**
+   * @param {object} opts
+   * @param {AudioNode} opts.node
+   * @param {number}    opts.index
+   * @param {number}    opts.numberOfChannels
+   * @param {boolean}   opts.enabled
+   */
+
   function AudioNodeOutput(opts) {
     _classCallCheck(this, AudioNodeOutput);
 
@@ -6898,16 +8416,21 @@ var AudioNodeOutput = function () {
     this._enabled = !!enabled;
   }
 
+  /**
+   * @return {number}
+   */
+
+
   _createClass(AudioNodeOutput, [{
-    key: "getAudioBus",
-    value: function getAudioBus() {
-      return this.bus;
-    }
-  }, {
     key: "getNumberOfChannels",
     value: function getNumberOfChannels() {
       return this.bus.getNumberOfChannels();
     }
+
+    /**
+     * @param {number} numberOfChannels
+     */
+
   }, {
     key: "setNumberOfChannels",
     value: function setNumberOfChannels(numberOfChannels) {
@@ -6922,16 +8445,31 @@ var AudioNodeOutput = function () {
         });
       }
     }
+
+    /**
+     * @return {number}
+     */
+
   }, {
     key: "getNumberOfConnections",
     value: function getNumberOfConnections() {
       return this._inputs.length;
     }
+
+    /**
+     * @return {boolean}
+     */
+
   }, {
     key: "isEnabled",
     value: function isEnabled() {
       return this._enabled;
     }
+
+    /**
+     *
+     */
+
   }, {
     key: "enable",
     value: function enable() {
@@ -6945,6 +8483,11 @@ var AudioNodeOutput = function () {
         });
       }
     }
+
+    /**
+     *
+     */
+
   }, {
     key: "disable",
     value: function disable() {
@@ -6958,21 +8501,37 @@ var AudioNodeOutput = function () {
         });
       }
     }
+
+    /**
+     *
+     */
+
   }, {
     key: "zeros",
     value: function zeros() {
       this.bus.zeros();
     }
+
+    /**
+     * @param {AudioNode|AudioParam} destination
+     * @param {number}               index
+     */
+
   }, {
     key: "connect",
     value: function connect(destination, input) {
-      var target = destination.getInput(input);
+      var target = destination.inputs[input | 0];
 
       if (this._inputs.indexOf(target) === -1) {
         this._inputs.push(target);
         target.connectFrom(this);
       }
     }
+
+    /**
+     *
+     */
+
   }, {
     key: "disconnect",
     value: function disconnect() {
@@ -6994,6 +8553,11 @@ var AudioNodeOutput = function () {
         }
       }
     }
+
+    /**
+     * @return {boolean}
+     */
+
   }, {
     key: "isConnectedTo",
     value: function isConnectedTo() {
@@ -7012,6 +8576,12 @@ var AudioNodeOutput = function () {
 
       return false;
     }
+
+    /**
+     * @param {*} e
+     * @return {AudioBus}
+     */
+
   }, {
     key: "pull",
     value: function pull(e) {
@@ -7263,7 +8833,7 @@ var AudioParam = function () {
       input.pull(currentSample);
 
       var hasEvents = !!this._timeline.length;
-      var hasInput = !inputBus.isSilent();
+      var hasInput = !inputBus.isSilent;
       var algorithm = hasEvents * 2 + hasInput;
 
       switch (algorithm) {
@@ -8056,7 +9626,7 @@ var ChannelMergerNode = function (_AudioNode) {
         return input.bus;
       });
       var allSilent = inputBuses.every(function (inputBus) {
-        return inputBus.isSilent();
+        return inputBus.isSilent;
       });
 
       outputBus.zeros();
@@ -8104,7 +9674,7 @@ var ChannelSplitterNode = function (_AudioNode) {
       var inputBus = this.inputs[0].bus;
       var outputs = this.outputs;
 
-      if (inputBus.isSilent()) {
+      if (inputBus.isSilent) {
         for (var i = 0, imax = outputs.length; i < imax; i++) {
           outputs[i].bus.zeros();
         }
@@ -8358,7 +9928,7 @@ var GainNode = function (_AudioNode) {
       var inputBus = this.inputs[0].bus;
       var outputBus = this.outputs[0].bus;
 
-      if (inputBus.isSilent()) {
+      if (inputBus.isSilent) {
         outputBus.zeros();
         return;
       }
@@ -8813,8 +10383,8 @@ var ScriptProcessorNode = function (_AudioNode) {
       eventItem.inputBuffer._impl = inputBuffer;
       eventItem.outputBuffer._impl = outputBuffer;
 
-      this._inputChannelData = inputBuffer.getAudioData().channelData;
-      this._outputChannelData = outputBuffer.getAudioData().channelData;
+      this._inputChannelData = inputBuffer.audioData.channelData;
+      this._outputChannelData = outputBuffer.audioData.channelData;
 
       this._eventItem = eventItem;
     }
@@ -8930,7 +10500,7 @@ var StereoPannerNode = function (_BasePannerNode) {
       var inputBus = this.inputs[0].bus;
       var outputBus = this.outputs[0].bus;
 
-      if (inputBus.isSilent()) {
+      if (inputBus.isSilent) {
         outputBus.zeros();
         return;
       }
@@ -9129,6 +10699,11 @@ module.exports = WaveShaperNode;
 },{"./AnalyserNode":38,"./AudioBuffer":39,"./AudioBufferSourceNode":40,"./AudioContext":41,"./AudioDestinationNode":42,"./AudioListener":43,"./AudioNode":44,"./AudioParam":45,"./AudioWorkerNode":48,"./BiquadFilterNode":50,"./ChannelMergerNode":51,"./ChannelSplitterNode":52,"./ConvolverNode":53,"./DelayNode":54,"./DynamicsCompressorNode":55,"./GainNode":57,"./IIRFilterNode":58,"./OscillatorNode":59,"./PannerNode":60,"./PeriodicWave":61,"./ScriptProcessorNode":62,"./SpatialPannerNode":63,"./StereoPannerNode":64,"./WaveShaperNode":65}],90:[function(require,module,exports){
 "use strict";
 
+/**
+ * @param {*} data
+ * @return {boolean}
+ */
+
 function isAudioData(data) {
   if (!data) {
     return false;
@@ -9147,6 +10722,10 @@ function isAudioData(data) {
   return true;
 }
 
+/**
+ * @param {object} data
+ * @return {AudioData}
+ */
 function toAudioData(data) {
   if (isAudioData(data)) {
     var numberOfChannels = data.channelData.length;
@@ -9169,6 +10748,10 @@ function toAudioData(data) {
   return { numberOfChannels: 0, length: 0, sampleRate: 0, channelData: [] };
 }
 
+/**
+ * @param {*} data
+ * @return {boolean}
+ */
 function isAudioBuffer(data) {
   if (!data) {
     return false;
@@ -9185,11 +10768,16 @@ function isAudioBuffer(data) {
   return true;
 }
 
+/**
+ * @param {object} data
+ * @param {class}  AudioBuffer
+ * @return {AudioBuffer}
+ */
 function toAudioBuffer(data, AudioBuffer) {
   data = toAudioData(data);
 
   var audioBuffer = new AudioBuffer({ sampleRate: data.sampleRate });
-  var audioData = (audioBuffer._impl || audioBuffer).getAudioData();
+  var audioData = (audioBuffer._impl || audioBuffer).audioData;
 
   audioData.numberOfChannels = data.numberOfChannels;
   audioData.length = data.length;
@@ -9210,6 +10798,11 @@ var EXPONENTIAL_RAMP_TO_VALUE_AT_TIME = 3;
 var SET_TARGET_AT_TIME = 4;
 var SET_VALUE_CURVE_AT_TIME = 5;
 
+/**
+ * @param {object[]} timeline
+ * @param {number}   time
+ * @param {number}   defaultValue
+ */
 function computeValueAtTime(timeline, time, defaultValue) {
   var value = defaultValue;
 
@@ -9326,6 +10919,12 @@ module.exports = { computeValueAtTime: computeValueAtTime, getLinearRampToValueA
 var audioDataUtil = require("./audioDataUtil");
 var resampler = require("./resampler");
 
+/**
+ * @param {function}    decodeFn
+ * @param {ArrayBuffer} audioData
+ * @param {object}      opts
+ * @return {Promise<AudioData>}
+ */
 function decode(decodeFn, audioData, opts) {
   opts = opts || /* istanbul ignore next */{};
 
@@ -9347,6 +10946,12 @@ module.exports = { decode: decode };
 },{"./audioDataUtil":90,"./resampler":97}],93:[function(require,module,exports){
 "use strict";
 
+/**
+ * @param {object} target
+ * @param {string} name
+ * @param {*}      value
+ */
+
 function defineProp(target, name, value) {
   Object.defineProperty(target, name, { value: value, enumerable: false, writable: true, configurable: true });
 }
@@ -9358,6 +10963,11 @@ module.exports = defineProp;
 
 var audioDataUtil = require("./audioDataUtil");
 
+/**
+ * @param {function}  encodeFn
+ * @param {AudioData} audioData
+ * @param {object}    opts
+ */
 function encode(encodeFn, audioData, opts) {
   opts = opts || /* istanbul ignore next */{};
   if (!audioDataUtil.isAudioData(audioData)) {
@@ -9376,31 +10986,57 @@ module.exports.defineProp = require("./defineProp");
 module.exports.toAudioTime = require("./toAudioTime");
 module.exports.toValidBitDepth = require("./toValidBitDepth");
 
+/**
+ * @param {number} value
+ * @param {number} minValue
+ * @param {number} maxValue
+ */
 function clip(value, minValue, maxValue) {
   return Math.max(minValue, Math.min(value, maxValue));
 }
 module.exports.clip = clip;
 
+/**
+ * @param {*} value
+ * @param {*) defaultValue
+ */
 function defaults(value, defaultValue) {
   return typeof value !== "undefined" ? value : defaultValue;
 }
 module.exports.defaults = defaults;
 
+/**
+ * @param {*} value
+ * @return {Array}
+ */
 function toArrayIfNeeded(value) {
   return Array.isArray(value) ? value : [value];
 }
 module.exports.toArrayIfNeeded = toArrayIfNeeded;
 
+/**
+ * @param {object} value
+ * @return {object}
+ */
 function toImpl(value) {
   return value._impl || value;
 }
 module.exports.toImpl = toImpl;
 
+/**
+ * @param {*} value
+ * @return {number}
+ */
 function toNumber(value) {
   return +value || 0;
 }
 module.exports.toNumber = toNumber;
 
+/**
+ * @param {number}   value
+ * @param {function} round
+ * @return {number}
+ */
 function toPowerOfTwo(value, round) {
   round = round || Math.round;
   return 1 << round(Math.log(value) / Math.log(2));
@@ -9410,6 +11046,10 @@ module.exports.toPowerOfTwo = toPowerOfTwo;
 var MIN_SAMPLERATE = 3000;
 var MAX_SAMPLERATE = 192000;
 
+/**
+ * @param {number} value
+ * @return {number}
+ */
 function toValidSampleRate(value) {
   return clip(toNumber(value), MIN_SAMPLERATE, MAX_SAMPLERATE);
 }
@@ -9418,6 +11058,10 @@ module.exports.toValidSampleRate = toValidSampleRate;
 var MIN_BLOCK_SIZE = 8;
 var MAX_BLOCK_SIZE = 1024;
 
+/**
+ * @param {number} value
+ * @return {number}
+ */
 function toValidBlockSize(value) {
   return clip(toPowerOfTwo(value), MIN_BLOCK_SIZE, MAX_BLOCK_SIZE);
 }
@@ -9425,6 +11069,10 @@ module.exports.toValidBlockSize = toValidBlockSize;
 
 var MAX_NUMBER_OF_CHANNELS = 32;
 
+/**
+ * @param {number} value
+ * @return {number}
+ */
 function toValidNumberOfChannels(value) {
   return clip(value | 0, 1, MAX_NUMBER_OF_CHANNELS);
 }
@@ -9433,6 +11081,11 @@ module.exports.toValidNumberOfChannels = toValidNumberOfChannels;
 },{"./defineProp":93,"./mixin":96,"./toAudioTime":98,"./toValidBitDepth":99}],96:[function(require,module,exports){
 "use strict";
 
+/**
+ * @param {class} targetKlass
+ * @param {class} partialKlass
+ * @return {class}
+ */
 function mixin(targetKlass, partialKlass) {
   var partialProto = partialKlass.prototype;
   var targetProto = targetKlass.prototype;
@@ -9452,6 +11105,11 @@ module.exports = mixin;
 
 },{}],97:[function(require,module,exports){
 "use strict";
+
+/**
+ * @param {AudioData} audioData
+ * @param {number}    sampleRate
+ */
 
 function resample(audioData, sampleRate) {
   if (audioData.sampleRate === sampleRate) {
@@ -9487,6 +11145,11 @@ module.exports = { resample: resample };
 },{}],98:[function(require,module,exports){
 "use strict";
 
+/**
+ * @param {number|string} str
+ * @return {number}
+ */
+
 function toAudioTime(str) {
   if (Number.isFinite(+str)) {
     var time = Math.max(0, +str);
@@ -9512,6 +11175,11 @@ module.exports = toAudioTime;
 },{}],99:[function(require,module,exports){
 "use strict";
 "use stirct";
+
+/**
+ * @param {number} value
+ * @return {number}
+ */
 
 function toValidBitDepth(value) {
   value = value | 0;
