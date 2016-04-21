@@ -52,13 +52,6 @@ class AudioNode extends EventTarget {
   }
 
   /**
-   * @return {AudioContext}
-   */
-  getContext() {
-    return this.context;
-  }
-
-  /**
    * @return {number}
    */
   getNumberOfInputs() {

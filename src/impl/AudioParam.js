@@ -360,13 +360,6 @@ class AudioParam {
   }
 
   /**
-   * @return {AudioContext}
-   */
-  getContext() {
-    return this.context;
-  }
-
-  /**
    * @return {string}
    */
   getRate() {

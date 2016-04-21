@@ -14,10 +14,6 @@ const GainNode = require("../../src/impl/GainNode")
 const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
 const testSpec = {};
 
-testSpec.context = {
-  testCase: [ { expected: context } ]
-};
-
 testSpec.value = {
   testCase: [
     { value: 1, expected: 1 }
