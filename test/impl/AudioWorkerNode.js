@@ -78,8 +78,8 @@ describe("AudioWorkerNode", () => {
       const node3 = new AudioNode(context, { inputs: [ 1 ] });
       const node4 = new AudioNode(context, { inputs: [ 1 ] });
 
-      node1.getOutput(0).enable();
-      node2.getOutput(0).enable();
+      node1.outputs[0].enable();
+      node2.outputs[0].enable();
       node2.connect(node3, 0);
       node2.connect(node4, 1);
 

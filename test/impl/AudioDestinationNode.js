@@ -55,7 +55,7 @@ describe("AudioDestinationNode", () => {
       const node1 = new AudioNode(context, { outputs: [ 4 ] });
       const node2 = new AudioDestinationNode(context, { numberOfChannels: 2 });
 
-      node1.getOutput(0).enable();
+      node1.outputs[0].enable();
       assert(node2.inputs[0].getNumberOfChannels() === 2);
 
       node1.connect(node2);
@@ -68,9 +68,9 @@ describe("AudioDestinationNode", () => {
     it("silent", () => {
       const node1 = new AudioNode(context, { outputs: [ 2 ] });
       const node2 = new AudioDestinationNode(context, { numberOfChannels: 2 });
-      const outputBus = node2.getOutput(0).getAudioBus();
+      const outputBus = node2.output.getAudioBus();
 
-      node1.getOutput(0).getAudioBus().zeros();
+      node1.outputs[0].getAudioBus().zeros();
       node1.enableOutputsIfNecessary();
       node1.connect(node2);
 
@@ -87,10 +87,10 @@ describe("AudioDestinationNode", () => {
       const node2 = new AudioDestinationNode(context, { numberOfChannels: 2 });
       const noise1 = np.random_sample(16);
       const noise2 = np.random_sample(16);
-      const outputBus = node2.getOutput(0).getAudioBus();
+      const outputBus = node2.output.getAudioBus();
 
-      node1.getOutput(0).getAudioBus().getMutableData()[0].set(noise1);
-      node1.getOutput(0).getAudioBus().getMutableData()[1].set(noise2);
+      node1.outputs[0].getAudioBus().getMutableData()[0].set(noise1);
+      node1.outputs[0].getAudioBus().getMutableData()[1].set(noise2);
       node1.enableOutputsIfNecessary();
       node1.connect(node2);
 

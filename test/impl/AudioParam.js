@@ -335,7 +335,7 @@ describe("AudioParam", () => {
       [ 0, 0.25, 0.5, 0.5 ].forEach((value, i) => {
         const noise = np.random_sample(16);
 
-        node1.getOutput(0).getAudioBus().getMutableData()[0].set(noise);
+        node1.outputs[0].getAudioBus().getMutableData()[0].set(noise);
 
         param.setValue(value);
         param.dspProcess(i * 16);
@@ -366,7 +366,7 @@ describe("AudioParam", () => {
       const noise = np.random_sample(16);
 
       node1.enableOutputsIfNecessary();
-      node1.getOutput(0).getAudioBus().getMutableData()[0].set(noise);
+      node1.outputs[0].getAudioBus().getMutableData()[0].set(noise);
 
       param.setValueAtTime(0, 0);
       param.linearRampToValueAtTime(1, 16/8000);

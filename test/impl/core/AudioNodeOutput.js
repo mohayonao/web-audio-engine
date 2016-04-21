@@ -21,7 +21,7 @@ describe("AudioNodeOutput", () => {
   describe("basic attributes", () => {
     attrTester.makeTests(context, {
       class: AudioNodeOutput,
-      create: context => new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] }).getOutput(0),
+      create: context => new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] }).outputs[0],
       testSpec
     });
   });
@@ -30,7 +30,7 @@ describe("AudioNodeOutput", () => {
     it("works", () => {
       const node1 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
       const node2 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
-      const output = node1.getOutput(0);
+      const output = node1.outputs[0];
 
       output.getAudioBus().getMutableData()[0].set(np.random_sample());
 
@@ -51,16 +51,16 @@ describe("AudioNodeOutput", () => {
       const node2 = new GainNode(context);
       const node3 = new GainNode(context);
 
-      node1.getOutput(0).enable();
+      node1.outputs[0].enable();
       node1.connect(node2);
       node2.connect(node3);
 
-      assert(node1.getOutput(0).getNumberOfChannels() === 1);
+      assert(node1.outputs[0].getNumberOfChannels() === 1);
       assert(node2.inputs[0].getNumberOfChannels() === 1);
 
-      node1.getOutput(0).setNumberOfChannels(4);
+      node1.outputs[0].setNumberOfChannels(4);
 
-      assert(node1.getOutput(0).getNumberOfChannels() === 4);
+      assert(node1.outputs[0].getNumberOfChannels() === 4);
       assert(node2.inputs[0].getNumberOfChannels() === 4);
     });
   });
@@ -81,34 +81,34 @@ describe("AudioNodeOutput", () => {
       assert(node2.inputs[0].getNumberOfConnections() === 1);
       assert(node2.inputs[0].getNumberOfFanOuts() === 0);
       assert(node2.inputs[0].isEnabled() === false);
-      assert(node2.getOutput(0).isEnabled() === false);
+      assert(node2.outputs[0].isEnabled() === false);
       assert(node3.inputs[0].isEnabled() === false);
     });
     it("should be enabled to synchronize with the input", () => {
-      node1.getOutput(0).enable();
+      node1.outputs[0].enable();
 
       assert(node2.inputs[0].getNumberOfConnections() === 1);
       assert(node2.inputs[0].getNumberOfFanOuts() === 1);
       assert(node2.inputs[0].isEnabled() === true);
-      assert(node2.getOutput(0).isEnabled() === true);
+      assert(node2.outputs[0].isEnabled() === true);
       assert(node3.inputs[0].isEnabled() === true);
     });
     it("should be disabled to synchronize with the input", () => {
-      node1.getOutput(0).disable();
+      node1.outputs[0].disable();
 
       assert(node2.inputs[0].getNumberOfConnections() === 1);
       assert(node2.inputs[0].getNumberOfFanOuts() === 0);
       assert(node2.inputs[0].isEnabled() === false);
-      assert(node2.getOutput(0).isEnabled() === false);
+      assert(node2.outputs[0].isEnabled() === false);
       assert(node3.inputs[0].isEnabled() === false);
     });
     it("should be disabled when disconnected", () => {
-      node1.getOutput(0).enable();
+      node1.outputs[0].enable();
 
       assert(node2.inputs[0].getNumberOfConnections() === 1);
       assert(node2.inputs[0].getNumberOfFanOuts() === 1);
       assert(node2.inputs[0].isEnabled() === true);
-      assert(node2.getOutput(0).isEnabled() === true);
+      assert(node2.outputs[0].isEnabled() === true);
       assert(node3.inputs[0].isEnabled() === true);
 
       node1.disconnect();
@@ -116,7 +116,7 @@ describe("AudioNodeOutput", () => {
       assert(node2.inputs[0].getNumberOfConnections() === 0);
       assert(node2.inputs[0].getNumberOfFanOuts() === 0);
       assert(node2.inputs[0].isEnabled() === false);
-      assert(node2.getOutput(0).isEnabled() === false);
+      assert(node2.outputs[0].isEnabled() === false);
       assert(node3.inputs[0].isEnabled() === false);
     });
   });
@@ -125,7 +125,7 @@ describe("AudioNodeOutput", () => {
     it("connect", () => {
       const node1 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
       const node2 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const output = node1.getOutput(0);
+      const output = node1.outputs[0];
 
       assert(output.getNumberOfConnections() === 0);
 
@@ -141,7 +141,7 @@ describe("AudioNodeOutput", () => {
     it("disconnect", () => {
       const node1 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
       const node2 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const output = node1.getOutput(0);
+      const output = node1.outputs[0];
 
       node1.connect(node2);
       assert(output.isConnectedTo(node2) === true);
@@ -156,7 +156,7 @@ describe("AudioNodeOutput", () => {
       const node1 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
       const node2 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
       const node3 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const output = node1.getOutput(0);
+      const output = node1.outputs[0];
 
       node1.connect(node2);
       assert(output.isConnectedTo(node2) === true);
@@ -178,7 +178,7 @@ describe("AudioNodeOutput", () => {
       const node1 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
       const node2 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
       const node3 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const output = node1.getOutput(0);
+      const output = node1.outputs[0];
 
       node1.connect(node2);
       assert(output.isConnectedTo(node2, 0) === true);
@@ -203,7 +203,7 @@ describe("AudioNodeOutput", () => {
 
     it("misc", () => {
       const node = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const output = node.getOutput(0);
+      const output = node.outputs[0];
 
       assert(output.isConnectedTo() === false);
     });
@@ -212,7 +212,7 @@ describe("AudioNodeOutput", () => {
   describe("processing", () => {
     it("pull", () => {
       const node = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const output = node.getOutput(0);
+      const output = node.outputs[0];
 
       node.dspProcess = sinon.spy();
 

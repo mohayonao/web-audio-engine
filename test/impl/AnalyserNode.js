@@ -85,8 +85,8 @@ describe("AnalyserNode", () => {
       const node2 = new AnalyserNode(context);
       const node3 = new AudioNode(context, { inputs: [ 1 ] });
 
-      node1.getOutput(0).enable();
-      node2.getOutput(0).enable();
+      node1.outputs[0].enable();
+      node2.outputs[0].enable();
       node2.connect(node3);
 
       assert(node2.inputs[0].getNumberOfChannels() === 1);

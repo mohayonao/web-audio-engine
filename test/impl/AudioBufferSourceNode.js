@@ -85,7 +85,7 @@ describe("AudioBufferSourceNode", () => {
       const node2 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
       const buffer = new AudioBuffer(context, { numberOfChannels: 2, length: 32, sampleRate: context.sampleRate });
 
-      node1.getOutput(0).enable();
+      node1.outputs[0].enable();
       node1.connect(node2);
 
       assert(node2.inputs[0].getNumberOfChannels() === 1);

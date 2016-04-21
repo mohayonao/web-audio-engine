@@ -62,11 +62,11 @@ describe("AudioNodeInput", () => {
       node2 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
       input = node2.inputs[0];
       node1.connect(node2);
-      node1.getOutput(0).enable();
+      node1.outputs[0].enable();
     });
 
     it("input 1ch", () => {
-      node1.getOutput(0).setNumberOfChannels(1);
+      node1.outputs[0].setNumberOfChannels(1);
       node2.setChannelCount(4);
 
       node2.setChannelCountMode("max");
@@ -79,7 +79,7 @@ describe("AudioNodeInput", () => {
       assert(input.computeNumberOfChannels() === 4);
     });
     it("input 8ch", () => {
-      node1.getOutput(0).setNumberOfChannels(8);
+      node1.outputs[0].setNumberOfChannels(8);
       node2.setChannelCount(4);
 
       node2.setChannelCountMode("max");
@@ -201,11 +201,11 @@ describe("AudioNodeInput", () => {
       assert(input.getNumberOfFanOuts() === 0);
       assert(input.isEnabled() === false);
 
-      node1.getOutput(0).enable();
+      node1.outputs[0].enable();
       assert(input.getNumberOfFanOuts() === 1);
       assert(input.isEnabled() === true);
 
-      node3.getOutput(0).enable();
+      node3.outputs[0].enable();
       assert(input.getNumberOfFanOuts() === 2);
       assert(input.isEnabled() === true);
 
@@ -214,7 +214,7 @@ describe("AudioNodeInput", () => {
       assert(input.getNumberOfFanOuts() === 1);
       assert(input.isEnabled() === true);
 
-      node3.getOutput(0).disable();
+      node3.outputs[0].disable();
       assert(input.getNumberOfConnections() === 2);
       assert(input.getNumberOfFanOuts() === 0);
       assert(input.isEnabled() === false);
@@ -241,10 +241,10 @@ describe("AudioNodeInput", () => {
       const noise1 = np.random_sample(16);
       const noise2 = np.random_sample(16);
 
-      node1.getOutput(0).enable();
+      node1.outputs[0].enable();
       node1.connect(node2);
 
-      node1.getOutput(0).getAudioBus().getMutableData()[0].set(noise1);
+      node1.outputs[0].getAudioBus().getMutableData()[0].set(noise1);
       node2.inputs[0].getAudioBus().getMutableData()[0].set(noise2);
 
       const input = node2.inputs[0];
@@ -264,13 +264,13 @@ describe("AudioNodeInput", () => {
       const noise2 = np.random_sample(16);
       const noise3 = np.random_sample(16);
 
-      node1.getOutput(0).enable();
-      node2.getOutput(0).enable();
+      node1.outputs[0].enable();
+      node2.outputs[0].enable();
       node1.connect(node3);
       node2.connect(node3);
 
-      node1.getOutput(0).getAudioBus().getMutableData()[0].set(noise1);
-      node2.getOutput(0).getAudioBus().getMutableData()[0].set(noise2);
+      node1.outputs[0].getAudioBus().getMutableData()[0].set(noise1);
+      node2.outputs[0].getAudioBus().getMutableData()[0].set(noise2);
       node3.inputs[0].getAudioBus().getMutableData()[0].set(noise3);
 
       const input = node3.inputs[0];
