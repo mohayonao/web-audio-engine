@@ -5,34 +5,57 @@ const AudioData = require("./AudioData");
 const DSPAlgorithm = {};
 
 class AudioBus {
+  /**
+   * @param {number} numberOfChannels
+   * @param {number} length
+   * @param {number} sampleRate
+   */
   constructor(numberOfChannels, length, sampleRate) {
     this._audioData = new AudioData(numberOfChannels, length, sampleRate);
     this._channelInterpretation = "discrete";
     this._isSilent = true;
   }
 
+  /**
+   * @return {AudioData}
+   */
   getAudioData() {
     return this._audioData;
   }
 
+  /**
+   * @return {string} [ "speakers", "discrete" ]
+   */
   getChannelInterpretation() {
     return this._channelInterpretation;
   }
 
+  /**
+   * @param {string} value - [ "speakers", "discrete" ]
+   */
   setChannelInterpretation(value) {
     if (value !== this._channelInterpretation && isValidChannelInterpretation(value)) {
       this._channelInterpretation = value;
     }
   }
 
+  /**
+   * @return {boolean}
+   */
   isSilent() {
     return this._isSilent;
   }
 
+  /**
+   * @return {number}
+   */
   getNumberOfChannels() {
     return this._audioData.numberOfChannels;
   }
 
+  /**
+   * @param {number} numberOfChannels
+   */
   setNumberOfChannels(numberOfChannels) {
     const audioBus = new AudioBus(numberOfChannels, this.getLength(), this.getSampleRate());
 
@@ -42,23 +65,38 @@ class AudioBus {
     this._audioData = audioBus._audioData;
   }
 
+  /**
+   * @return {number}
+   */
   getLength() {
     return this._audioData.length;
   }
 
+  /**
+   * @return {number}
+   */
   getSampleRate() {
     return this._audioData.sampleRate;
   }
 
+  /**
+   * @return {Float32Array[]}
+   */
   getChannelData() {
     return this._audioData.channelData;
   }
 
+  /**
+   * @return {Float32Array[]}
+   */
   getMutableData() {
     this._isSilent = false;
     return this._audioData.channelData;
   }
 
+  /**
+   *
+   */
   zeros() {
     /* istanbul ignore else */
     if (!this._isSilent) {
@@ -71,6 +109,9 @@ class AudioBus {
     this._isSilent = true;
   }
 
+  /**
+   * @param {AudioBus} audioBus
+   */
   copyFrom(audioBus) {
     const source = audioBus._audioData.channelData;
     const destination = this._audioData.channelData;
@@ -87,6 +128,10 @@ class AudioBus {
     this._isSilent = audioBus._isSilent;
   }
 
+  /**
+   * @param {AudioBus} audioBus
+   * @param {number}   offset
+   */
   copyFromWithOffset(audioBus, offset) {
     const source = audioBus._audioData.channelData;
     const destination = this._audioData.channelData;
@@ -104,6 +149,9 @@ class AudioBus {
     this._isSilent = this._isSilent && audioBus._isSilent;
   }
 
+  /**
+   * @param {AudioBus} audioBus
+   */
   sumFrom(audioBus) {
     assert(audioBus instanceof AudioBus);
 
@@ -118,6 +166,10 @@ class AudioBus {
     this._sumFrom(source, destination, audioBus.getLength());
   }
 
+  /**
+   * @param {AudioBus} audioBus
+   * @param {number}   offset
+   */
   sumFromWithOffset(audioBus, offset) {
     assert(audioBus instanceof AudioBus);
 
@@ -134,6 +186,9 @@ class AudioBus {
     this._sumFrom(source, destination, audioBus.getLength());
   }
 
+  /**
+   * @private
+   */
   _sumFrom(source, destination, length) {
     let mixFunction;
     let algoIndex = source.length * 1000 + destination.length;

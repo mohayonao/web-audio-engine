@@ -4,6 +4,9 @@ const util = require("../util");
 const AudioSourceNode = require("./AudioSourceNode");
 
 class AudioScheduledSourceNode extends AudioSourceNode {
+  /**
+   * @param {AudioContext} context
+   */
   constructor(context) {
     super(context);
 
@@ -13,10 +16,17 @@ class AudioScheduledSourceNode extends AudioSourceNode {
     this._stopSample = Infinity;
   }
 
+  /**
+   * not used
+   * @deprecated
+   */
   getState() {
     return this._state;
   }
 
+  /**
+   * @param {number} when
+   */
   start(when) {
     /* istanbul ignore else */
     if (this._startTime === Infinity) {
@@ -32,6 +42,9 @@ class AudioScheduledSourceNode extends AudioSourceNode {
     return false;
   }
 
+  /**
+   * @param {number} when
+   */
   stop(when) {
     /* istanbul ignore else */
     if (this._startTime !== Infinity && this._stopTime === Infinity) {
@@ -45,6 +58,10 @@ class AudioScheduledSourceNode extends AudioSourceNode {
     return false;
   }
 
+  /**
+   * @param {number} currentSample
+   * @return {string}
+   */
   checkSchedule(currentSample) {
     // timeline
     // |----------------|-------*--------|----------------|-----*----------|----------------|

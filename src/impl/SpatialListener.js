@@ -3,6 +3,9 @@
 const AudioParam = require("./AudioParam");
 
 class SpatialListener {
+  /**
+   * @param {AudioContext} context
+   */
   constructor(context) {
     this.context = context;
     this._positionX = new AudioParam(context, { rate: "audio", defaultValue: 0 });
@@ -16,38 +19,65 @@ class SpatialListener {
     this._upZ = new AudioParam(context, { rate: "audio", defaultValue: 0 });
   }
 
+  /**
+   * @return {AudioParam}
+   */
   getPositionX() {
     return this._positionX;
   }
 
+  /**
+   * @return {AudioParam}
+   */
   getPositionY() {
     return this._positionY;
   }
 
+  /**
+   * @return {AudioParam}
+   */
   getPositionZ() {
     return this._positionZ;
   }
 
+  /**
+   * @return {AudioParam}
+   */
   getForwardX() {
     return this._forwardX;
   }
 
+  /**
+   * @return {AudioParam}
+   */
   getForwardY() {
     return this._forwardY;
   }
 
+  /**
+   * @return {AudioParam}
+   */
   getForwardZ() {
     return this._forwardZ;
   }
 
+  /**
+   * @return {AudioParam}
+   */
   getUpX() {
     return this._upX;
   }
 
+  /**
+   * @return {AudioParam}
+   */
   getUpY() {
     return this._upY;
   }
 
+  /**
+   * @return {AudioParam}
+   */
   getUpZ() {
     return this._upZ;
   }

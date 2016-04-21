@@ -2,6 +2,11 @@
 
 const audioDataUtil = require("./audioDataUtil");
 
+/**
+ * @param {function}  encodeFn
+ * @param {AudioData} audioData
+ * @param {object}    opts
+ */
 function encode(encodeFn, audioData, opts) {
   opts = opts || /* istanbul ignore next */ {};
   if (!audioDataUtil.isAudioData(audioData)) {

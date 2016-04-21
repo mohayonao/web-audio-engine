@@ -2,7 +2,19 @@
 
 const AudioBus = require("./AudioBus");
 
+/**
+ * @prop {AudioNode} node
+ * @prop {number}    index
+ * @prop {AudioBus}  bus
+ */
 class AudioNodeOutput {
+  /**
+   * @param {object} opts
+   * @param {AudioNode} opts.node
+   * @param {number}    opts.index
+   * @param {number}    opts.numberOfChannels
+   * @param {boolean}   opts.enabled
+   */
   constructor(opts) {
     let node = opts.node;
     let index = opts.index;
@@ -16,14 +28,24 @@ class AudioNodeOutput {
     this._enabled = !!enabled;
   }
 
+  /**
+   * @return {AudioBus}
+   * @deprecated use `.bus` directly
+   */
   getAudioBus() {
     return this.bus;
   }
 
+  /**
+   * @return {number}
+   */
   getNumberOfChannels() {
     return this.bus.getNumberOfChannels();
   }
 
+  /**
+   * @param {number} numberOfChannels
+   */
   setNumberOfChannels(numberOfChannels) {
     /* istanbul ignore else */
     if (numberOfChannels !== this.getNumberOfChannels()) {
@@ -37,14 +59,23 @@ class AudioNodeOutput {
     }
   }
 
+  /**
+   * @return {number}
+   */
   getNumberOfConnections() {
     return this._inputs.length;
   }
 
+  /**
+   * @return {boolean}
+   */
   isEnabled() {
     return this._enabled;
   }
 
+  /**
+   *
+   */
   enable() {
     /* istanbul ignore else */
     if (!this._enabled) {
@@ -55,6 +86,9 @@ class AudioNodeOutput {
     }
   }
 
+  /**
+   *
+   */
   disable() {
     /* istanbul ignore else */
     if (this._enabled) {
@@ -65,10 +99,17 @@ class AudioNodeOutput {
     }
   }
 
+  /**
+   *
+   */
   zeros() {
     this.bus.zeros();
   }
 
+  /**
+   * @param {AudioNode|AudioParam} destination
+   * @param {number}               index
+   */
   connect(destination, input) {
     const target = destination.getInput(input);
 
@@ -78,6 +119,9 @@ class AudioNodeOutput {
     }
   }
 
+  /**
+   *
+   */
   disconnect() {
     const args = Array.from(arguments);
     const isTargetToDisconnect =
@@ -95,6 +139,9 @@ class AudioNodeOutput {
     }
   }
 
+  /**
+   * @return {boolean}
+   */
   isConnectedTo() {
     const args = Array.from(arguments);
 
@@ -108,6 +155,10 @@ class AudioNodeOutput {
     return false;
   }
 
+  /**
+   * @param {*} e
+   * @return {AudioBus}
+   */
   pull(e) {
     this.node.processIfNecessary(e);
     return this.bus;

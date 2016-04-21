@@ -7,6 +7,11 @@ const AudioBuffer = require("../api/AudioBuffer");
 const setImmediate = global.setImmediate || /* istanbul ignore next */ (fn => setTimeout(fn, 0));
 
 class OfflineAudioContext extends AudioContext {
+  /**
+   * @param {number} numberOfChannels
+   * @param {number} length
+   * @param {number} sampleRate
+   */
   constructor(numberOfChannels, length, sampleRate) {
     numberOfChannels = util.toValidNumberOfChannels(numberOfChannels);
     length = Math.max(0, length|0);
@@ -28,15 +33,24 @@ class OfflineAudioContext extends AudioContext {
     util.defineProp(this, "_writeIndex", 0);
   }
 
+  /**
+   * @return {function}
+   */
   get oncomplete() {
     return this._impl.$oncomplete;
   }
 
+  /**
+   * @param {function} callback
+   */
   set oncomplete(callback) {
     this._impl.replaceEventListener("complete", this._impl.$oncomplete, callback);
     this._impl.$oncomplete = callback;
   }
 
+  /**
+   * @return {Promise<void>}
+   */
   resume() {
     if (this.state === "suspended" && this._renderingPromise !== null) {
       render.call(this, this._impl);
@@ -44,6 +58,10 @@ class OfflineAudioContext extends AudioContext {
     return Promise.resolve();
   }
 
+  /**
+   * @param {number} time
+   * @return {Promise<void>}
+   */
   suspend(time) {
     time = Math.max(0, util.toNumber(time));
 
@@ -58,11 +76,17 @@ class OfflineAudioContext extends AudioContext {
     return this._suspendPromise;
   }
 
+  /**
+   * @return {Promise<void>}
+   */
   /* istanbul ignore next */
   close() {
     return Promise.reject();
   }
 
+  /**
+   * @return {Promise<AudioBuffer>}
+   */
   startRendering() {
     if (this._renderingPromise === null) {
       this._renderingPromise = new Promise((resolve) => {

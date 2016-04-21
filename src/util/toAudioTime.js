@@ -1,5 +1,9 @@
 "use strict";
 
+/**
+ * @param {number|string} str
+ * @return {number}
+ */
 function toAudioTime(str) {
   if (Number.isFinite(+str)) {
     const time = Math.max(0, +str);

@@ -6,7 +6,19 @@ const AudioNodeInput = require("./core/AudioNodeInput");
 const AudioBus = require("./core/AudioBus");
 const AudioParamDSP = require("./dsp/AudioParam");
 
+/**
+ * @prop {AudioContext}      context
+ * @prop {number}            blockSize
+ * @prop {number}            sampleRate
+ * @prop {AudioNodeInput[]}  inputs
+ * @prop {AudioBus}          outputBus
+ */
 class AudioParam {
+  /**
+   * @param {AudioContext} context
+   * @param {string}       opts.rate - [ "audio", "control "]
+   * @param {number}       opts.defaultValue
+   */
   constructor(context, opts) {
     opts = opts || /* istanbul ignore next */ {};
 
@@ -36,18 +48,31 @@ class AudioParam {
     this.dspInit(this._rate);
   }
 
+  /**
+   * @return {number}
+   */
   getValue() {
     return this._value;
   }
 
+  /**
+   * @param {number} value
+   */
   setValue(value) {
     this._value = this._userValue = util.toNumber(value);
   }
 
+  /**
+   * @return {number}
+   */
   getDefaultValue() {
     return this._defaultValue;
   }
 
+  /**
+   * @param {number} value
+   * @param {number} startTime
+   */
   setValueAtTime(value, startTime) {
     value = util.toNumber(value);
     startTime = Math.max(0, util.toNumber(startTime));
@@ -91,6 +116,10 @@ class AudioParam {
     }
   }
 
+  /**
+   * @param {number} value
+   * @param {number} endTime
+   */
   linearRampToValueAtTime(value, endTime) {
     value = util.toNumber(value);
     endTime = Math.max(0, util.toNumber(endTime));
@@ -141,6 +170,10 @@ class AudioParam {
     }
   }
 
+  /**
+   * @param {number} value
+   * @param {number} endTime
+   */
   exponentialRampToValueAtTime(value, endTime) {
     value = Math.max(1e-6, util.toNumber(value));
     endTime = Math.max(0, util.toNumber(endTime));
@@ -191,6 +224,11 @@ class AudioParam {
     }
   }
 
+  /**
+   * @param {number} target
+   * @param {number} startTime
+   * @param {number} timeConstant
+   */
   setTargetAtTime(target, startTime, timeConstant) {
     target = util.toNumber(target);
     startTime = Math.max(0, util.toNumber(startTime));
@@ -244,6 +282,11 @@ class AudioParam {
     }
   }
 
+  /**
+   * @param {Float32Array[]} values
+   * @param {number}         startTime
+   * @param {number}         duration
+   */
   setValueCurveAtTime(values, startTime, duration) {
     startTime = Math.max(0, util.toNumber(startTime));
     duration = Math.max(0, util.toNumber(duration));
@@ -290,6 +333,9 @@ class AudioParam {
     }
   }
 
+  /**
+   * @param {number} startTime
+   */
   cancelScheduledValues(startTime) {
     startTime = Math.max(0, util.toNumber(startTime));
 
@@ -313,30 +359,55 @@ class AudioParam {
     }
   }
 
+  /**
+   * @return {AudioContext}
+   */
   getContext() {
     return this.context;
   }
 
+  /**
+   * @param {number} channel
+   * @return {AudioNodeInput}
+   */
   getInput(channel) {
     return this.inputs[channel|0];
   }
 
+  /**
+   * @return {string}
+   */
   getRate() {
     return this.toRateName(this._rate);
   }
 
+  /**
+   * @return {boolean}
+   */
   hasSampleAccurateValues() {
     return this._hasSampleAccurateValues;
   }
 
+  /**
+   * @return {Float32Array}
+   */
   getSampleAccurateValues() {
     return this.outputBus.getChannelData()[0];
   }
 
+  /**
+   *
+   */
   enableOutputsIfNecessary() {}
 
+  /**
+   *
+   */
   disableOutputsIfNecessary() {}
 
+  /**
+   * @return {boolean}
+   */
   isConnectedFrom() {
     const args = Array.from(arguments);
 
@@ -347,10 +418,16 @@ class AudioParam {
     return false;
   }
 
+  /**
+   * @return {object[]}
+   */
   getTimeline() {
     return this._timeline;
   }
 
+  /**
+   * @return {object[]}
+   */
   getEvents() {
     return this._timeline.map((event) => {
       return {
@@ -361,6 +438,10 @@ class AudioParam {
     });
   }
 
+  /**
+   * @param {object}
+   * @return {number}
+   */
   insertEvent(eventItem) {
     const time = eventItem.time;
     const timeline = this._timeline;
@@ -389,6 +470,10 @@ class AudioParam {
     return pos
   }
 
+  /**
+   * @param {string} value
+   * @return {number}
+   */
   fromRateName(value) {
     if (value === "audio") {
       return AudioParamDSP.AUDIO;
@@ -396,6 +481,10 @@ class AudioParam {
     return AudioParamDSP.CONTROL;
   }
 
+  /**
+   * @param {number} value
+   * @return {string}
+   */
   toRateName(value) {
     if (value === AudioParamDSP.AUDIO) {
       return "audio";
@@ -403,6 +492,10 @@ class AudioParam {
     return "control";
   }
 
+  /**
+   * @param {number} value
+   * @return {string}
+   */
   toMethodName(value) {
     switch (value) {
     case AudioParamDSP.SET_VALUE_AT_TIME:

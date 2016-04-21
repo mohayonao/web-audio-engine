@@ -7,6 +7,10 @@ class EventTarget {
     this._emitter = new events.EventEmitter();
   }
 
+  /**
+   * @param {string}   type
+   * @param {function} listener
+   */
   addEventListener(type, listener) {
     /* istanbul ignore else */
     if (typeof listener === "function") {
@@ -14,6 +18,10 @@ class EventTarget {
     }
   }
 
+  /**
+   * @param {string}   type
+   * @param {function} listener
+   */
   removeEventListener(type, listener) {
     /* istanbul ignore else */
     if (typeof listener === "function") {
@@ -21,11 +29,20 @@ class EventTarget {
     }
   }
 
+  /**
+   * @param {string}   type
+   * @param {function} oldListener
+   * @param {function} newListener
+   */
   replaceEventListener(type, oldListener, newListener) {
     this.removeEventListener(type, oldListener);
     this.addEventListener(type, newListener);
   }
 
+  /**
+   * @param {object} event
+   * @param {string} event.type
+   */
   dispatchEvent(event) {
     this._emitter.emit(event.type, event);
   }

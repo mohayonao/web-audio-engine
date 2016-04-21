@@ -3,6 +3,12 @@
 const audioDataUtil = require("./audioDataUtil");
 const resampler = require("./resampler");
 
+/**
+ * @param {function}    decodeFn
+ * @param {ArrayBuffer} audioData
+ * @param {object}      opts
+ * @return {Promise<AudioData>}
+ */
 function decode(decodeFn, audioData, opts) {
   opts = opts || /* istanbul ignore next */ {};
 

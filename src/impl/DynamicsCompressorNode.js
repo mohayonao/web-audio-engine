@@ -5,6 +5,9 @@ const AudioNode = require("./AudioNode");
 const DynamicsCompressorNodeDSP = require("./dsp/DynamicsCompressorNode");
 
 class DynamicsCompressorNode extends AudioNode {
+  /**
+   * @param {AudioContext} context
+   */
   constructor(context) {
     super(context, {
       inputs: [ 1 ],
@@ -19,27 +22,45 @@ class DynamicsCompressorNode extends AudioNode {
     this._release = this.addParam("control", 0.250);
   }
 
+  /**
+   * @param {AudioParam}
+   */
   getThreshold() {
     return this._threshold;
   }
 
+  /**
+   * @param {AudioParam}
+   */
   getKnee() {
     return this._knee;
   }
 
+  /**
+   * @param {AudioParam}
+   */
   getRatio() {
     return this._ratio;
   }
 
+  /**
+   * @return {number}
+   */
   /* istanbul ignore next */
   getReduction() {
     throw new TypeError("NOT YET IMPLEMENTED");
   }
 
+  /**
+   * @param {AudioParam}
+   */
   getAttack() {
     return this._attack;
   }
 
+  /**
+   * @param {AudioParam}
+   */
   getRelease() {
     return this._release;
   }

@@ -5,6 +5,11 @@ const AudioNode = require("./AudioNode");
 const ChannelSplitterNodeDSP = require("./dsp/ChannelSplitterNode");
 
 class ChannelSplitterNode extends AudioNode {
+  /**
+   * @param {AudioContext} context
+   * @param {object}       opts
+   * @param {number}       opts.numberOfOutputs
+   */
   constructor(context, opts) {
     opts = opts || /* istanbul ignore next */ {};
 

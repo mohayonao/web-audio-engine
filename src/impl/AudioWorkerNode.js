@@ -4,6 +4,12 @@ const util = require("../util");
 const AudioNode = require("./AudioNode");
 
 class AudioWorkerNode extends AudioNode {
+  /**
+   * @param {AudioContext} context
+   * @param {object}       opts
+   * @param {number}       opts.numberOfInputs
+   * @param {number}       opts.numberOfOutputs
+   */
   constructor(context, opts) {
     opts = opts || /* istanbul ignore next */ {};
 
@@ -28,6 +34,9 @@ class AudioWorkerNode extends AudioNode {
     this.enableOutputsIfNecessary();
   }
 
+  /**
+   * @return {number}
+   */
   getChannelCount() {
     return this._maxChannelCount;
   }
@@ -36,6 +45,9 @@ class AudioWorkerNode extends AudioNode {
     // This node's channelCount cannot be changed.
   }
 
+  /**
+   * @return {string}
+   */
   getChannelCountMode() {
     return "explicit";
   }
@@ -44,25 +56,40 @@ class AudioWorkerNode extends AudioNode {
     // This node's channelCountMode cannot be changed.
   }
 
+  /**
+   * @return {string}
+   */
   getChannelInterpretation() {
     return this.inputs[0].getChannelInterpretation();
   }
 
+  /**
+   * @param {string} value
+   */
   setChannelInterpretation(value) {
     this.inputs.forEach((input) => {
       input.setChannelInterpretation(value);
     });
   }
 
+  /**
+   * @param {*} message
+   */
   /* istanbul ignore next */
   postMessage() {
     throw new TypeError("NOT YET IMPLEMENTED");
   }
 
+  /**
+   * @return {AudioWorker}
+   */
   getWorker() {
     return this._worker;
   }
 
+  /**
+   * @return {number}
+   */
   getTailTime() {
     return Infinity;
   }

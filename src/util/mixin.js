@@ -2,6 +2,11 @@
 
 const assert = require("assert");
 
+/**
+ * @param {class} targetKlass
+ * @param {class} partialKlass
+ * @return {class}
+ */
 function mixin(targetKlass, partialKlass) {
   const partialProto = partialKlass.prototype;
   const targetProto = targetKlass.prototype;

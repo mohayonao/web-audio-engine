@@ -5,6 +5,14 @@ const AudioContext = require("../api/AudioContext");
 const DSPAlgorithm = [];
 
 class WebAudioContext extends AudioContext {
+  /**
+   * @param {object}  opts
+   * @param {AudioContext} opts.context
+   * @param {AudioNode}    opts.destination
+   * @param {number}       opts.blockSize
+   * @param {number}       opts.numberOfChannels
+   * @param {number}       opts.bufferSize
+   */
   constructor(opts) {
     opts = opts || /* istanbul ignore next */ {};
 
@@ -36,6 +44,9 @@ class WebAudioContext extends AudioContext {
     return this._originalContext;
   }
 
+  /**
+   * @return {Promise<void>}
+   */
   resume() {
     if (this._processor) {
       this._processor.connect(this._destination);
@@ -43,6 +54,9 @@ class WebAudioContext extends AudioContext {
     return super.resume();
   }
 
+  /**
+   * @return {Promise<void>}
+   */
   suspend() {
     if (this._processor) {
       this._processor.disconnect();
@@ -50,6 +64,9 @@ class WebAudioContext extends AudioContext {
     return super.suspend();
   }
 
+  /**
+   * @return {Promise<void>}
+   */
   close() {
     if (this._processor) {
       this._processor.disconnect();

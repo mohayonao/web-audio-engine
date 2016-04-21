@@ -5,6 +5,14 @@ const AudioContext = require("../api/AudioContext");
 const encoder = require("../encoder");
 
 class RenderingAudioContext extends AudioContext {
+  /**
+   * @param {object}  opts
+   * @param {number}  opts.sampleRate
+   * @param {number}  opts.blockSize
+   * @param {number}  opts.numberOfChannels
+   * @param {number}  opts.bitDepth
+   * @param {boolean} opts.floatingPoint
+   */
   constructor(opts) {
     opts = opts || /* istanbul ignore next */ {};
 
@@ -26,10 +34,16 @@ class RenderingAudioContext extends AudioContext {
     util.defineProp(this, "_rendered", []);
   }
 
+  /**
+   * @return {number}
+   */
   get blockSize() {
     return this._impl.blockSize;
   }
 
+  /**
+   * @param {number|string} time
+   */
   processTo(time) {
     time = util.toAudioTime(time);
 
@@ -61,6 +75,9 @@ class RenderingAudioContext extends AudioContext {
     impl.changeState("suspended");
   }
 
+  /**
+   * @return {AudioData}
+   */
   exportAsAudioData() {
     const numberOfChannels = this._format.numberOfChannels;
     const length = this._rendered.reduce((length, buffers) => length + buffers[0].length, 0);
@@ -80,6 +97,10 @@ class RenderingAudioContext extends AudioContext {
     return audioData;
   }
 
+  /**
+   * @param {AudioData} audioData
+   * @param {object}    opts
+   */
   encodeAudioData(audioData, opts) {
     opts = Object.assign({}, this._format, opts);
     return encoder.encode(audioData, opts);
