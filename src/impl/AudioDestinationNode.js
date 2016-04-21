@@ -50,13 +50,6 @@ class AudioDestinationNode extends AudioNode {
     value = util.clip(value|0, 1, this.getMaxChannelCount());
     super.setChannelCount(value);
   }
-
-  /**
-   * @return {AudioNodeOutput}
-   */
-  getOutput() {
-    return this.output;
-  }
 }
 
 module.exports = util.mixin(AudioDestinationNode, AudioDestinationNodeDSP);

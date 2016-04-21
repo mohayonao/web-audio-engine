@@ -52,13 +52,6 @@ class AudioNode extends EventTarget {
   }
 
   /**
-   * @return {AudioContext}
-   */
-  getContext() {
-    return this.context;
-  }
-
-  /**
    * @return {number}
    */
   getNumberOfInputs() {
@@ -188,26 +181,6 @@ class AudioNode extends EventTarget {
     this._params.push(param);
 
     return param;
-  }
-
-  /**
-   * @param {number} channel
-   * @return {AudioNodeInput}
-   * @deprecated use `.inputs[channel]` directly
-   */
-  getInput(channel) {
-    assert(0 <= channel && channel < this.inputs.length);
-    return this.inputs[channel|0];
-  }
-
-  /**
-   * @param {number} channel
-   * @return {AudioNodeOutput}
-   * @deprecated use `.outputs[channel]` directly
-   */
-  getOutput(channel) {
-    assert(0 <= channel && channel < this.outputs.length);
-    return this.outputs[channel|0];
   }
 
   /**

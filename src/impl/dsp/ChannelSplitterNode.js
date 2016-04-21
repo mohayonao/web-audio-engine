@@ -7,7 +7,7 @@ class ChannelSplitterNode extends AudioNode {
     const inputBus = this.inputs[0].bus;
     const outputs = this.outputs;
 
-    if (inputBus.isSilent()) {
+    if (inputBus.isSilent) {
       for (let i = 0, imax = outputs.length; i < imax; i++) {
         outputs[i].bus.zeros();
       }

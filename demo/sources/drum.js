@@ -9,7 +9,7 @@ module.exports = function(context, util) {
     return Math.random() < ratio;
   }
 
-  return util.fetchAudioBuffer([ "kick.wav", "snare.wav", "hihat1.wav" ]).then(function(instruments) {
+  return util.fetchAudioBuffer([ "kick.wav", "snare.wav", "hihat1.wav", "hihat2.wav" ]).then(function(instruments) {
     function shot(e) {
       var inst = instruments[e.args.inst % instruments.length];
       var t0 = e.playbackTime;
@@ -57,15 +57,19 @@ module.exports = function(context, util) {
 
         // hihat
         if (i % 4 === 0) {
-          sched.insert(e.playbackTime + i * 0.125, shot, { inst: 2, amp: 0.40, duration: 1.00 });
+          sched.insert(t0, shot, { inst: 2, amp: 0.40, duration: 1.00 });
+        } else if (i % 2 === 0 && coin(0.25)) {
+          sched.insert(t0, shot, { inst: 3, amp: 0.30, duration: 0.15 });
+        } else if (i % 2 === 0 && coin(0.25)) {
+          sched.insert(t0, shot, { inst: 3, amp: 0.50, duration: 0.05 });
         } else if (i % 2 === 0 && coin(0.5)) {
-          sched.insert(e.playbackTime + i * 0.125, shot, { inst: 2, amp: 0.10, duration: 1.00 });
+          sched.insert(t0, shot, { inst: 2, amp: 0.10, duration: 1.00 });
         } else if (coin(0.25)) {
-          sched.insert(e.playbackTime + i * 0.125, shot, { inst: 2, amp: 0.10, duration: 0.10 });
+          sched.insert(t0, shot, { inst: 3, amp: 0.10, duration: 0.10 });
         } else if (coin(0.25)) {
-          sched.insert(e.playbackTime + i * 0.125, shot, { inst: 2, amp: 0.20, duration: 0.25 });
+          sched.insert(t0, shot, { inst: 2, amp: 0.20, duration: 0.25 });
         } else if (coin(0.8)) {
-          sched.insert(e.playbackTime + i * 0.125, shot, { inst: 2, amp: 0.05, duration: 0.85 });
+          sched.insert(t0, shot, { inst: 2, amp: 0.05, duration: 0.85 });
         }
       }
 

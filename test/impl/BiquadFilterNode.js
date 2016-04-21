@@ -72,17 +72,17 @@ describe("BiquadFilterNode", () => {
       const node2 = new BiquadFilterNode(context);
       const node3 = new AudioNode(context, { inputs: [ 1 ] });
 
-      node1.getOutput(0).enable();
-      node2.getOutput(0).enable();
+      node1.outputs[0].enable();
+      node2.outputs[0].enable();
       node2.connect(node3);
 
-      assert(node2.getInput(0).getNumberOfChannels() === 1);
-      assert(node3.getInput(0).getNumberOfChannels() === 1);
+      assert(node2.inputs[0].getNumberOfChannels() === 1);
+      assert(node3.inputs[0].getNumberOfChannels() === 1);
 
       node1.connect(node2);
 
-      assert(node2.getInput(0).getNumberOfChannels() === 4);
-      assert(node3.getInput(0).getNumberOfChannels() === 4);
+      assert(node2.inputs[0].getNumberOfChannels() === 4);
+      assert(node3.inputs[0].getNumberOfChannels() === 4);
     });
   });
 

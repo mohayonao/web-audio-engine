@@ -72,7 +72,7 @@ describe("OscillatorNode", () => {
 
       node1.connect(node2);
 
-      assert(node2.getInput(0).getNumberOfChannels() === 1);
+      assert(node2.inputs[0].getNumberOfChannels() === 1);
     });
   });
 
@@ -83,7 +83,7 @@ describe("OscillatorNode", () => {
 
     it("start - stop", () => {
       const node = new OscillatorNode(context);
-      const output = context.getDestination().getOutput().getAudioBus().getChannelData()[0];
+      const output = context.getDestination().output.bus.getChannelData()[0];
       const onended = sinon.spy();
 
       node.start((16+4)/8000);

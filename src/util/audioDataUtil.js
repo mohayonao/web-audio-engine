@@ -73,7 +73,7 @@ function toAudioBuffer(data, AudioBuffer) {
   data = toAudioData(data);
 
   const audioBuffer = new AudioBuffer({ sampleRate: data.sampleRate });
-  const audioData = (audioBuffer._impl || audioBuffer).getAudioData();
+  const audioData = (audioBuffer._impl || audioBuffer).audioData;
 
   audioData.numberOfChannels = data.numberOfChannels;
   audioData.length = data.length;

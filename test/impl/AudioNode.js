@@ -13,10 +13,6 @@ const GainNode = require("../../src/impl/GainNode");
 const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
 const testSpec = {};
 
-testSpec.context = {
-  testCase: [ { expected: context } ]
-};
-
 testSpec.numberOfInputs = {
   testCase: [ { expected: 1 } ]
 };
@@ -93,12 +89,12 @@ describe("AudioNode", () => {
     it("inputs/outputs", () => {
       const node = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
 
-      assert(node.getInput(0) instanceof AudioNodeInput);
-      assert(node.getInput(1) instanceof AudioNodeInput);
-      assert(node.getInput(0) !== node.getInput(1));
-      assert(node.getOutput(0) instanceof AudioNodeOutput);
-      assert(node.getOutput(1) instanceof AudioNodeOutput);
-      assert(node.getOutput(0) !== node.getOutput(1));
+      assert(node.inputs[0] instanceof AudioNodeInput);
+      assert(node.inputs[1] instanceof AudioNodeInput);
+      assert(node.inputs[0] !== node.inputs[1]);
+      assert(node.outputs[0] instanceof AudioNodeOutput);
+      assert(node.outputs[1] instanceof AudioNodeOutput);
+      assert(node.outputs[0] !== node.outputs[1]);
     });
   });
 
@@ -186,7 +182,7 @@ describe("AudioNode", () => {
 
     before(() => {
       node = new AudioNode(context, { outputs: [ 1 ] });
-      output = node.getOutput(0);
+      output = node.outputs[0];
 
       output.enable = sinon.spy();
       output.disable = sinon.spy();
@@ -233,8 +229,8 @@ describe("AudioNode", () => {
       const node3 = new GainNode(context);
       const param = node1.getGain();
 
-      node1.getOutput(0).enable();
-      node2.getOutput(0).enable();
+      node1.outputs[0].enable();
+      node2.outputs[0].enable();
       node1.connect(node2);
       node2.connect(node3);
 
@@ -252,8 +248,8 @@ describe("AudioNode", () => {
       const node2 = new GainNode(context);
       const node3 = new GainNode(context);
 
-      node1.getOutput(0).enable();
-      node2.getOutput(0).enable();
+      node1.outputs[0].enable();
+      node2.outputs[0].enable();
       node1.connect(node2);
       node2.connect(node3);
       node3.connect(node1);

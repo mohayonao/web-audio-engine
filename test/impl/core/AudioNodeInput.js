@@ -5,16 +5,11 @@ const deepEqual = require("deep-equal");
 const np = require("../../helpers/np");
 const attrTester = require("../../helpers/attrTester");
 const AudioNodeInput = require("../../../src/impl/core/AudioNodeInput");
-const AudioBus = require("../../../src/impl/core/AudioBus");
 const AudioContext = require("../../../src/impl/AudioContext");
 const AudioNode = require("../../../src/impl/AudioNode");
 
 const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
 const testSpec = {};
-
-testSpec.audioBus = {
-  testCase: [ { expected: value => value instanceof AudioBus } ]
-};
 
 testSpec.channelCount = {
   defaultValue: 1,
@@ -49,7 +44,7 @@ describe("AudioNodeInput", () => {
   describe("basic attributes", () => {
     attrTester.makeTests(context, {
       class: AudioNodeInput,
-      create: context => new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] }).getInput(0),
+      create: context => new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] }).inputs[0],
       testSpec
     });
   });
@@ -60,13 +55,13 @@ describe("AudioNodeInput", () => {
     beforeEach(() => {
       node1 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
       node2 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
-      input = node2.getInput(0);
+      input = node2.inputs[0];
       node1.connect(node2);
-      node1.getOutput(0).enable();
+      node1.outputs[0].enable();
     });
 
     it("input 1ch", () => {
-      node1.getOutput(0).setNumberOfChannels(1);
+      node1.outputs[0].setNumberOfChannels(1);
       node2.setChannelCount(4);
 
       node2.setChannelCountMode("max");
@@ -79,7 +74,7 @@ describe("AudioNodeInput", () => {
       assert(input.computeNumberOfChannels() === 4);
     });
     it("input 8ch", () => {
-      node1.getOutput(0).setNumberOfChannels(8);
+      node1.outputs[0].setNumberOfChannels(8);
       node2.setChannelCount(4);
 
       node2.setChannelCountMode("max");
@@ -97,7 +92,7 @@ describe("AudioNodeInput", () => {
     it("connect", () => {
       const node1 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
       const node2 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const input = node2.getInput(0);
+      const input = node2.inputs[0];
 
       assert(input.getNumberOfConnections() === 0);
 
@@ -113,7 +108,7 @@ describe("AudioNodeInput", () => {
     it("disconnect", () => {
       const node1 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
       const node2 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const input = node2.getInput(0);
+      const input = node2.inputs[0];
 
       node1.connect(node2);
       assert(input.isConnectedFrom(node1) === true);
@@ -128,7 +123,7 @@ describe("AudioNodeInput", () => {
       const node1 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
       const node2 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
       const node3 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const input = node2.getInput(0);
+      const input = node2.inputs[0];
 
       node1.connect(node2);
       assert(input.isConnectedFrom(node1) === true);
@@ -150,7 +145,7 @@ describe("AudioNodeInput", () => {
       const node1 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
       const node2 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
       const node3 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const input = node2.getInput(0);
+      const input = node2.inputs[0];
 
       node1.connect(node2);
       assert(input.isConnectedFrom(node1, 0) === true);
@@ -191,7 +186,7 @@ describe("AudioNodeInput", () => {
       const node2 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
       const node3 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
       const node4 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
-      const input = node4.getInput(0);
+      const input = node4.inputs[0];
 
       node1.connect(node2);
       node2.connect(node4);
@@ -201,11 +196,11 @@ describe("AudioNodeInput", () => {
       assert(input.getNumberOfFanOuts() === 0);
       assert(input.isEnabled() === false);
 
-      node1.getOutput(0).enable();
+      node1.outputs[0].enable();
       assert(input.getNumberOfFanOuts() === 1);
       assert(input.isEnabled() === true);
 
-      node3.getOutput(0).enable();
+      node3.outputs[0].enable();
       assert(input.getNumberOfFanOuts() === 2);
       assert(input.isEnabled() === true);
 
@@ -214,7 +209,7 @@ describe("AudioNodeInput", () => {
       assert(input.getNumberOfFanOuts() === 1);
       assert(input.isEnabled() === true);
 
-      node3.getOutput(0).disable();
+      node3.outputs[0].disable();
       assert(input.getNumberOfConnections() === 2);
       assert(input.getNumberOfFanOuts() === 0);
       assert(input.isEnabled() === false);
@@ -228,7 +223,7 @@ describe("AudioNodeInput", () => {
 
     it("misc", () => {
       const node = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
-      const input = node.getInput(0);
+      const input = node.inputs[0];
 
       assert(input.isConnectedFrom() === false);
     });
@@ -241,17 +236,17 @@ describe("AudioNodeInput", () => {
       const noise1 = np.random_sample(16);
       const noise2 = np.random_sample(16);
 
-      node1.getOutput(0).enable();
+      node1.outputs[0].enable();
       node1.connect(node2);
 
-      node1.getOutput(0).getAudioBus().getMutableData()[0].set(noise1);
-      node2.getInput(0).getAudioBus().getMutableData()[0].set(noise2);
+      node1.outputs[0].bus.getMutableData()[0].set(noise1);
+      node2.inputs[0].bus.getMutableData()[0].set(noise2);
 
-      const input = node2.getInput(0);
+      const input = node2.inputs[0];
 
       input.pull(0);
 
-      const actual = input.getAudioBus().getChannelData()[0];
+      const actual = input.bus.getChannelData()[0];
       const expected = noise1;
 
       assert(deepEqual(actual, expected));
@@ -264,20 +259,20 @@ describe("AudioNodeInput", () => {
       const noise2 = np.random_sample(16);
       const noise3 = np.random_sample(16);
 
-      node1.getOutput(0).enable();
-      node2.getOutput(0).enable();
+      node1.outputs[0].enable();
+      node2.outputs[0].enable();
       node1.connect(node3);
       node2.connect(node3);
 
-      node1.getOutput(0).getAudioBus().getMutableData()[0].set(noise1);
-      node2.getOutput(0).getAudioBus().getMutableData()[0].set(noise2);
-      node3.getInput(0).getAudioBus().getMutableData()[0].set(noise3);
+      node1.outputs[0].bus.getMutableData()[0].set(noise1);
+      node2.outputs[0].bus.getMutableData()[0].set(noise2);
+      node3.inputs[0].bus.getMutableData()[0].set(noise3);
 
-      const input = node3.getInput(0);
+      const input = node3.inputs[0];
 
       input.pull(0);
 
-      const actual = input.getAudioBus().getChannelData()[0];
+      const actual = input.bus.getChannelData()[0];
       const expected = noise1.map((_, i) => noise1[i] + noise2[i]);
 
       assert(deepEqual(actual, expected));

@@ -17,14 +17,6 @@ class AudioScheduledSourceNode extends AudioSourceNode {
   }
 
   /**
-   * not used
-   * @deprecated
-   */
-  getState() {
-    return this._state;
-  }
-
-  /**
    * @param {number} when
    */
   start(when) {

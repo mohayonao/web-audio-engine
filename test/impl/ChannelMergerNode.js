@@ -56,14 +56,14 @@ describe("ChannelMergerNode", () => {
       const node = new ChannelMergerNode(context, { numberOfInputs: 2 });
 
       assert(node.getChannelInterpretation() === "speakers");
-      assert(node.getInput(0).getChannelInterpretation() === "speakers");
-      assert(node.getInput(1).getChannelInterpretation() === "speakers");
+      assert(node.inputs[0].getChannelInterpretation() === "speakers");
+      assert(node.inputs[1].getChannelInterpretation() === "speakers");
 
       node.setChannelInterpretation("discrete");
 
       assert(node.getChannelInterpretation() === "discrete");
-      assert(node.getInput(0).getChannelInterpretation() === "discrete");
-      assert(node.getInput(1).getChannelInterpretation() === "discrete");
+      assert(node.inputs[0].getChannelInterpretation() === "discrete");
+      assert(node.inputs[1].getChannelInterpretation() === "discrete");
     });
   });
 
@@ -73,17 +73,17 @@ describe("ChannelMergerNode", () => {
       const node2 = new ChannelMergerNode(context, { numberOfInputs: 6 });
       const node3 = new AudioNode(context, { inputs: [ 1 ] });
 
-      node1.getOutput(0).enable();
-      node2.getOutput(0).enable();
+      node1.outputs[0].enable();
+      node2.outputs[0].enable();
       node2.connect(node3);
 
-      assert(node2.getInput(0).getNumberOfChannels() === 1);
-      assert(node3.getInput(0).getNumberOfChannels() === 6);
+      assert(node2.inputs[0].getNumberOfChannels() === 1);
+      assert(node3.inputs[0].getNumberOfChannels() === 6);
 
       node1.connect(node2);
 
-      assert(node2.getInput(0).getNumberOfChannels() === 1);
-      assert(node3.getInput(0).getNumberOfChannels() === 6);
+      assert(node2.inputs[0].getNumberOfChannels() === 1);
+      assert(node3.inputs[0].getNumberOfChannels() === 6);
     });
   });
 
@@ -126,12 +126,12 @@ describe("ChannelMergerNode", () => {
       node3.connect(context.getDestination());
       node1.enableOutputsIfNecessary();
       node2.enableOutputsIfNecessary();
-      node1.getOutput(0).getAudioBus().getMutableData()[0].set(noise1);
-      node2.getOutput(0).getAudioBus().getMutableData()[0].set(noise2);
+      node1.outputs[0].bus.getMutableData()[0].set(noise1);
+      node2.outputs[0].bus.getMutableData()[0].set(noise2);
 
       context.process();
 
-      const actual = node3.getOutput(0).getAudioBus().getChannelData();
+      const actual = node3.outputs[0].bus.getChannelData();
       const expected = [ noise1, noise2, np.zeros(16), np.zeros(16) ];
 
       assert(deepEqual(actual, expected));

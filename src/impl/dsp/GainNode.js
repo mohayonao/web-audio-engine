@@ -8,7 +8,7 @@ class GainNode extends AudioNode {
     const inputBus = this.inputs[0].bus;
     const outputBus = this.outputs[0].bus;
 
-    if (inputBus.isSilent()) {
+    if (inputBus.isSilent) {
       outputBus.zeros();
       return;
     }

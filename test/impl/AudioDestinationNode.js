@@ -55,12 +55,12 @@ describe("AudioDestinationNode", () => {
       const node1 = new AudioNode(context, { outputs: [ 4 ] });
       const node2 = new AudioDestinationNode(context, { numberOfChannels: 2 });
 
-      node1.getOutput(0).enable();
-      assert(node2.getInput(0).getNumberOfChannels() === 2);
+      node1.outputs[0].enable();
+      assert(node2.inputs[0].getNumberOfChannels() === 2);
 
       node1.connect(node2);
 
-      assert(node2.getInput(0).getNumberOfChannels() === 2);
+      assert(node2.inputs[0].getNumberOfChannels() === 2);
     });
   });
 
@@ -68,9 +68,9 @@ describe("AudioDestinationNode", () => {
     it("silent", () => {
       const node1 = new AudioNode(context, { outputs: [ 2 ] });
       const node2 = new AudioDestinationNode(context, { numberOfChannels: 2 });
-      const outputBus = node2.getOutput(0).getAudioBus();
+      const outputBus = node2.output.bus;
 
-      node1.getOutput(0).getAudioBus().zeros();
+      node1.outputs[0].bus.zeros();
       node1.enableOutputsIfNecessary();
       node1.connect(node2);
 
@@ -78,7 +78,7 @@ describe("AudioDestinationNode", () => {
 
       node2.processIfNecessary(0);
 
-      assert(outputBus.isSilent() === true);
+      assert(outputBus.isSilent === true);
       assert(deepEqual(outputBus.getChannelData()[0], np.zeros(16)));
       assert(deepEqual(outputBus.getChannelData()[1], np.zeros(16)));
     });
@@ -87,16 +87,16 @@ describe("AudioDestinationNode", () => {
       const node2 = new AudioDestinationNode(context, { numberOfChannels: 2 });
       const noise1 = np.random_sample(16);
       const noise2 = np.random_sample(16);
-      const outputBus = node2.getOutput(0).getAudioBus();
+      const outputBus = node2.output.bus;
 
-      node1.getOutput(0).getAudioBus().getMutableData()[0].set(noise1);
-      node1.getOutput(0).getAudioBus().getMutableData()[1].set(noise2);
+      node1.outputs[0].bus.getMutableData()[0].set(noise1);
+      node1.outputs[0].bus.getMutableData()[1].set(noise2);
       node1.enableOutputsIfNecessary();
       node1.connect(node2);
 
       node2.processIfNecessary(0);
 
-      assert(outputBus.isSilent() === false);
+      assert(outputBus.isSilent === false);
       assert(deepEqual(outputBus.getChannelData()[0], noise1));
       assert(deepEqual(outputBus.getChannelData()[1], noise2));
     });

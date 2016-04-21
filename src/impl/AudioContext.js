@@ -1,8 +1,8 @@
 "use strict";
 
 const assert = require("assert");
-const config = require("../config");
 const util = require("../util");
+const config = require("../config");
 const EventTarget = require("./EventTarget");
 const AudioDestinationNode = require("./AudioDestinationNode");
 const AudioListener = require("./AudioListener");
@@ -21,13 +21,17 @@ class AudioContext extends EventTarget {
    * @param {number} opts.numberOfChannels
    */
   constructor(opts) {
+    opts = opts || /* istanbul ignore next */ {};
+
     super();
 
-    opts = Object.assign({}, config, opts);
+    let sampleRate = util.defaults(opts.sampleRate, config.sampleRate);
+    let blockSize = util.defaults(opts.blockSize, config.blockSize);
+    let numberOfChannels = util.defaults(opts.channels || opts.numberOfChannels, config.numberOfChannels);
 
-    const sampleRate = util.toValidSampleRate(opts.sampleRate);
-    const blockSize = util.toValidBlockSize(opts.blockSize, sampleRate);
-    const numberOfChannels = util.toValidNumberOfChannels(opts.numberOfChannels);
+    sampleRate = util.toValidSampleRate(opts.sampleRate);
+    blockSize = util.toValidBlockSize(opts.blockSize, sampleRate);
+    numberOfChannels = util.toValidNumberOfChannels(opts.numberOfChannels);
 
     this.sampleRate = sampleRate;
     this.blockSize = blockSize;
@@ -212,7 +216,7 @@ class AudioContext extends EventTarget {
       outputBus.zeros();
     }
 
-    return outputBus.getAudioData();
+    return outputBus.audioData;
   }
 
   /**

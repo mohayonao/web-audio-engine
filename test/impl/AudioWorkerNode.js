@@ -60,14 +60,14 @@ describe("AudioWorkerNode", () => {
       const node = new AudioWorkerNode(context, { worker, numberOfInputs: [ 1, 1 ], numberOfOutputs: [ 1, 2 ] });
 
       assert(node.getChannelInterpretation() === "speakers");
-      assert(node.getInput(0).getChannelInterpretation() === "speakers");
-      assert(node.getInput(1).getChannelInterpretation() === "speakers");
+      assert(node.inputs[0].getChannelInterpretation() === "speakers");
+      assert(node.inputs[1].getChannelInterpretation() === "speakers");
 
       node.setChannelInterpretation("discrete");
 
       assert(node.getChannelInterpretation() === "discrete");
-      assert(node.getInput(0).getChannelInterpretation() === "discrete");
-      assert(node.getInput(1).getChannelInterpretation() === "discrete");
+      assert(node.inputs[0].getChannelInterpretation() === "discrete");
+      assert(node.inputs[1].getChannelInterpretation() === "discrete");
     });
   });
 
@@ -78,20 +78,20 @@ describe("AudioWorkerNode", () => {
       const node3 = new AudioNode(context, { inputs: [ 1 ] });
       const node4 = new AudioNode(context, { inputs: [ 1 ] });
 
-      node1.getOutput(0).enable();
-      node2.getOutput(0).enable();
+      node1.outputs[0].enable();
+      node2.outputs[0].enable();
       node2.connect(node3, 0);
       node2.connect(node4, 1);
 
-      assert(node2.getInput(0).getNumberOfChannels() === 4);
-      assert(node3.getInput(0).getNumberOfChannels() === 1);
-      assert(node4.getInput(0).getNumberOfChannels() === 2);
+      assert(node2.inputs[0].getNumberOfChannels() === 4);
+      assert(node3.inputs[0].getNumberOfChannels() === 1);
+      assert(node4.inputs[0].getNumberOfChannels() === 2);
 
       node1.connect(node2);
 
-      assert(node2.getInput(0).getNumberOfChannels() === 4);
-      assert(node3.getInput(0).getNumberOfChannels() === 1);
-      assert(node4.getInput(0).getNumberOfChannels() === 2);
+      assert(node2.inputs[0].getNumberOfChannels() === 4);
+      assert(node3.inputs[0].getNumberOfChannels() === 1);
+      assert(node4.inputs[0].getNumberOfChannels() === 2);
     });
   });
 

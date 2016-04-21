@@ -1,6 +1,7 @@
 "use strict";
 
 const util = require("../util");
+const config = require("../config");
 const AudioContext = require("../api/AudioContext");
 const DSPAlgorithm = [];
 
@@ -19,9 +20,9 @@ class WebAudioContext extends AudioContext {
     let destination = opts.destination || opts.context.destination;
     let context = destination.context;
     let sampleRate = context.sampleRate;
-    let blockSize = util.defaults(opts.blockSize, 128);
-    let numberOfChannels = util.defaults(opts.numberOfChannels, 2);
-    let bufferSize = util.defaults(bufferSize, 1024);
+    let blockSize = util.defaults(opts.blockSize, config.blockSize);
+    let numberOfChannels = util.defaults(opts.numberOfChannels, config.numberOfChannels);
+    let bufferSize = util.defaults(opts.bufferSize, 1024);
 
     blockSize = util.toValidBlockSize(blockSize);
     numberOfChannels = util.toValidNumberOfChannels(numberOfChannels);

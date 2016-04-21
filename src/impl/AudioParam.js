@@ -360,21 +360,6 @@ class AudioParam {
   }
 
   /**
-   * @return {AudioContext}
-   */
-  getContext() {
-    return this.context;
-  }
-
-  /**
-   * @param {number} channel
-   * @return {AudioNodeInput}
-   */
-  getInput(channel) {
-    return this.inputs[channel|0];
-  }
-
-  /**
    * @return {string}
    */
   getRate() {

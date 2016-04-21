@@ -29,14 +29,6 @@ class AudioNodeOutput {
   }
 
   /**
-   * @return {AudioBus}
-   * @deprecated use `.bus` directly
-   */
-  getAudioBus() {
-    return this.bus;
-  }
-
-  /**
    * @return {number}
    */
   getNumberOfChannels() {
@@ -111,7 +103,7 @@ class AudioNodeOutput {
    * @param {number}               index
    */
   connect(destination, input) {
-    const target = destination.getInput(input);
+    const target = destination.inputs[input|0];
 
     if (this._inputs.indexOf(target) === -1) {
       this._inputs.push(target);

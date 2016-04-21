@@ -3,6 +3,9 @@
 const util = require("../util");
 const AudioData = require("./core/AudioData");
 
+/**
+ * @prop {AudioData} audioData
+ */
 class AudioBuffer {
   /**
    * @param {AudioContext} context
@@ -22,49 +25,42 @@ class AudioBuffer {
     length = Math.max(0, util.toNumber(length));
     sampleRate = util.toValidSampleRate(sampleRate);
 
-    this._audioData = new AudioData(numberOfChannels, length, sampleRate);
+    this.audioData = new AudioData(numberOfChannels, length, sampleRate);
   }
 
   /**
    * @return {number}
    */
   getSampleRate() {
-    return this._audioData.sampleRate;
+    return this.audioData.sampleRate;
   }
 
   /**
    * @return {number}
    */
   getLength() {
-    return this._audioData.length;
+    return this.audioData.length;
   }
 
   /**
    * @return {number}
    */
   getDuration() {
-    return this._audioData.length / this._audioData.sampleRate;
+    return this.audioData.length / this.audioData.sampleRate;
   }
 
   /**
    * @return {number}
    */
   getNumberOfChannels() {
-    return this._audioData.numberOfChannels;
-  }
-
-  /**
-   * @return {AudioData}
-   */
-  getAudioData() {
-    return this._audioData;
+    return this.audioData.numberOfChannels;
   }
 
   /**
    * @return {Float32Array}
    */
   getChannelData(channel) {
-    return this._audioData.channelData[channel|0];
+    return this.audioData.channelData[channel|0];
   }
 
   /**
@@ -73,7 +69,7 @@ class AudioBuffer {
    * @param {number}       startInChannel
    */
   copyFromChannel(destination, channelNumber, startInChannel) {
-    const source = this._audioData.channelData[channelNumber|0];
+    const source = this.audioData.channelData[channelNumber|0];
 
     startInChannel = startInChannel|0;
 
@@ -86,7 +82,7 @@ class AudioBuffer {
    * @param {number}       startInChannel
    */
   copyToChannel(source, channelNumber, startInChannel) {
-    const destination = this._audioData.channelData[channelNumber|0];
+    const destination = this.audioData.channelData[channelNumber|0];
 
     startInChannel = startInChannel|0;
 
