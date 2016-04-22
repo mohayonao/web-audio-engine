@@ -1,8 +1,6 @@
 "use strict";
 
-const AudioNode = require("../AudioNode");
-
-class WaveShaperNode extends AudioNode {
+const WaveShaperNodeDSP = {
   dspProcess() {
     const inputBus = this.inputs[0].bus;
     const outputBus = this.outputs[0].bus;
@@ -23,7 +21,7 @@ class WaveShaperNode extends AudioNode {
         outputs[ch][i] = this.dspApplyCurve(inputs[ch][i], curve);
       }
     }
-  }
+  },
 
   dspApplyCurve(x, curve) {
     x = Math.max(-1, Math.min(x, 1));
@@ -43,6 +41,6 @@ class WaveShaperNode extends AudioNode {
 
     return y0 + a * (y1 - y0);
   }
-}
+};
 
-module.exports = WaveShaperNode;
+module.exports = WaveShaperNodeDSP;

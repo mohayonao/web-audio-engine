@@ -1,7 +1,6 @@
 "use strict";
 
 const assert = require("assert");
-const util = require("../util");
 const AudioNode = require("./AudioNode");
 const BiquadFilterNodeDSP = require("./dsp/BiquadFilterNode");
 
@@ -151,4 +150,6 @@ class BiquadFilterNode extends AudioNode {
   }
 }
 
-module.exports = util.mixin(BiquadFilterNode, BiquadFilterNodeDSP);
+Object.assign(BiquadFilterNode.prototype, BiquadFilterNodeDSP);
+
+module.exports = BiquadFilterNode;

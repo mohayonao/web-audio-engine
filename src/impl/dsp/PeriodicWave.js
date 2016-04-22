@@ -2,10 +2,10 @@
 
 const WAVE_TABLE_LENGTH = 8192;
 
-class PeriodicWave {
+const PeriodicWaveDSP = {
   dspInit() {
     this._waveTable = null;
-  }
+  },
 
   dspBuildWaveTable() {
     if (this._waveTable !== null) {
@@ -40,6 +40,6 @@ class PeriodicWave {
 
     return waveTable;
   }
-}
+};
 
-module.exports = PeriodicWave;
+module.exports = PeriodicWaveDSP;

@@ -1,6 +1,5 @@
 "use strict";
 
-const util = require("../util");
 const BasePannerNode = require("./BasePannerNode");
 const PannerNodeDSP = require("./dsp/PannerNode");
 
@@ -43,4 +42,6 @@ class PannerNode extends BasePannerNode {
   }
 }
 
-module.exports = util.mixin(PannerNode, PannerNodeDSP);
+Object.assign(PannerNode.prototype, PannerNodeDSP);
+
+module.exports = PannerNode;

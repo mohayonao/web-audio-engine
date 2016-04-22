@@ -1,7 +1,6 @@
 "use strict";
 
 const assert = require("assert");
-const AudioNode = require("../AudioNode");
 
 const LOWPASS = 0;
 const HIGHPASS = 1;
@@ -15,7 +14,7 @@ const ALLPASS = 7;
 const FilterTypes = [ LOWPASS, HIGHPASS, BANDPASS, LOWSHELF, HIGHSHELF, PEAKING, NOTCH, ALLPASS ];
 const computeCoefficients = {};
 
-class BiquadFilterNode extends AudioNode {
+const BiquadFilterNodeDSP = {
   dspInit() {
     this._kernels = [];
     this._initCoefficients = false;
@@ -24,7 +23,7 @@ class BiquadFilterNode extends AudioNode {
     this._prevDetune = 0;
     this._prevQ = 0;
     this._prevGain = 0;
-  }
+  },
 
   dspSetNumberOfChannels(numberOfChannels) {
     if (numberOfChannels < this._kernels.length) {
@@ -35,7 +34,7 @@ class BiquadFilterNode extends AudioNode {
       }
     }
     assert(numberOfChannels === this._kernels.length);
-  }
+  },
 
   dspProcess() {
     const inputs = this.inputs[0].bus.getChannelData();
@@ -58,7 +57,7 @@ class BiquadFilterNode extends AudioNode {
         kernels[i].process(inputs[i], outputs[i], inNumSamples);
       }
     }
-  }
+  },
 
   dspUpdateCoefficients() {
     const frequency = this._frequency.getValue();
@@ -81,7 +80,7 @@ class BiquadFilterNode extends AudioNode {
 
     return true;
   }
-}
+};
 
 class BiquadFilterKernel {
   constructor() {
@@ -408,14 +407,14 @@ function flushDenormalFloatToZero(f) {
   return (Math.abs(f) < 1.175494e-38) ? 0.0 : f;
 }
 
-BiquadFilterNode.FilterTypes = FilterTypes;
-BiquadFilterNode.LOWPASS = LOWPASS;
-BiquadFilterNode.HIGHPASS = HIGHPASS;
-BiquadFilterNode.BANDPASS = BANDPASS;
-BiquadFilterNode.LOWSHELF = LOWSHELF;
-BiquadFilterNode.HIGHSHELF = HIGHSHELF;
-BiquadFilterNode.PEAKING = PEAKING;
-BiquadFilterNode.NOTCH = NOTCH;
-BiquadFilterNode.ALLPASS = ALLPASS;
+BiquadFilterNodeDSP.FilterTypes = FilterTypes;
+BiquadFilterNodeDSP.LOWPASS = LOWPASS;
+BiquadFilterNodeDSP.HIGHPASS = HIGHPASS;
+BiquadFilterNodeDSP.BANDPASS = BANDPASS;
+BiquadFilterNodeDSP.LOWSHELF = LOWSHELF;
+BiquadFilterNodeDSP.HIGHSHELF = HIGHSHELF;
+BiquadFilterNodeDSP.PEAKING = PEAKING;
+BiquadFilterNodeDSP.NOTCH = NOTCH;
+BiquadFilterNodeDSP.ALLPASS = ALLPASS;
 
-module.exports = BiquadFilterNode;
+module.exports = BiquadFilterNodeDSP;

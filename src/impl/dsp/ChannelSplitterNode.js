@@ -1,8 +1,6 @@
 "use strict";
 
-const AudioNode = require("../AudioNode");
-
-class ChannelSplitterNode extends AudioNode {
+const ChannelSplitterNodeDSP = {
   dspProcess() {
     const inputBus = this.inputs[0].bus;
     const outputs = this.outputs;
@@ -25,6 +23,6 @@ class ChannelSplitterNode extends AudioNode {
       }
     }
   }
-}
+};
 
-module.exports = ChannelSplitterNode;
+module.exports = ChannelSplitterNodeDSP;

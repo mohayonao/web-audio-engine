@@ -52,4 +52,6 @@ class AudioDestinationNode extends AudioNode {
   }
 }
 
-module.exports = util.mixin(AudioDestinationNode, AudioDestinationNodeDSP);
+Object.assign(AudioDestinationNode.prototype, AudioDestinationNodeDSP);
+
+module.exports = AudioDestinationNode;

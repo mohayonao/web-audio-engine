@@ -1,6 +1,5 @@
 "use strict";
 
-const util = require("../util");
 const AudioNode = require("./AudioNode");
 const DynamicsCompressorNodeDSP = require("./dsp/DynamicsCompressorNode");
 
@@ -66,4 +65,6 @@ class DynamicsCompressorNode extends AudioNode {
   }
 }
 
-module.exports = util.mixin(DynamicsCompressorNode, DynamicsCompressorNodeDSP);
+Object.assign(DynamicsCompressorNode.prototype, DynamicsCompressorNodeDSP);
+
+module.exports = DynamicsCompressorNode;

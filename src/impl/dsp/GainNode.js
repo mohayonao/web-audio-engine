@@ -1,9 +1,8 @@
 "use strict";
 
-const AudioNode = require("../AudioNode");
 const DSPAlgorithm = {};
 
-class GainNode extends AudioNode {
+const GainNodeDSP = {
   dspProcess() {
     const inputBus = this.inputs[0].bus;
     const outputBus = this.outputs[0].bus;
@@ -46,7 +45,7 @@ class GainNode extends AudioNode {
 
     dsp(inputs, outputs, gainValue, this.blockSize);
   }
-}
+};
 
 function selectAlgorithm(numberOfChannels, base) {
   const algorithmIndex = numberOfChannels + base;
@@ -120,4 +119,4 @@ DSPAlgorithm[2002] = (inputs, outputs, gainValue, blockSize) => {
   }
 };
 
-module.exports = GainNode;
+module.exports = GainNodeDSP;

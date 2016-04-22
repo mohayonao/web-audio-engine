@@ -499,4 +499,6 @@ class AudioParam {
   }
 }
 
-module.exports = util.mixin(AudioParam, AudioParamDSP);
+Object.assign(AudioParam.prototype, AudioParamDSP);
+
+module.exports = AudioParam;

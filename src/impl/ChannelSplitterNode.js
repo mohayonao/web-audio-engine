@@ -26,4 +26,6 @@ class ChannelSplitterNode extends AudioNode {
   }
 }
 
-module.exports = util.mixin(ChannelSplitterNode, ChannelSplitterNodeDSP);
+Object.assign(ChannelSplitterNode.prototype, ChannelSplitterNodeDSP);
+
+module.exports = ChannelSplitterNode;

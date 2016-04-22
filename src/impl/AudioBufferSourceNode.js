@@ -119,4 +119,6 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
   }
 }
 
-module.exports = util.mixin(AudioBufferSourceNode, AudioBufferSourceNodeDSP);
+Object.assign(AudioBufferSourceNode.prototype, AudioBufferSourceNodeDSP);
+
+module.exports = AudioBufferSourceNode;
