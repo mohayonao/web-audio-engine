@@ -83,4 +83,6 @@ class ConvolverNode extends AudioNode {
   }
 }
 
-module.exports = util.mixin(ConvolverNode, ConvolverNodeDSP);
+Object.assign(ConvolverNode.prototype, ConvolverNodeDSP);
+
+module.exports = ConvolverNode;

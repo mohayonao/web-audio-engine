@@ -11,7 +11,7 @@ const SET_VALUE_CURVE_AT_TIME = 5;
 const CONTROL = 1;
 const AUDIO = 2;
 
-class AudioParam {
+const AudioParamDSP = {
   dspInit() {
     this._prevValue = NaN;
     this._hasSampleAccurateValues = false;
@@ -19,7 +19,7 @@ class AudioParam {
     this._expectedCurrentSample = -1;
     this._remainSamples = 0;
     this._schedParams = {};
-  }
+  },
 
   dspProcess(currentSample) {
     const input = this.inputs[0];
@@ -48,7 +48,7 @@ class AudioParam {
       /* istanbul ignore next */
       assert(!"NOT REACHED");
     }
-  }
+  },
 
   dspStaticValue() {
     const value = this._value;
@@ -63,7 +63,7 @@ class AudioParam {
     }
 
     this._hasSampleAccurateValues = false;
-  }
+  },
 
   dspInputAndOffset(currentSample, inputBus) {
     const blockSize = this.blockSize;
@@ -82,7 +82,7 @@ class AudioParam {
 
     this._prevValue = NaN;
     this._hasSampleAccurateValues = true;
-  }
+  },
 
   dspEvents(currentSample) {
     const outputBus = this.outputBus;
@@ -92,7 +92,7 @@ class AudioParam {
 
     this._prevValue = NaN;
     this._hasSampleAccurateValues = true;
-  }
+  },
 
   dspEventsAndInput(currentSample, inputBus) {
     const blockSize = this.blockSize;
@@ -108,7 +108,7 @@ class AudioParam {
 
     this._prevValue = NaN;
     this._hasSampleAccurateValues = true;
-  }
+  },
 
   dspValuesForTimeRange(currentSample, output) {
     const blockSize = this.blockSize;
@@ -319,14 +319,14 @@ class AudioParam {
     this._remainSamples = remainSamples;
     this._expectedCurrentSample = nextSample;
   }
-}
+};
 
-AudioParam.SET_VALUE_AT_TIME = SET_VALUE_AT_TIME;
-AudioParam.LINEAR_RAMP_TO_VALUE_AT_TIME = LINEAR_RAMP_TO_VALUE_AT_TIME;
-AudioParam.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME = EXPONENTIAL_RAMP_TO_VALUE_AT_TIME;
-AudioParam.SET_TARGET_AT_TIME = SET_TARGET_AT_TIME;
-AudioParam.SET_VALUE_CURVE_AT_TIME = SET_VALUE_CURVE_AT_TIME;
-AudioParam.CONTROL = CONTROL;
-AudioParam.AUDIO = AUDIO;
+AudioParamDSP.SET_VALUE_AT_TIME = SET_VALUE_AT_TIME;
+AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME = LINEAR_RAMP_TO_VALUE_AT_TIME;
+AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME = EXPONENTIAL_RAMP_TO_VALUE_AT_TIME;
+AudioParamDSP.SET_TARGET_AT_TIME = SET_TARGET_AT_TIME;
+AudioParamDSP.SET_VALUE_CURVE_AT_TIME = SET_VALUE_CURVE_AT_TIME;
+AudioParamDSP.CONTROL = CONTROL;
+AudioParamDSP.AUDIO = AUDIO;
 
-module.exports = AudioParam;
+module.exports = AudioParamDSP;

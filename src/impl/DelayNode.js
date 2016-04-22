@@ -57,4 +57,6 @@ class DelayNode extends AudioNode {
   }
 }
 
-module.exports = util.mixin(DelayNode, DelayNodeDSP);
+Object.assign(DelayNode.prototype, DelayNodeDSP);
+
+module.exports = DelayNode;

@@ -1,6 +1,5 @@
 "use strict";
 
-const util = require("../util");
 const PeriodicWaveDSP = require("./dsp/PeriodicWave");
 
 class PeriodicWave {
@@ -110,4 +109,6 @@ class PeriodicWave {
 
 PeriodicWave.BasicWaveForms = [ "sine", "sawtooth", "triangle", "square" ];
 
-module.exports = util.mixin(PeriodicWave, PeriodicWaveDSP);
+Object.assign(PeriodicWave.prototype, PeriodicWaveDSP);
+
+module.exports = PeriodicWave;

@@ -139,4 +139,6 @@ class AnalyserNode extends AudioNode {
   }
 }
 
-module.exports = util.mixin(AnalyserNode, AnalyserNodeDSP);
+Object.assign(AnalyserNode.prototype, AnalyserNodeDSP);
+
+module.exports = AnalyserNode;

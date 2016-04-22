@@ -1,8 +1,6 @@
 "use strict";
 
-const BasePannerNode = require("../BasePannerNode");
-
-class StereoPannerNode extends BasePannerNode {
+const StereoPannerNodeDSP = {
   dspProcess() {
     const inputBus = this.inputs[0].bus;
     const outputBus = this.outputs[0].bus;
@@ -19,7 +17,7 @@ class StereoPannerNode extends BasePannerNode {
     } else {
       this.dspStaticValue(inputBus, outputBus, panParam.getValue(), this.blockSize);
     }
-  }
+  },
 
   dspSampleAccurateValues(inputBus, outputBus, panValues, blockSize) {
     const outputs = outputBus.getMutableData();
@@ -55,7 +53,7 @@ class StereoPannerNode extends BasePannerNode {
         }
       }
     }
-  }
+  },
 
   dspStaticValue(inputBus, outputBus, panValue, blockSize) {
     const outputs = outputBus.getMutableData();
@@ -92,6 +90,6 @@ class StereoPannerNode extends BasePannerNode {
       }
     }
   }
-}
+};
 
-module.exports = StereoPannerNode;
+module.exports = StereoPannerNodeDSP;

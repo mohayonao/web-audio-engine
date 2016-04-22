@@ -72,4 +72,6 @@ class ChannelMergerNode extends AudioNode {
   }
 }
 
-module.exports = util.mixin(ChannelMergerNode, ChannelMergerNodeDSP);
+Object.assign(ChannelMergerNode.prototype, ChannelMergerNodeDSP);
+
+module.exports = ChannelMergerNode;

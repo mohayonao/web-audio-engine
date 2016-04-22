@@ -1,6 +1,5 @@
 "use strict";
 
-const util = require("../util");
 const AudioNode = require("./AudioNode");
 const WaveShaperNodeDSP = require("./dsp/WaveShaperNode");
 
@@ -63,4 +62,6 @@ class WaveShaperNode extends AudioNode {
   }
 }
 
-module.exports = util.mixin(WaveShaperNode, WaveShaperNodeDSP);
+Object.assign(WaveShaperNode.prototype, WaveShaperNodeDSP);
+
+module.exports = WaveShaperNode;

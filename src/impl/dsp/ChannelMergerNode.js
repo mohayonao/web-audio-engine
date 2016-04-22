@@ -1,8 +1,6 @@
 "use strict";
 
-const AudioNode = require("../AudioNode");
-
-class ChannelMergerNode extends AudioNode {
+const ChannelMergerNodeDSP = {
   dspProcess() {
     const outputBus = this.outputs[0].bus;
     const inputBuses = this.inputs.map(input => input.bus);
@@ -18,6 +16,6 @@ class ChannelMergerNode extends AudioNode {
       }
     }
   }
-}
+};
 
-module.exports = ChannelMergerNode;
+module.exports = ChannelMergerNodeDSP;

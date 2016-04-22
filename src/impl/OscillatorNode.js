@@ -97,4 +97,6 @@ class OscillatorNode extends AudioScheduledSourceNode {
   }
 }
 
-module.exports = util.mixin(OscillatorNode, OscillatorNodeDSP);
+Object.assign(OscillatorNode.prototype, OscillatorNodeDSP);
+
+module.exports = OscillatorNode;

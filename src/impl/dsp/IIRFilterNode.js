@@ -1,11 +1,9 @@
 "use strict";
 
-const AudioNode = require("../AudioNode");
-
-class IIRFilterNode extends AudioNode {
+const IIRFilterNodeDSP = {
   dspProcess() {
     this.outputs[0].bus.copyFrom(this.inputs[0].bus);
   }
-}
+};
 
-module.exports = IIRFilterNode;
+module.exports = IIRFilterNodeDSP;

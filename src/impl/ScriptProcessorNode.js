@@ -65,4 +65,6 @@ class ScriptProcessorNode extends AudioNode {
   }
 }
 
-module.exports = util.mixin(ScriptProcessorNode, ScriptProcessorNodeDSP);
+Object.assign(ScriptProcessorNode.prototype, ScriptProcessorNodeDSP);
+
+module.exports = ScriptProcessorNode;

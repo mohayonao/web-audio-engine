@@ -1,9 +1,8 @@
 "use strict";
 
-const AudioNode = require("../AudioNode");
 const AudioBus = require("../core/AudioBus");
 
-class DelayNode extends AudioNode {
+const DelayNodeDSP = {
   dspInit(maxDelayTime) {
     const frameToDelay = computeFrameToDelay(maxDelayTime, this.sampleRate, this.blockSize);
 
@@ -11,11 +10,11 @@ class DelayNode extends AudioNode {
     this._delayBusLength = frameToDelay;
     this._delayIndex = 0;
     this._delayIndexes = new Float32Array(this.blockSize);
-  }
+  },
 
   dspSetNumberOfChannels(numberOfChannels) {
     this._delayBus.setNumberOfChannels(numberOfChannels);
-  }
+  },
 
   dspProcess() {
     const delayBus = this._delayBus;
@@ -42,7 +41,7 @@ class DelayNode extends AudioNode {
     if (this._delayIndex === this._delayBusLength) {
       this._delayIndex = 0;
     }
-  }
+  },
 
   dspUpdateDelayIndexes(delayTimeValues) {
     const baseIndex = this._delayIndex;
@@ -52,7 +51,7 @@ class DelayNode extends AudioNode {
     for (let i = 0, imax = delayTimeValues.length; i < imax; i++) {
       delayIndexes[i] = (baseIndex + i) - (delayTimeValues[i] * sampleRate);
     }
-  }
+  },
 
   dspKernelProcess(delayBuffer, output, delayIndexes, inNumSamples) {
     const length = delayBuffer.length;
@@ -74,7 +73,7 @@ class DelayNode extends AudioNode {
       }
     }
   }
-}
+};
 
 function tt(index, length) {
   if (index < 0) {
@@ -96,4 +95,4 @@ function computeFrameToDelay(delayTime, sampleRate, blockSize) {
   return Math.ceil(delayTime * sampleRate / blockSize) * blockSize + blockSize;
 }
 
-module.exports = DelayNode;
+module.exports = DelayNodeDSP;

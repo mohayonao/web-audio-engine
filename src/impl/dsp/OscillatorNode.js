@@ -1,11 +1,9 @@
 "use strict";
 
-const AudioScheduledSourceNode = require("../AudioScheduledSourceNode");
-
-class OscillatorNode extends AudioScheduledSourceNode {
+const OscillatorNodeDSP = {
   dspInit() {
     this._phase = 0;
-  }
+  },
 
   dspProcess(currentSample) {
     const nextSample = currentSample + this.blockSize;
@@ -43,7 +41,7 @@ class OscillatorNode extends AudioScheduledSourceNode {
         this.dispatchEvent({ type: "ended" });
       });
     }
-  }
+  },
 
   dspSine(output, writeIndex, blockSize, sampleRate) {
     const frequency = this._frequency;
@@ -80,7 +78,7 @@ class OscillatorNode extends AudioScheduledSourceNode {
     this._phase = phase;
 
     return writeIndex;
-  }
+  },
 
   dspWave(output, writeIndex, blockSize, sampleRate) {
     const frequency = this._frequency;
@@ -127,6 +125,6 @@ class OscillatorNode extends AudioScheduledSourceNode {
 
     return writeIndex;
   }
-}
+};
 
-module.exports = OscillatorNode;
+module.exports = OscillatorNodeDSP;

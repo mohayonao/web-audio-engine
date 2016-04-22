@@ -1,18 +1,16 @@
 "use strict";
 
-const AudioScheduledSourceNode = require("../AudioScheduledSourceNode");
-
-class AudioBufferSourceNode extends AudioScheduledSourceNode {
+const AudioBufferSourceNodeDSP = {
   dspInit() {
     this._phase = 0;
-  }
+  },
 
   dspStart() {
     const bufferSampleRate = this._audioData.sampleRate;
     const bufferDuration = this._audioData.length / bufferSampleRate;
 
     this._phase = Math.max(0, Math.min(this._offset, bufferDuration)) * bufferSampleRate;
-  }
+  },
 
   dspProcess(currentSample) {
     const nextSample = currentSample + this.blockSize;
@@ -50,7 +48,7 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
         this.dispatchEvent({ type: "ended" });
       });
     }
-  }
+  },
 
   dspBufferRendering(outputs, writeIndex, inNumSamples, sampleRate) {
     const playbackRateValues = this._playbackRate.getSampleAccurateValues();
@@ -96,6 +94,6 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
 
     return writeIndex;
   }
-}
+};
 
-module.exports = AudioBufferSourceNode;
+module.exports = AudioBufferSourceNodeDSP;

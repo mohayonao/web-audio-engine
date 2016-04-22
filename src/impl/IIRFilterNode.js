@@ -1,6 +1,5 @@
 "use strict";
 
-const util = require("../util");
 const AudioNode = require("./AudioNode");
 const IIRFilterNodeDSP = require("./dsp/IIRFilterNode");
 
@@ -59,4 +58,6 @@ class IIRFilterNode extends AudioNode {
   }
 }
 
-module.exports = util.mixin(IIRFilterNode, IIRFilterNodeDSP);
+Object.assign(IIRFilterNode.prototype, IIRFilterNodeDSP);
+
+module.exports = IIRFilterNode;

@@ -1,15 +1,14 @@
 "use strict";
 
-const AudioNode = require("../AudioNode");
 const AudioBuffer = require("../AudioBuffer");
 
-class ScriptProcessorNode extends AudioNode {
+const ScriptProcessorNodeDSP = {
   dspInit() {
     this._eventItem = null;
     this._inputChannelData = null;
     this._outputChannelData = null;
     this._writeIndex = 0;
-  }
+  },
 
   dspSetEventItem(eventItem) {
     const numberOfInputChannels = this.inputs[0].getNumberOfChannels();
@@ -28,7 +27,7 @@ class ScriptProcessorNode extends AudioNode {
     this._outputChannelData = outputBuffer.audioData.channelData;
 
     this._eventItem = eventItem;
-  }
+  },
 
   dspProcess(currentSample) {
     const inputs = this.inputs[0].bus.getChannelData();
@@ -64,6 +63,6 @@ class ScriptProcessorNode extends AudioNode {
       this._writeIndex = 0;
     }
   }
-}
+};
 
-module.exports = ScriptProcessorNode;
+module.exports = ScriptProcessorNodeDSP;
