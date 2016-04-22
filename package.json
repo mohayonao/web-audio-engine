@@ -55,6 +55,7 @@
     "build:to5": "mkdir -p lib && BABEL_ENV=production babel --out-dir=lib src",
     "clean": "rm -rf lib coverage .nyc_output npm-debug.log",
     "cover": "BABEL_ENV=coverage nyc --reporter text --reporter html mocha --require babel-register",
+    "gh-pages": "git checkout gh-pages && git merge master && git push origin gh-pages && git checkout master",
     "lint": "eslint src test",
     "mocha": "mocha",
     "postversion": "git push && git push --tags && npm run clean",
