@@ -2603,7 +2603,7 @@ var OfflineAudioContext = function (_AudioContext) {
 function createRenderingAudioData(numberOfChannels, length, sampleRate, blockSize) {
   length = Math.ceil(length / blockSize) * blockSize;
 
-  var channelData = new Array(numberOfChannels).fill().map(function () {
+  var channelData = Array.from({ length: numberOfChannels }, function () {
     return new Float32Array(length);
   });
 
@@ -2756,7 +2756,7 @@ var RenderingAudioContext = function (_AudioContext) {
       var iterations = Math.ceil(duration * this.sampleRate / blockSize);
       var bufferLength = blockSize * iterations;
       var numberOfChannels = this._format.numberOfChannels;
-      var buffers = new Array(numberOfChannels).fill().map(function () {
+      var buffers = Array.from({ length: numberOfChannels }, function () {
         return new Float32Array(bufferLength);
       });
 
@@ -2787,7 +2787,7 @@ var RenderingAudioContext = function (_AudioContext) {
         return length + buffers[0].length;
       }, 0);
       var sampleRate = this._format.sampleRate;
-      var channelData = new Array(numberOfChannels).fill().map(function () {
+      var channelData = Array.from({ length: numberOfChannels }, function () {
         return new Float32Array(length);
       });
       var audioData = { numberOfChannels: numberOfChannels, length: length, sampleRate: sampleRate, channelData: channelData };
@@ -8012,8 +8012,8 @@ function AudioData(numberOfChannels, length, sampleRate) {
   this.numberOfChannels = numberOfChannels | 0;
   this.length = length | 0;
   this.sampleRate = sampleRate | 0;
-  this.channelData = new Array(this.numberOfChannels).fill().map(function () {
-    return new Float32Array(_this.length).fill(0);
+  this.channelData = Array.from({ length: this.numberOfChannels }, function () {
+    return new Float32Array(_this.length);
   });
 };
 
@@ -10307,7 +10307,7 @@ function toAudioData(data) {
   if (isAudioBuffer(data)) {
     var _numberOfChannels = data.numberOfChannels;
     var _sampleRate = data.sampleRate;
-    var _channelData = new Array(_numberOfChannels).fill().map(function (_, ch) {
+    var _channelData = Array.from({ length: _numberOfChannels }, function (_, ch) {
       return data.getChannelData(ch);
     });
     var _length = _numberOfChannels ? _channelData[0].length : 0;
@@ -10662,7 +10662,7 @@ function resample(audioData, sampleRate) {
   var rate = audioData.sampleRate / sampleRate;
   var numberOfChannels = audioData.channelData.length;
   var length = Math.round(audioData.channelData[0].length / rate);
-  var channelData = new Array(numberOfChannels).fill().map(function () {
+  var channelData = Array.from({ length: numberOfChannels }, function () {
     return new Float32Array(length);
   });
 
