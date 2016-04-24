@@ -59,7 +59,7 @@ class RenderingAudioContext extends AudioContext {
     const iterations = Math.ceil(duration * this.sampleRate / blockSize);
     const bufferLength = blockSize * iterations;
     const numberOfChannels = this._format.numberOfChannels;
-    const buffers = new Array(numberOfChannels).fill().map(() => new Float32Array(bufferLength));
+    const buffers = Array.from({ length: numberOfChannels }, () => new Float32Array(bufferLength));
 
     impl.changeState("running");
 
@@ -83,7 +83,7 @@ class RenderingAudioContext extends AudioContext {
     const numberOfChannels = this._format.numberOfChannels;
     const length = this._rendered.reduce((length, buffers) => length + buffers[0].length, 0);
     const sampleRate = this._format.sampleRate;
-    const channelData = new Array(numberOfChannels).fill().map(() => new Float32Array(length));
+    const channelData = Array.from({ length: numberOfChannels }, () => new Float32Array(length));
     const audioData = { numberOfChannels, length, sampleRate, channelData };
 
     let offset = 0;
