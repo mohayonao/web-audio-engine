@@ -108,7 +108,7 @@ class OfflineAudioContext extends AudioContext {
 function createRenderingAudioData(numberOfChannels, length, sampleRate, blockSize) {
   length = Math.ceil(length / blockSize) * blockSize;
 
-  const channelData = new Array(numberOfChannels).fill().map(() => new Float32Array(length));
+  const channelData = Array.from({ length: numberOfChannels }, () => new Float32Array(length));
 
   return { numberOfChannels, length, sampleRate, channelData };
 }

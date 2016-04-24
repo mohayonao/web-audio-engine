@@ -36,7 +36,7 @@ function toAudioData(data) {
   if (isAudioBuffer(data)) {
     const numberOfChannels = data.numberOfChannels;
     const sampleRate = data.sampleRate;
-    const channelData = new Array(numberOfChannels).fill().map((_, ch) => data.getChannelData(ch));
+    const channelData = Array.from({ length: numberOfChannels }, (_, ch) => data.getChannelData(ch));
     const length = numberOfChannels ? channelData[0].length : 0;
 
     return { numberOfChannels, length, sampleRate, channelData };

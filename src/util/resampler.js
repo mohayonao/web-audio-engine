@@ -12,7 +12,7 @@ function resample(audioData, sampleRate) {
   const rate = audioData.sampleRate / sampleRate;
   const numberOfChannels = audioData.channelData.length;
   const length = Math.round(audioData.channelData[0].length / rate);
-  const channelData = new Array(numberOfChannels).fill().map(() => new Float32Array(length));
+  const channelData = Array.from({ length: numberOfChannels }, () => new Float32Array(length));
 
   for (let i = 0; i < length; i++) {
     const ix = i * rate;

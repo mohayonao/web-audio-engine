@@ -19,9 +19,7 @@ class AudioData {
     this.numberOfChannels = numberOfChannels|0;
     this.length = length|0;
     this.sampleRate = sampleRate|0;
-    this.channelData = new Array(this.numberOfChannels).fill().map(() => {
-      return new Float32Array(this.length).fill(0);
-    });
+    this.channelData = Array.from({ length: this.numberOfChannels }, () => new Float32Array(this.length));
   }
 }
 
