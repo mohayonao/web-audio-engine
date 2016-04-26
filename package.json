@@ -1,7 +1,7 @@
 {
   "name": "web-audio-engine",
   "description": "Pure JS implementation of the Web Audio API",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "author": "Nao Yonamine <mohayonao@gmail.com>",
   "bugs": {
     "url": "https://github.com/mohayonao/web-audio-engine/issues"
