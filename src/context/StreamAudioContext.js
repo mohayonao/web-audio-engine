@@ -137,25 +137,17 @@ function createEncoder(numberOfChannels, length, bitDepth, floatingPoint) {
 
   const bytes = bitDepth >> 3;
   const bufferLength = numberOfChannels * length * bytes;
-  const buffer = new global.Buffer(new Uint8Array(bufferLength));
-  const writer = createBufferWriter(buffer);
   const methodName = "pcm" + bitDepth + floatingPoint;
-
-  if (!writer[methodName]) {
-    throw new TypeError("Not supported bit depth: " + bitDepth);
-  }
-
-  const write = writer[methodName].bind(writer);
 
   return {
     encode(audioData) {
       const channelData = audioData.channelData;
-
-      writer.rewind();
+      const buffer = new global.Buffer(bufferLength);
+      const writer = createBufferWriter(buffer);
 
       for (let i = 0, imax = audioData.length; i < imax; i++) {
         for (let ch = 0; ch < numberOfChannels; ch++) {
-          write(channelData[ch][i]);
+          writer[methodName](channelData[ch][i]);
         }
       }
 
@@ -168,9 +160,6 @@ function createBufferWriter(buffer) {
   let pos = 0;
 
   return {
-    rewind() {
-      pos = 0;
-    },
     pcm8(value) {
       value = Math.max(-1, Math.min(value, +1));
       value = (value * 0.5 + 0.5) * 128;
