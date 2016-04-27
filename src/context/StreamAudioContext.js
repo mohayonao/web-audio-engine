@@ -3,6 +3,7 @@
 const util = require("../util");
 const config = require("../config");
 const AudioContext = require("../api/AudioContext");
+const Buffer = global.Buffer;
 const setImmediate = global.setImmediate || /* istanbul ignore next */ (fn => setTimeout(fn, 0));
 const noopWriter = { write: () => true };
 
@@ -138,11 +139,12 @@ function createEncoder(numberOfChannels, length, bitDepth, floatingPoint) {
   const bytes = bitDepth >> 3;
   const bufferLength = numberOfChannels * length * bytes;
   const methodName = "pcm" + bitDepth + floatingPoint;
+  const allocBuffer = Buffer.alloc ? Buffer.alloc : (size) => new Buffer(size);
 
   return {
     encode(audioData) {
       const channelData = audioData.channelData;
-      const buffer = new global.Buffer(bufferLength);
+      const buffer = allocBuffer(bufferLength);
       const writer = createBufferWriter(buffer);
 
       for (let i = 0, imax = audioData.length; i < imax; i++) {
