@@ -239,6 +239,16 @@
       lineNumbers: true, mode: "javascript"
     });
 
+    var hash = location.hash;
+
+    if (hash) {
+      hash = hash.substr(1);
+
+      if (vue.list.indexOf(hash) !== -1) {
+        vue.selected = hash;
+      }
+    }
+
     vue.loadScript();
   });
   </script>
