@@ -2844,6 +2844,7 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var util = require("../util");
 var config = require("../config");
 var AudioContext = require("../api/AudioContext");
+var Buffer = global.Buffer;
 var setImmediate = global.setImmediate || /* istanbul ignore next */function (fn) {
   return setTimeout(fn, 0);
 };
@@ -3012,11 +3013,14 @@ function createEncoder(numberOfChannels, length, bitDepth, floatingPoint) {
   var bytes = bitDepth >> 3;
   var bufferLength = numberOfChannels * length * bytes;
   var methodName = "pcm" + bitDepth + floatingPoint;
+  var allocBuffer = Buffer.alloc ? Buffer.alloc : function (size) {
+    return new Buffer(size);
+  };
 
   return {
     encode: function encode(audioData) {
       var channelData = audioData.channelData;
-      var buffer = new global.Buffer(bufferLength);
+      var buffer = allocBuffer(bufferLength);
       var writer = createBufferWriter(buffer);
 
       for (var i = 0, imax = audioData.length; i < imax; i++) {
