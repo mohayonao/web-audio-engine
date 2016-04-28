@@ -227,16 +227,10 @@ $ npm install
 $ node demo --help
 ```
 
-Play demo with SoX `play` command (recommended for mac user).
+Simplest play demo with `node-speaker`.
 
 ```
-$ node demo sines | play -t s16 -r 44100 -c 2 -
-```
-
-Play demo with ALSA `aplay` command (recommended for linux user).
-
-```
-$ node demo sines | aplay -f cd
+$ node demo sines
 ```
 
 Rendering and export to the wav file.
