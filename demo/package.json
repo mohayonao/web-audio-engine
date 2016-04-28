@@ -3,7 +3,7 @@
   "description": "sound test",
   "version": "0.0.0",
   "cliOptions": {
-    "prepend": "Usage: cmd [options] demo-name",
+    "prepend": "Usage: node demo [options] demo-name",
     "options": [
       {
         "option": "help",
@@ -58,11 +58,11 @@
         "default": "false"
       }
     ],
-    "append": "AUDIO FILE FORMATS: s16 s32 u8 raw"
+    "append": "AUDIO FILE FORMATS: s16 s32 u8 raw cd"
   },
   "dependencies": {
     "optionator": "^0.8.1",
-    "tickable-timer": "^1.0.0",
+    "wae-cli": "^0.5.0",
     "web-audio-scheduler": "^1.0.1"
   },
   "license": "MIT",

@@ -1,12 +1,12 @@
 module.exports = function(context, util) {
-  var sched = new util.WebAudioScheduler({ context: context });
+  var sched = new util.WebAudioScheduler({ context: context, timerAPI: global });
 
   function sample(list) {
     return list[(Math.random() * list.length)|0];
   }
 
-  function coin(ratio) {
-    return Math.random() < ratio;
+  function coin(rate) {
+    return Math.random() < rate;
   }
 
   return util.fetchAudioBuffer([ "kick.wav", "snare.wav", "hihat1.wav", "hihat2.wav" ]).then(function(instruments) {

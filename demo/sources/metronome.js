@@ -1,5 +1,5 @@
 module.exports = function(context, util) {
-  var sched = new util.WebAudioScheduler({ context: context });
+  var sched = new util.WebAudioScheduler({ context: context, timerAPI: global });
 
   function metronome(e) {
     sched.insert(e.playbackTime + 0.000, ticktack, { frequency: 880, amp: 1.0, duration: 1.00 });
