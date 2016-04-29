@@ -17,7 +17,9 @@ module.exports = (func, target) => {
 
   function runInOfflineAudioContext(api) {
     return (deferred) => {
-      const context = new api.OfflineAudioContext(2, 44100 * 10, 44100);
+      const context = new api.OfflineAudioContext(2, 44100, 44100);
+
+      context._renderingIterations = 65536;
 
       func(context);
 
@@ -27,15 +29,17 @@ module.exports = (func, target) => {
     };
   }
 
-  target.forEach((name) => {
-    const api = requireAPIIfExists(name);
+  if (target) {
+    target.forEach((name) => {
+      const api = requireAPIIfExists(name);
 
-    if (!api || typeof api.OfflineAudioContext !== "function") {
-      return console.log(`api: ${ name } is not found`);
-    }
+      if (!api || typeof api.OfflineAudioContext !== "function") {
+        return console.log(`api: ${ name } is not found`);
+      }
 
-    suite.add(name, runInOfflineAudioContext(api), { defer: true });
-  });
+      suite.add(name, runInOfflineAudioContext(api), { defer: true });
+    });
+  }
 
   suite.add("build", runInOfflineAudioContext(build), { defer: true });
   suite.add("dev", runInOfflineAudioContext(dev), { defer: true });
