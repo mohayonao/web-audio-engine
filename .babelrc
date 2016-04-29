@@ -2,6 +2,9 @@
   "env": {
     "production": {
       "only": [ "src" ],
+      "presets": [
+        "babel-preset-es2015"
+      ],
       "plugins": [
         [ "babel-plugin-unassert" ]
       ]
