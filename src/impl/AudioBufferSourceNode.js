@@ -118,11 +118,11 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
     duration = Math.max(0, util.toNumber(duration));
 
     this._startTime = when;
-    this._startSample = Math.round(when * this.sampleRate);
+    this._startFrame = Math.round(when * this.sampleRate);
     this._offset = offset;
 
     if (duration !== Infinity) {
-      this._stopSample = Math.round((this._startTime + duration) * this.sampleRate);
+      this._stopFrame = Math.round((this._startTime + duration) * this.sampleRate);
     }
 
     this.context.sched(when, () => {

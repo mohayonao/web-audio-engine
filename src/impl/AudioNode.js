@@ -41,7 +41,7 @@ class AudioNode extends EventTarget {
 
     this._params = [];
     this._enabled = false;
-    this._disableSample = Infinity;
+    this._suicideAtSampleFrame = Infinity;
 
     inputs.forEach((numberOfChannels) => {
       this.addInput(numberOfChannels, channelCount, channelCountMode);
@@ -202,7 +202,7 @@ class AudioNode extends EventTarget {
    */
   enableOutputsIfNecessary() {
     if (!this._enabled) {
-      this._disableSample = Infinity;
+      this._suicideAtSampleFrame = Infinity;
       this._enabled = true;
       this.outputs.forEach((output) => {
         output.enable();
@@ -215,12 +215,12 @@ class AudioNode extends EventTarget {
    */
   disableOutputsIfNecessary() {
     const currentTime = this.context.currentTime;
-    const disableTime = currentTime + this.getTailTime();
+    const disableAtTime = currentTime + this.getTailTime();
 
-    if (disableTime === currentTime) {
+    if (disableAtTime === currentTime) {
       this._disableOutputsIfNecessary();
-    } else if (disableTime !== Infinity) {
-      this._disableSample = Math.round(disableTime * this.sampleRate);
+    } else if (disableAtTime !== Infinity) {
+      this._suicideAtSampleFrame = Math.round(disableAtTime * this.sampleRate);
     }
   }
 
@@ -313,12 +313,13 @@ class AudioNode extends EventTarget {
    *
    */
   processIfNecessary() {
+    // prevent infinite loop when audio graph has feedback
     if (this.context.currentSampleFrame <= this.currentSampleFrame) {
       return;
     }
     this.currentSampleFrame = this.context.currentSampleFrame;
 
-    if (this._disableSample <= this.currentSampleFrame) {
+    if (this._suicideAtSampleFrame <= this.currentSampleFrame) {
       const outputs = this.outputs;
 
       for (let i = 0, imax = outputs.length; i < imax; i++) {

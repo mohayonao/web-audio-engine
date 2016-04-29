@@ -12,8 +12,8 @@ class AudioScheduledSourceNode extends AudioSourceNode {
 
     this._startTime = Infinity;
     this._stopTime = Infinity;
-    this._startSample = Infinity;
-    this._stopSample = Infinity;
+    this._startFrame = Infinity;
+    this._stopFrame = Infinity;
   }
 
   /**
@@ -28,7 +28,7 @@ class AudioScheduledSourceNode extends AudioSourceNode {
     when = Math.max(this.context.currentTime, util.toNumber(when));
 
     this._startTime = when;
-    this._startSample = Math.round(when * this.sampleRate);
+    this._startFrame = Math.round(when * this.sampleRate);
 
     this.context.sched(when, () => {
       this.outputs[0].enable();
@@ -47,7 +47,7 @@ class AudioScheduledSourceNode extends AudioSourceNode {
     when = Math.max(this.context.currentTime, this._startTime, util.toNumber(when));
 
     this._stopTime = when;
-    this._stopSample = Math.round(when * this.sampleRate);
+    this._stopFrame = Math.round(when * this.sampleRate);
   }
 }
 

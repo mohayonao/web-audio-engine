@@ -144,7 +144,7 @@ describe("AudioParam", () => {
     function pluck(items) {
       const list = [];
 
-      [ "type", "startSample", "endSample", "startValue", "endValue" ].forEach((key) => {
+      [ "type", "startFrame", "endFrame", "startValue", "endValue" ].forEach((key) => {
         list.push(items[key]);
       });
 

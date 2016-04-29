@@ -16,13 +16,12 @@ const AudioParamDSP = {
     this._prevValue = NaN;
     this._hasSampleAccurateValues = false;
     this._currentEventIndex = -1;
-    this._expectedCurrentSample = -1;
+    this._quantumStartFrame = -1;
     this._remainSamples = 0;
     this._schedParams = {};
   },
 
   dspProcess() {
-    const currentSample = this.context.currentSampleFrame;
     const input = this.inputs[0];
     const inputBus = input.bus;
 
@@ -35,16 +34,16 @@ const AudioParamDSP = {
     switch (algorithm) {
     case 0:
       // events: x / input: x
-      return this.dspStaticValue(currentSample);
+      return this.dspStaticValue();
     case 1:
       // events: x / input: o
-      return this.dspInputAndOffset(currentSample, inputBus);
+      return this.dspInputAndOffset(inputBus);
     case 2:
       // events: o / input: x
-      return this.dspEvents(currentSample);
+      return this.dspEvents();
     case 3:
       // events: o / input: o
-      return this.dspEventsAndInput(currentSample, inputBus);
+      return this.dspEventsAndInput(inputBus);
     default:
       /* istanbul ignore next */
       assert(!"NOT REACHED");
@@ -66,7 +65,7 @@ const AudioParamDSP = {
     this._hasSampleAccurateValues = false;
   },
 
-  dspInputAndOffset(currentSample, inputBus) {
+  dspInputAndOffset(inputBus) {
     const blockSize = this.blockSize;
     const outputBus = this.outputBus;
     const output = outputBus.getMutableData()[0];
@@ -85,23 +84,23 @@ const AudioParamDSP = {
     this._hasSampleAccurateValues = true;
   },
 
-  dspEvents(currentSample) {
+  dspEvents() {
     const outputBus = this.outputBus;
     const output = outputBus.getMutableData()[0];
 
-    this.dspValuesForTimeRange(currentSample, output);
+    this.dspValuesForTimeRange(output);
 
     this._prevValue = NaN;
     this._hasSampleAccurateValues = true;
   },
 
-  dspEventsAndInput(currentSample, inputBus) {
+  dspEventsAndInput(inputBus) {
     const blockSize = this.blockSize;
     const outputBus = this.outputBus;
     const output = outputBus.getMutableData()[0];
     const input = inputBus.getChannelData()[0];
 
-    this.dspValuesForTimeRange(currentSample, output);
+    this.dspValuesForTimeRange(output);
 
     for (let i = 0; i < blockSize; i++) {
       output[i] += input[i];
@@ -111,25 +110,27 @@ const AudioParamDSP = {
     this._hasSampleAccurateValues = true;
   },
 
-  dspValuesForTimeRange(currentSample, output) {
+  dspValuesForTimeRange(output) {
     const blockSize = this.blockSize;
+    const quantumStartFrame = this.context.currentSampleFrame;
+    const quantumEndFrame = quantumStartFrame + blockSize;
     const sampleRate = this.sampleRate;
     const timeline = this._timeline;
-    const nextSample = currentSample + blockSize;
 
     let value = this._value;
     let writeIndex = 0;
 
     // processing until the first event
     if (this._currentEventIndex === -1) {
-      const firstEventSample = timeline[0].startSample;
+      const firstEventStartFrame = timeline[0].startFrame;
 
       // timeline
       // |----------------|----------------|-------*--------|----------------|
       // ^                ^                        ^
-      // currentSample    nextSample               firstEventSample
-      // <---------------> fill 'value'
-      if (nextSample <= firstEventSample) {
+      // |                quantumEndFrame          firstEventStartFrame
+      // quantumStartFrame
+      // <---------------> fill value with in range
+      if (quantumEndFrame <= firstEventStartFrame) {
         for (let i = 0; i < blockSize; i++) {
           output[i] = value;
         }
@@ -140,11 +141,11 @@ const AudioParamDSP = {
       // timeline
       // |----------------|----------------|-------*--------|----------------|
       //                                   ^       ^        ^
-      //                                   |       |        nextSample
-      //                                   |       firstEventSample
-      //                                   currentSample
-      //                                   <------> fill 'value'
-      for (let i = 0, imax = firstEventSample - currentSample; i < imax; i++) {
+      //                                   |       |        quantumEndFrame
+      //                                   |       firstEventStartFrame
+      //                                   quantumStartFrame
+      //                                   <------> fill value with in range
+      for (let i = 0, imax = firstEventStartFrame - quantumStartFrame; i < imax; i++) {
         output[writeIndex++] = value;
       }
       this._currentEventIndex = 0;
@@ -152,35 +153,37 @@ const AudioParamDSP = {
 
     this._hasSampleAccurateValues = true;
 
-    let remainSamples = this._expectedCurrentSample === currentSample ? this._remainSamples : 0;
+    let remainSamples = this._quantumStartFrame === quantumStartFrame ? this._remainSamples : 0;
     let schedParams = this._schedParams;
 
+    // if new event exists, should recalculate remainSamples
     if (remainSamples === Infinity && this._currentEventIndex + 1 !== timeline.length) {
-      remainSamples = timeline[this._currentEventIndex + 1].startSample - currentSample;
+      remainSamples = timeline[this._currentEventIndex + 1].startFrame - quantumStartFrame;
     }
 
     while (writeIndex < blockSize && this._currentEventIndex < timeline.length) {
       const eventItem = timeline[this._currentEventIndex];
-      const startSample = eventItem.startSample;
-      const endSample = eventItem.endSample;
+      const startFrame = eventItem.startFrame;
+      const endFrame = eventItem.endFrame;
 
       // timeline
       // |-------*--------|-------*--------|----------------|----------------|
       //         ^                ^        ^                ^
-      //         |<-------------->|        currentSample    nextSample
-      //         startSample      endSample
+      //         |<-------------->|        |                quantumEndFrame
+      //         |                |        quantumStartFrame
+      //         startFrame       endFrame
       // skip event if
-      // (endSample < currentSample): past event
+      // (endFrame < quantumStartFrame): past event
       //  or
-      // (startSample === endSample): setValueAtTime before linearRampToValueAtTime or exponentialRampToValueAtTime.
-      if (endSample < currentSample || startSample === endSample) {
+      // (startFrame === endFrame): setValueAtTime before linearRampToValueAtTime or exponentialRampToValueAtTime.
+      if (endFrame < quantumStartFrame || startFrame === endFrame) {
         remainSamples = 0;
         this._currentEventIndex += 1;
         continue;
       }
 
       if (remainSamples <= 0) {
-        const processedSamples = Math.max(0, currentSample - startSample);
+        const processedSamples = Math.max(0, quantumStartFrame - startFrame);
 
         switch (eventItem.type) {
         case SET_VALUE_AT_TIME:
@@ -192,7 +195,7 @@ const AudioParamDSP = {
         case LINEAR_RAMP_TO_VALUE_AT_TIME:
           {
             const valueRange = eventItem.endValue - eventItem.startValue;
-            const frameRange = eventItem.endSample - eventItem.startSample;
+            const frameRange = eventItem.endFrame - eventItem.startFrame;
             const grow = valueRange / frameRange;
 
             if (grow) {
@@ -207,7 +210,7 @@ const AudioParamDSP = {
         case EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
           {
             const valueRatio = eventItem.endValue / eventItem.startValue;
-            const frameRange = eventItem.endSample - eventItem.startSample;
+            const frameRange = eventItem.endFrame - eventItem.startFrame;
             const grow = Math.pow(valueRatio, 1 / frameRange);
 
             if (grow) {
@@ -224,7 +227,7 @@ const AudioParamDSP = {
             const target = Math.fround(eventItem.args[0]);
             const timeConstant = eventItem.args[2];
             const discreteTimeConstant = 1 - Math.exp(-1 / (sampleRate * timeConstant));
-            const time = (currentSample + writeIndex) / sampleRate;
+            const time = (quantumStartFrame + writeIndex) / sampleRate;
 
             value = audioParamUtil.computeValueAtTime(timeline, time, this._userValue);
 
@@ -239,12 +242,12 @@ const AudioParamDSP = {
           {
             const curve = eventItem.args[0];
 
-            schedParams = { type: SET_VALUE_CURVE_AT_TIME, curve, startSample, endSample };
+            schedParams = { type: SET_VALUE_CURVE_AT_TIME, curve, startFrame, endFrame };
           }
           break;
         }
 
-        remainSamples = endSample - startSample - processedSamples;
+        remainSamples = endFrame - startFrame - processedSamples;
       } // if (remainSamples === 0)
 
       const fillFrames = Math.min(blockSize - writeIndex, remainSamples);
@@ -284,11 +287,11 @@ const AudioParamDSP = {
       case SET_VALUE_CURVE_AT_TIME:
         {
           const curve = schedParams.curve;
-          const schedRange = schedParams.endSample - schedParams.startSample;
-          const schedStartFrame = schedParams.startSample;
+          const schedRange = schedParams.endFrame - schedParams.startFrame;
+          const schedStartFrame = schedParams.startFrame;
 
           for (let i = 0; i < fillFrames; i++) {
-            const xx = (currentSample + writeIndex - schedStartFrame) / schedRange;
+            const xx = (quantumStartFrame + writeIndex - schedStartFrame) / schedRange;
             const ix = xx * (curve.length - 1);
             const i0 = ix | 0;
             const i1 = i0 + 1;
@@ -318,7 +321,7 @@ const AudioParamDSP = {
     this._value = value;
     this._schedParams = schedParams;
     this._remainSamples = remainSamples;
-    this._expectedCurrentSample = nextSample;
+    this._quantumStartFrame = quantumEndFrame;
   }
 };
 

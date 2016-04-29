@@ -6,12 +6,11 @@ const OscillatorNodeDSP = {
   },
 
   dspProcess() {
-    const currentSample = this.context.currentSampleFrame;
     const blockSize = this.blockSize;
-    const nextSample = currentSample + blockSize;
-    const sampleOffset = Math.max(0, this._startSample - currentSample);
-    const endSample = Math.min(nextSample, this._stopSample);
-    const fillToSample = endSample - currentSample;
+    const quantumStartFrame = this.context.currentSampleFrame;
+    const quantumEndFrame = quantumStartFrame + blockSize;
+    const sampleOffset = Math.max(0, this._startFrame - quantumStartFrame);
+    const fillToSample = Math.min(quantumEndFrame, this._stopFrame) - quantumStartFrame;
     const output = this.outputs[0].bus.getMutableData()[0];
 
     let writeIndex = 0;
@@ -22,7 +21,15 @@ const OscillatorNodeDSP = {
       writeIndex = this.dspWave(output, sampleOffset, fillToSample, this.sampleRate);
     }
 
-    if (this._stopSample <= currentSample + writeIndex) {
+    // timeline
+    // |----------------|-------*--------|----------------|----------------|
+    //                  ^       ^        ^
+    //                  |------>|        quantumEndFrame
+    //                  | wrote |
+    //                  |       stopFrame
+    //                  quantumStartFrame
+    if (this._stopFrame <= quantumStartFrame + writeIndex) {
+      // rest samples fill zero
       while (writeIndex < blockSize) {
         output[writeIndex++] = 0;
       }
