@@ -3658,8 +3658,6 @@ module.exports = AudioBuffer;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _get = function get(object, property, receiver) { if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -3813,16 +3811,32 @@ var AudioBufferSourceNode = function (_AudioScheduledSource) {
   }, {
     key: "start",
     value: function start(when, offset, duration) {
-      /* istanbul ignore else */
-      if (_get(Object.getPrototypeOf(AudioBufferSourceNode.prototype), "start", this).call(this, when)) {
-        offset = offset | 0;
-        this._offset = offset;
-        if (typeof duration !== "undefined") {
-          duration = Math.max(0, util.toNumber(duration));
-          this._stopSample = Math.round((this._startTime + duration) * this.sampleRate);
-        }
-        this.dspStart();
+      var _this2 = this;
+
+      /* istanbul ignore next */
+      if (this._startTime !== Infinity) {
+        return;
       }
+
+      duration = util.defaults(duration, Infinity);
+
+      when = Math.max(this.context.currentTime, util.toNumber(when));
+      offset = Math.max(0, offset | 0);
+      duration = Math.max(0, util.toNumber(duration));
+
+      this._startTime = when;
+      this._startFrame = Math.round(when * this.sampleRate);
+      this._offset = offset;
+
+      if (duration !== Infinity) {
+        this._stopFrame = Math.round((this._startTime + duration) * this.sampleRate);
+      }
+
+      this.context.sched(when, function () {
+        _this2.outputs[0].enable();
+      });
+
+      this.dspStart();
     }
   }]);
 
@@ -3855,6 +3869,7 @@ var AudioListener = require("./AudioListener");
  * @prop {number} blockSize
  * @prop {number} numberOfChannels
  * @prop {number} currentTime
+ * @prop {number} currentSampleFrame
  */
 
 var AudioContext = function (_EventTarget) {
@@ -3886,11 +3901,11 @@ var AudioContext = function (_EventTarget) {
     _this.blockSize = blockSize;
     _this.numberOfChannels = numberOfChannels;
     _this.currentTime = 0;
+    _this.currentSampleFrame = 0;
     _this._destination = new AudioDestinationNode(_this, { numberOfChannels: numberOfChannels });
     _this._listener = new AudioListener(_this);
     _this._state = "suspended";
-    _this._scheduledSourceNodes = [];
-    _this._callbacksForPreProcess = [];
+    _this._sched = [];
     _this._callbacksForPostProcess = null;
     _this._currentFrameIndex = 0;
     return _this;
@@ -3998,10 +4013,8 @@ var AudioContext = function (_EventTarget) {
 
       this._state = state;
       return new Promise(function (resolve) {
-        _this2.addPreProcess(function () {
-          _this2.dispatchEvent({ type: "statechange" });
-          resolve();
-        });
+        _this2.dispatchEvent({ type: "statechange" });
+        resolve();
       });
     }
 
@@ -4012,51 +4025,25 @@ var AudioContext = function (_EventTarget) {
   }, {
     key: "notChangeState",
     value: function notChangeState() {
-      var _this3 = this;
-
-      return new Promise(function (resolve) {
-        _this3.addPreProcess(resolve);
-      });
+      return Promise.resolve();
     }
 
     /**
-     * @param {AudioNode} node
-     */
-
-  }, {
-    key: "addToScheduledSource",
-    value: function addToScheduledSource(node) {
-      var index = this._scheduledSourceNodes.indexOf(node);
-
-      /* istanbul ignore else */
-      if (index === -1) {
-        this._scheduledSourceNodes.push(node);
-      }
-    }
-
-    /**
-     * @param {AudioNode} node
-     */
-
-  }, {
-    key: "removeFromScheduledSource",
-    value: function removeFromScheduledSource(node) {
-      var index = this._scheduledSourceNodes.indexOf(node);
-
-      /* istanbul ignore else */
-      if (index === -1) {
-        this._scheduledSourceNodes.splice(index, 1);
-      }
-    }
-
-    /**
+     * @param {number}   time
      * @param {function} task
      */
 
   }, {
-    key: "addPreProcess",
-    value: function addPreProcess(task) {
-      this._callbacksForPreProcess.push(task);
+    key: "sched",
+    value: function sched(time, task) {
+      var deltaTime = Math.max(0, time - this.currentTime);
+      var schedIndex = Math.floor(deltaTime * this.sampleRate / this.blockSize);
+
+      if (!this._sched[schedIndex]) {
+        this._sched[schedIndex] = [task];
+      } else {
+        this._sched[schedIndex].push(task);
+      }
     }
 
     /**
@@ -4088,33 +4075,25 @@ var AudioContext = function (_EventTarget) {
   }, {
     key: "process",
     value: function process() {
-      this.callTasks(this._callbacksForPreProcess);
-      this._callbacksForPreProcess = [];
-
       var destination = this._destination;
       var outputBus = destination.outputBus;
 
-      if (this._state === "running") {
-        var sampleRate = this.sampleRate;
-        var blockSize = this.blockSize;
-        var currentSample = this._currentFrameIndex * blockSize;
-        var scheduledSourceNodes = this._scheduledSourceNodes;
+      if (this._state !== "running") {
+        outputBus.zeros();
+      } else {
+        var tasks = this._sched.shift();
 
-        for (var i = scheduledSourceNodes.length - 1; i >= 0; i--) {
-          if (scheduledSourceNodes[i].checkSchedule(currentSample) === "running") {
-            scheduledSourceNodes.splice(i, 1);
-          }
+        if (tasks) {
+          this.callTasks(tasks);
         }
 
         this._callbacksForPostProcess = [];
 
-        destination.processIfNecessary(currentSample);
+        destination.processIfNecessary();
 
         this.callTasks(this._callbacksForPostProcess);
-        this.currentTime = (currentSample + blockSize) / sampleRate;
-        this._currentFrameIndex += 1;
-      } else {
-        outputBus.zeros();
+        this.currentSampleFrame += this.blockSize;
+        this.currentTime = this.currentSampleFrame / this.sampleRate;
       }
 
       return outputBus.audioData;
@@ -4128,12 +4107,12 @@ var AudioContext = function (_EventTarget) {
     key: "reset",
     value: function reset() {
       this.currentTime = 0;
+      this.currentSampleFrame = 0;
       this._destination = new AudioDestinationNode(this, { numberOfChannels: this.numberOfChannels });
       this._listener = new AudioListener(this);
       this._state = "suspended";
-      this._callbacksForPreProcess = [];
+      this._sched = [];
       this._callbacksForPostProcess = null;
-      this._currentFrameIndex = 0;
     }
   }]);
 
@@ -4335,11 +4314,11 @@ var AudioNode = function (_EventTarget) {
     _this.sampleRate = context.sampleRate;
     _this.inputs = [];
     _this.outputs = [];
+    _this.currentSampleFrame = -1;
 
     _this._params = [];
     _this._enabled = false;
-    _this._lastProcessingSample = -1;
-    _this._disableSample = Infinity;
+    _this._suicideAtSampleFrame = Infinity;
 
     inputs.forEach(function (numberOfChannels) {
       _this.addInput(numberOfChannels, channelCount, channelCountMode);
@@ -4509,7 +4488,7 @@ var AudioNode = function (_EventTarget) {
   }, {
     key: "addParam",
     value: function addParam(rate, defaultValue) {
-      var param = new AudioParam(this, { rate: rate, defaultValue: defaultValue });
+      var param = new AudioParam(this.context, { rate: rate, defaultValue: defaultValue });
 
       this._params.push(param);
 
@@ -4544,7 +4523,7 @@ var AudioNode = function (_EventTarget) {
     key: "enableOutputsIfNecessary",
     value: function enableOutputsIfNecessary() {
       if (!this._enabled) {
-        this._disableSample = Infinity;
+        this._suicideAtSampleFrame = Infinity;
         this._enabled = true;
         this.outputs.forEach(function (output) {
           output.enable();
@@ -4560,12 +4539,12 @@ var AudioNode = function (_EventTarget) {
     key: "disableOutputsIfNecessary",
     value: function disableOutputsIfNecessary() {
       var currentTime = this.context.currentTime;
-      var disableTime = currentTime + this.getTailTime();
+      var disableAtTime = currentTime + this.getTailTime();
 
-      if (disableTime === currentTime) {
+      if (disableAtTime === currentTime) {
         this._disableOutputsIfNecessary();
-      } else if (disableTime !== Infinity) {
-        this._disableSample = Math.round(disableTime * this.sampleRate);
+      } else if (disableAtTime !== Infinity) {
+        this._suicideAtSampleFrame = Math.round(disableAtTime * this.sampleRate);
       }
     }
 
@@ -4679,20 +4658,21 @@ var AudioNode = function (_EventTarget) {
     }
 
     /**
-     * @param {number} currentSample
+     *
      */
 
   }, {
     key: "processIfNecessary",
-    value: function processIfNecessary(currentSample) {
+    value: function processIfNecessary() {
       var _this2 = this;
 
-      if (currentSample <= this._lastProcessingSample) {
+      // prevent infinite loop when audio graph has feedback
+      if (this.context.currentSampleFrame <= this.currentSampleFrame) {
         return;
       }
-      this._lastProcessingSample = currentSample;
+      this.currentSampleFrame = this.context.currentSampleFrame;
 
-      if (this._disableSample <= currentSample) {
+      if (this._suicideAtSampleFrame <= this.currentSampleFrame) {
         var outputs = this.outputs;
 
         for (var i = 0, imax = outputs.length; i < imax; i++) {
@@ -4708,16 +4688,16 @@ var AudioNode = function (_EventTarget) {
       var inputs = this.inputs;
 
       for (var _i = 0, _imax = inputs.length; _i < _imax; _i++) {
-        inputs[_i].pull(currentSample);
+        inputs[_i].pull();
       }
 
       var params = this._params;
 
       for (var _i2 = 0, _imax2 = params.length; _i2 < _imax2; _i2++) {
-        params[_i2].dspProcess(currentSample);
+        params[_i2].dspProcess();
       }
 
-      this.dspProcess(currentSample);
+      this.dspProcess();
     }
   }, {
     key: "dspInit",
@@ -4834,8 +4814,8 @@ var AudioParam = function () {
         type: AudioParamDSP.SET_VALUE_AT_TIME,
         time: startTime,
         args: [value, startTime],
-        startSample: Math.round(startTime * this.sampleRate),
-        endSample: Infinity,
+        startFrame: Math.round(startTime * this.sampleRate),
+        endFrame: Infinity,
         startValue: value,
         endValue: value
       };
@@ -4847,7 +4827,7 @@ var AudioParam = function () {
         switch (prevEventItem.type) {
           case AudioParamDSP.SET_VALUE_AT_TIME:
           case AudioParamDSP.SET_TARGET_AT_TIME:
-            prevEventItem.endSample = eventItem.startSample;
+            prevEventItem.endFrame = eventItem.startFrame;
             break;
         }
       }
@@ -4856,11 +4836,11 @@ var AudioParam = function () {
         switch (nextEventItem.type) {
           case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
           case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
-            nextEventItem.startSample = eventItem.startSample;
+            nextEventItem.startFrame = eventItem.startFrame;
             nextEventItem.startValue = eventItem.startValue;
             break;
         }
-        eventItem.endSample = nextEventItem.startSample;
+        eventItem.endFrame = nextEventItem.startFrame;
       }
 
       if (index <= this._currentEventIndex) {
@@ -4884,8 +4864,8 @@ var AudioParam = function () {
         type: AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME,
         time: endTime,
         args: [value, endTime],
-        startSample: 0,
-        endSample: Math.round(endTime * this.sampleRate),
+        startFrame: 0,
+        endFrame: Math.round(endTime * this.sampleRate),
         startValue: this._defaultValue,
         endValue: value
       };
@@ -4897,14 +4877,14 @@ var AudioParam = function () {
         switch (prevEventItem.type) {
           case AudioParamDSP.SET_VALUE_AT_TIME:
           case AudioParamDSP.SET_TARGET_AT_TIME:
-            eventItem.startSample = prevEventItem.startSample;
+            eventItem.startFrame = prevEventItem.startFrame;
             eventItem.startValue = prevEventItem.startValue;
-            prevEventItem.endSample = eventItem.startSample;
+            prevEventItem.endFrame = eventItem.startFrame;
             break;
           case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
           case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
           case AudioParamDSP.SET_VALUE_CURVE_AT_TIME:
-            eventItem.startSample = prevEventItem.endSample;
+            eventItem.startFrame = prevEventItem.endFrame;
             eventItem.startValue = prevEventItem.endValue;
             break;
         }
@@ -4914,7 +4894,7 @@ var AudioParam = function () {
         switch (nextEventItem.type) {
           case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
           case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
-            nextEventItem.startSample = eventItem.endSample;
+            nextEventItem.startFrame = eventItem.endFrame;
             nextEventItem.startValue = eventItem.endValue;
             break;
         }
@@ -4941,8 +4921,8 @@ var AudioParam = function () {
         type: AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME,
         time: endTime,
         args: [value, endTime],
-        startSample: 0,
-        endSample: Math.round(endTime * this.sampleRate),
+        startFrame: 0,
+        endFrame: Math.round(endTime * this.sampleRate),
         startValue: Math.max(1e-6, this._defaultValue),
         endValue: value
       };
@@ -4954,14 +4934,14 @@ var AudioParam = function () {
         switch (prevEventItem.type) {
           case AudioParamDSP.SET_VALUE_AT_TIME:
           case AudioParamDSP.SET_TARGET_AT_TIME:
-            eventItem.startSample = prevEventItem.startSample;
+            eventItem.startFrame = prevEventItem.startFrame;
             eventItem.startValue = prevEventItem.startValue;
-            prevEventItem.endSample = eventItem.startSample;
+            prevEventItem.endFrame = eventItem.startFrame;
             break;
           case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
           case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
           case AudioParamDSP.SET_VALUE_CURVE_AT_TIME:
-            eventItem.startSample = prevEventItem.endSample;
+            eventItem.startFrame = prevEventItem.endFrame;
             eventItem.startValue = prevEventItem.endValue;
             break;
         }
@@ -4971,7 +4951,7 @@ var AudioParam = function () {
         switch (nextEventItem.type) {
           case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
           case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
-            nextEventItem.startSample = eventItem.endSample;
+            nextEventItem.startFrame = eventItem.endFrame;
             nextEventItem.startValue = eventItem.endValue;
             break;
         }
@@ -5000,8 +4980,8 @@ var AudioParam = function () {
         type: AudioParamDSP.SET_TARGET_AT_TIME,
         time: startTime,
         args: [target, startTime, timeConstant],
-        startSample: Math.round(startTime * this.sampleRate),
-        endSample: Infinity,
+        startFrame: Math.round(startTime * this.sampleRate),
+        endFrame: Infinity,
         startValue: 0,
         endValue: target
       };
@@ -5013,11 +4993,11 @@ var AudioParam = function () {
         switch (prevEventItem.type) {
           case AudioParamDSP.SET_VALUE_AT_TIME:
             eventItem.startValue = prevEventItem.endValue;
-            prevEventItem.endSample = eventItem.startSample;
+            prevEventItem.endFrame = eventItem.startFrame;
             break;
           case AudioParamDSP.SET_TARGET_AT_TIME:
             eventItem.startValue = 0;
-            prevEventItem.endSample = eventItem.startSample;
+            prevEventItem.endFrame = eventItem.startFrame;
             break;
           case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
           case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
@@ -5031,11 +5011,11 @@ var AudioParam = function () {
         switch (nextEventItem.type) {
           case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
           case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
-            nextEventItem.startSample = eventItem.startSample;
+            nextEventItem.startFrame = eventItem.startFrame;
             nextEventItem.startValue = eventItem.startValue;
             break;
         }
-        eventItem.endSample = nextEventItem.startSample;
+        eventItem.endFrame = nextEventItem.startFrame;
       }
 
       if (index <= this._currentEventIndex) {
@@ -5064,8 +5044,8 @@ var AudioParam = function () {
         type: AudioParamDSP.SET_VALUE_CURVE_AT_TIME,
         time: startTime,
         args: [values, startTime, duration],
-        startSample: Math.round(startTime * this.sampleRate),
-        endSample: Math.round((startTime + duration) * this.sampleRate),
+        startFrame: Math.round(startTime * this.sampleRate),
+        endFrame: Math.round((startTime + duration) * this.sampleRate),
         startValue: values[0],
         endValue: values[values.length - 1]
       };
@@ -5077,7 +5057,7 @@ var AudioParam = function () {
         switch (prevEventItem.type) {
           case AudioParamDSP.SET_VALUE_AT_TIME:
           case AudioParamDSP.SET_TARGET_AT_TIME:
-            prevEventItem.endSample = eventItem.startSample;
+            prevEventItem.endFrame = eventItem.startFrame;
             break;
         }
       }
@@ -5086,7 +5066,7 @@ var AudioParam = function () {
         switch (nextEventItem.type) {
           case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
           case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
-            nextEventItem.startSample = eventItem.startSample;
+            nextEventItem.startFrame = eventItem.startFrame;
             nextEventItem.startValue = eventItem.endValue;
             break;
         }
@@ -5118,7 +5098,7 @@ var AudioParam = function () {
         switch (lastEventItem.type) {
           case AudioParamDSP.SET_VALUE_AT_TIME:
           case AudioParamDSP.SET_TARGET_AT_TIME:
-            lastEventItem.endSample = Infinity;
+            lastEventItem.endFrame = Infinity;
             break;
         }
       }
@@ -5341,8 +5321,8 @@ var AudioScheduledSourceNode = function (_AudioSourceNode) {
 
     _this._startTime = Infinity;
     _this._stopTime = Infinity;
-    _this._startSample = Infinity;
-    _this._stopSample = Infinity;
+    _this._startFrame = Infinity;
+    _this._stopFrame = Infinity;
     return _this;
   }
 
@@ -5354,18 +5334,21 @@ var AudioScheduledSourceNode = function (_AudioSourceNode) {
   _createClass(AudioScheduledSourceNode, [{
     key: "start",
     value: function start(when) {
-      /* istanbul ignore else */
-      if (this._startTime === Infinity) {
-        when = Math.max(this.context.currentTime, util.toNumber(when));
-        this._startTime = when;
-        this._startSample = Math.round(when * this.sampleRate);
+      var _this2 = this;
 
-        this.context.addToScheduledSource(this);
-
-        return true;
+      /* istanbul ignore next */
+      if (this._startTime !== Infinity) {
+        return;
       }
 
-      return false;
+      when = Math.max(this.context.currentTime, util.toNumber(when));
+
+      this._startTime = when;
+      this._startFrame = Math.round(when * this.sampleRate);
+
+      this.context.sched(when, function () {
+        _this2.outputs[0].enable();
+      });
     }
 
     /**
@@ -5375,44 +5358,15 @@ var AudioScheduledSourceNode = function (_AudioSourceNode) {
   }, {
     key: "stop",
     value: function stop(when) {
-      /* istanbul ignore else */
-      if (this._startTime !== Infinity && this._stopTime === Infinity) {
-        when = Math.max(this.context.currentTime, this._startTime, util.toNumber(when));
-        this._stopTime = when;
-        this._stopSample = Math.round(when * this.sampleRate);
-
-        return true;
+      /* istanbul ignore next */
+      if (this._startTime === Infinity && this._stopTime !== Infinity) {
+        return;
       }
 
-      return false;
-    }
+      when = Math.max(this.context.currentTime, this._startTime, util.toNumber(when));
 
-    /**
-     * @param {number} currentSample
-     * @return {string}
-     */
-
-  }, {
-    key: "checkSchedule",
-    value: function checkSchedule(currentSample) {
-      // timeline
-      // |----------------|-------*--------|----------------|-----*----------|----------------|
-      //                  |       ^                               ^          |
-      //                  |       startSample                     stopSample |
-      // --- suspended -->|<------------------- running -------------------->|<-- closed ------
-      var nextSample = currentSample + this.blockSize;
-
-      if (nextSample < this._startSample) {
-        return "suspended";
-      }
-
-      if (this._stopSample <= currentSample) {
-        return "closed";
-      }
-
-      this.outputs[0].enable();
-
-      return "running";
+      this._stopTime = when;
+      this._stopFrame = Math.round(when * this.sampleRate);
     }
   }]);
 
@@ -5915,7 +5869,7 @@ var BiquadFilterNode = function (_AudioNode) {
     _this._gain = _this.addParam("control", 0);
 
     _this.dspInit();
-    _this.dspSetNumberOfChannels(1);
+    _this.dspUpdateKernel(1);
     return _this;
   }
 
@@ -6004,7 +5958,7 @@ var BiquadFilterNode = function (_AudioNode) {
   }, {
     key: "channelDidUpdate",
     value: function channelDidUpdate(numberOfChannels) {
-      this.dspSetNumberOfChannels(numberOfChannels);
+      this.dspUpdateKernel(numberOfChannels);
       this.outputs[0].setNumberOfChannels(numberOfChannels);
     }
 
@@ -6411,6 +6365,7 @@ var DelayNode = function (_AudioNode) {
     _this._delayTime = _this.addParam("audio", 0);
 
     _this.dspInit(_this._maxDelayTime);
+    _this.dspUpdateKernel(1);
     return _this;
   }
 
@@ -6442,7 +6397,7 @@ var DelayNode = function (_AudioNode) {
   }, {
     key: "channelDidUpdate",
     value: function channelDidUpdate(numberOfChannels) {
-      this.dspSetNumberOfChannels(numberOfChannels);
+      this.dspUpdateKernel(numberOfChannels);
       this.outputs[0].setNumberOfChannels(numberOfChannels);
     }
 
@@ -6723,6 +6678,7 @@ function _possibleConstructorReturn(self, call) { if (!self) { throw new Referen
 
 function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+var util = require("../util");
 var AudioNode = require("./AudioNode");
 var IIRFilterNodeDSP = require("./dsp/IIRFilterNode");
 
@@ -6741,8 +6697,8 @@ var IIRFilterNode = function (_AudioNode) {
 
     opts = opts || /* istanbul ignore next */{};
 
-    var feedforward = opts.feedforward;
-    var feedback = opts.feedback;
+    var feedforward = util.defaults(opts.feedforward, [0]);
+    var feedback = util.defaults(opts.feedback, [1]);
 
     var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(IIRFilterNode).call(this, context, {
       inputs: [1],
@@ -6753,6 +6709,9 @@ var IIRFilterNode = function (_AudioNode) {
 
     _this._feedforward = feedforward;
     _this._feedback = feedback;
+
+    _this.dspInit();
+    _this.dspUpdateKernel(1);
     return _this;
   }
 
@@ -6797,6 +6756,7 @@ var IIRFilterNode = function (_AudioNode) {
   }, {
     key: "channelDidUpdate",
     value: function channelDidUpdate(numberOfChannels) {
+      this.dspUpdateKernel(numberOfChannels);
       this.outputs[0].setNumberOfChannels(numberOfChannels);
     }
   }]);
@@ -6808,7 +6768,7 @@ Object.assign(IIRFilterNode.prototype, IIRFilterNodeDSP);
 
 module.exports = IIRFilterNode;
 
-},{"./AudioNode":44,"./dsp/IIRFilterNode":81}],59:[function(require,module,exports){
+},{"../util":95,"./AudioNode":44,"./dsp/IIRFilterNode":81}],59:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -7460,6 +7420,9 @@ var WaveShaperNode = function (_AudioNode) {
 
     _this._curve = null;
     _this._overSample = "none";
+
+    _this.dspInit();
+    _this.dspUpdateKernel(null, 1);
     return _this;
   }
 
@@ -7484,6 +7447,7 @@ var WaveShaperNode = function (_AudioNode) {
       /* istanbul ignore else */
       if (value === null || value instanceof Float32Array) {
         this._curve = value;
+        this.dspUpdateKernel(this._curve, this.outputs[0].getNumberOfChannels());
       }
     }
 
@@ -7517,6 +7481,7 @@ var WaveShaperNode = function (_AudioNode) {
   }, {
     key: "channelDidUpdate",
     value: function channelDidUpdate(numberOfChannels) {
+      this.dspUpdateKernel(this._curve, numberOfChannels);
       this.outputs[0].setNumberOfChannels(numberOfChannels);
     }
   }]);
@@ -8310,43 +8275,41 @@ var AudioNodeInput = function () {
     }
 
     /**
-     * @param {*} e
      * @return {AudioBus}
      */
 
   }, {
     key: "sumAllConnections",
-    value: function sumAllConnections(e) {
+    value: function sumAllConnections() {
       var audioBus = this.bus;
       var outputs = this._outputs;
 
       audioBus.zeros();
 
       for (var i = 0, imax = outputs.length; i < imax; i++) {
-        audioBus.sumFrom(outputs[i].pull(e));
+        audioBus.sumFrom(outputs[i].pull());
       }
 
       return audioBus;
     }
 
     /**
-     * @param {*} e
      * @return {AudioBus}
      */
 
   }, {
     key: "pull",
-    value: function pull(e) {
+    value: function pull() {
       if (this._outputs.length === 1) {
         var output = this._outputs[0];
 
         /* istanbul ignore else */
         if (output.getNumberOfChannels() === this.getNumberOfChannels()) {
-          return this.bus.copyFrom(output.pull(e));
+          return this.bus.copyFrom(output.pull());
         }
       }
 
-      return this.sumAllConnections(e);
+      return this.sumAllConnections();
     }
   }]);
 
@@ -8600,14 +8563,13 @@ var AudioNodeOutput = function () {
     }
 
     /**
-     * @param {*} e
      * @return {AudioBus}
      */
 
   }, {
     key: "pull",
-    value: function pull(e) {
-      this.node.processIfNecessary(e);
+    value: function pull() {
+      this.node.processIfNecessary();
       return this.bus;
     }
   }]);
@@ -8641,38 +8603,38 @@ var AudioBufferSourceNodeDSP = {
 
     this._phase = Math.max(0, Math.min(this._offset, bufferDuration)) * bufferSampleRate;
   },
-  dspProcess: function dspProcess(currentSample) {
+  dspProcess: function dspProcess() {
     var _this = this;
 
-    var nextSample = currentSample + this.blockSize;
-
-    if (nextSample < this._startSample) {
-      return;
-    }
-
-    if (this._stopSample <= currentSample) {
-      return;
-    }
-
-    var sampleRate = this.sampleRate;
     var blockSize = this.blockSize;
-    var frameOffset = Math.max(0, this._startSample - currentSample);
-    var endSample = Math.min(nextSample, this._stopSample);
-    var fillToFrame = endSample - currentSample;
+    var quantumStartFrame = this.context.currentSampleFrame;
+    var quantumEndFrame = quantumStartFrame + blockSize;
+    var sampleOffset = Math.max(0, this._startFrame - quantumStartFrame);
+    var fillToSample = Math.min(quantumEndFrame, this._stopFrame) - quantumStartFrame;
     var outputs = this.outputs[0].bus.getMutableData();
-    var numberOfChannels = outputs.length;
 
     var writeIndex = 0;
 
-    writeIndex = this.dspBufferRendering(outputs, frameOffset, fillToFrame, sampleRate);
+    writeIndex = this.dspBufferRendering(outputs, sampleOffset, fillToSample, this.sampleRate);
 
-    if (writeIndex < blockSize) {
+    // timeline
+    // |----------------|-------*--------|----------------|----------------|
+    //                  ^       ^        ^
+    //                  |------>|        quantumEndFrame
+    //                  | wrote |
+    //                  |       stopFrame
+    //                  quantumStartFrame
+    if (this._stopFrame <= quantumStartFrame + writeIndex) {
+      // rest samples fill zero
+      var numberOfChannels = outputs.length;
+
       while (writeIndex < blockSize) {
         for (var ch = 0; ch < numberOfChannels; ch++) {
           outputs[ch][writeIndex] = 0;
         }
         writeIndex += 1;
       }
+
       this.context.addPostProcess(function () {
         _this.outputs[0].bus.zeros();
         _this.outputs[0].disable();
@@ -8757,15 +8719,15 @@ var AudioParamDSP = {
     this._prevValue = NaN;
     this._hasSampleAccurateValues = false;
     this._currentEventIndex = -1;
-    this._expectedCurrentSample = -1;
+    this._quantumStartFrame = -1;
     this._remainSamples = 0;
     this._schedParams = {};
   },
-  dspProcess: function dspProcess(currentSample) {
+  dspProcess: function dspProcess() {
     var input = this.inputs[0];
     var inputBus = input.bus;
 
-    input.pull(currentSample);
+    input.pull();
 
     var hasEvents = !!this._timeline.length;
     var hasInput = !inputBus.isSilent;
@@ -8774,16 +8736,16 @@ var AudioParamDSP = {
     switch (algorithm) {
       case 0:
         // events: x / input: x
-        return this.dspStaticValue(currentSample);
+        return this.dspStaticValue();
       case 1:
         // events: x / input: o
-        return this.dspInputAndOffset(currentSample, inputBus);
+        return this.dspInputAndOffset(inputBus);
       case 2:
         // events: o / input: x
-        return this.dspEvents(currentSample);
+        return this.dspEvents();
       case 3:
         // events: o / input: o
-        return this.dspEventsAndInput(currentSample, inputBus);
+        return this.dspEventsAndInput(inputBus);
       default:
     }
   },
@@ -8801,7 +8763,7 @@ var AudioParamDSP = {
 
     this._hasSampleAccurateValues = false;
   },
-  dspInputAndOffset: function dspInputAndOffset(currentSample, inputBus) {
+  dspInputAndOffset: function dspInputAndOffset(inputBus) {
     var blockSize = this.blockSize;
     var outputBus = this.outputBus;
     var output = outputBus.getMutableData()[0];
@@ -8819,22 +8781,22 @@ var AudioParamDSP = {
     this._prevValue = NaN;
     this._hasSampleAccurateValues = true;
   },
-  dspEvents: function dspEvents(currentSample) {
+  dspEvents: function dspEvents() {
     var outputBus = this.outputBus;
     var output = outputBus.getMutableData()[0];
 
-    this.dspValuesForTimeRange(currentSample, output);
+    this.dspValuesForTimeRange(output);
 
     this._prevValue = NaN;
     this._hasSampleAccurateValues = true;
   },
-  dspEventsAndInput: function dspEventsAndInput(currentSample, inputBus) {
+  dspEventsAndInput: function dspEventsAndInput(inputBus) {
     var blockSize = this.blockSize;
     var outputBus = this.outputBus;
     var output = outputBus.getMutableData()[0];
     var input = inputBus.getChannelData()[0];
 
-    this.dspValuesForTimeRange(currentSample, output);
+    this.dspValuesForTimeRange(output);
 
     for (var i = 0; i < blockSize; i++) {
       output[i] += input[i];
@@ -8843,25 +8805,27 @@ var AudioParamDSP = {
     this._prevValue = NaN;
     this._hasSampleAccurateValues = true;
   },
-  dspValuesForTimeRange: function dspValuesForTimeRange(currentSample, output) {
+  dspValuesForTimeRange: function dspValuesForTimeRange(output) {
     var blockSize = this.blockSize;
+    var quantumStartFrame = this.context.currentSampleFrame;
+    var quantumEndFrame = quantumStartFrame + blockSize;
     var sampleRate = this.sampleRate;
     var timeline = this._timeline;
-    var nextSample = currentSample + blockSize;
 
     var value = this._value;
     var writeIndex = 0;
 
     // processing until the first event
     if (this._currentEventIndex === -1) {
-      var firstEventSample = timeline[0].startSample;
+      var firstEventStartFrame = timeline[0].startFrame;
 
       // timeline
       // |----------------|----------------|-------*--------|----------------|
       // ^                ^                        ^
-      // currentSample    nextSample               firstEventSample
-      // <---------------> fill 'value'
-      if (nextSample <= firstEventSample) {
+      // |                quantumEndFrame          firstEventStartFrame
+      // quantumStartFrame
+      // <---------------> fill value with in range
+      if (quantumEndFrame <= firstEventStartFrame) {
         for (var i = 0; i < blockSize; i++) {
           output[i] = value;
         }
@@ -8872,11 +8836,11 @@ var AudioParamDSP = {
       // timeline
       // |----------------|----------------|-------*--------|----------------|
       //                                   ^       ^        ^
-      //                                   |       |        nextSample
-      //                                   |       firstEventSample
-      //                                   currentSample
-      //                                   <------> fill 'value'
-      for (var _i = 0, imax = firstEventSample - currentSample; _i < imax; _i++) {
+      //                                   |       |        quantumEndFrame
+      //                                   |       firstEventStartFrame
+      //                                   quantumStartFrame
+      //                                   <------> fill value with in range
+      for (var _i = 0, imax = firstEventStartFrame - quantumStartFrame; _i < imax; _i++) {
         output[writeIndex++] = value;
       }
       this._currentEventIndex = 0;
@@ -8884,35 +8848,37 @@ var AudioParamDSP = {
 
     this._hasSampleAccurateValues = true;
 
-    var remainSamples = this._expectedCurrentSample === currentSample ? this._remainSamples : 0;
+    var remainSamples = this._quantumStartFrame === quantumStartFrame ? this._remainSamples : 0;
     var schedParams = this._schedParams;
 
+    // if new event exists, should recalculate remainSamples
     if (remainSamples === Infinity && this._currentEventIndex + 1 !== timeline.length) {
-      remainSamples = timeline[this._currentEventIndex + 1].startSample - currentSample;
+      remainSamples = timeline[this._currentEventIndex + 1].startFrame - quantumStartFrame;
     }
 
     while (writeIndex < blockSize && this._currentEventIndex < timeline.length) {
       var eventItem = timeline[this._currentEventIndex];
-      var startSample = eventItem.startSample;
-      var endSample = eventItem.endSample;
+      var startFrame = eventItem.startFrame;
+      var endFrame = eventItem.endFrame;
 
       // timeline
       // |-------*--------|-------*--------|----------------|----------------|
       //         ^                ^        ^                ^
-      //         |<-------------->|        currentSample    nextSample
-      //         startSample      endSample
+      //         |<-------------->|        |                quantumEndFrame
+      //         |                |        quantumStartFrame
+      //         startFrame       endFrame
       // skip event if
-      // (endSample < currentSample): past event
+      // (endFrame < quantumStartFrame): past event
       //  or
-      // (startSample === endSample): setValueAtTime before linearRampToValueAtTime or exponentialRampToValueAtTime.
-      if (endSample < currentSample || startSample === endSample) {
+      // (startFrame === endFrame): setValueAtTime before linearRampToValueAtTime or exponentialRampToValueAtTime.
+      if (endFrame < quantumStartFrame || startFrame === endFrame) {
         remainSamples = 0;
         this._currentEventIndex += 1;
         continue;
       }
 
       if (remainSamples <= 0) {
-        var processedSamples = Math.max(0, currentSample - startSample);
+        var processedSamples = Math.max(0, quantumStartFrame - startFrame);
 
         switch (eventItem.type) {
           case SET_VALUE_AT_TIME:
@@ -8924,7 +8890,7 @@ var AudioParamDSP = {
           case LINEAR_RAMP_TO_VALUE_AT_TIME:
             {
               var valueRange = eventItem.endValue - eventItem.startValue;
-              var frameRange = eventItem.endSample - eventItem.startSample;
+              var frameRange = eventItem.endFrame - eventItem.startFrame;
               var grow = valueRange / frameRange;
 
               if (grow) {
@@ -8939,7 +8905,7 @@ var AudioParamDSP = {
           case EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
             {
               var valueRatio = eventItem.endValue / eventItem.startValue;
-              var _frameRange = eventItem.endSample - eventItem.startSample;
+              var _frameRange = eventItem.endFrame - eventItem.startFrame;
               var _grow = Math.pow(valueRatio, 1 / _frameRange);
 
               if (_grow) {
@@ -8956,7 +8922,7 @@ var AudioParamDSP = {
               var target = Math.fround(eventItem.args[0]);
               var timeConstant = eventItem.args[2];
               var discreteTimeConstant = 1 - Math.exp(-1 / (sampleRate * timeConstant));
-              var time = (currentSample + writeIndex) / sampleRate;
+              var time = (quantumStartFrame + writeIndex) / sampleRate;
 
               value = audioParamUtil.computeValueAtTime(timeline, time, this._userValue);
 
@@ -8971,12 +8937,12 @@ var AudioParamDSP = {
             {
               var curve = eventItem.args[0];
 
-              schedParams = { type: SET_VALUE_CURVE_AT_TIME, curve: curve, startSample: startSample, endSample: endSample };
+              schedParams = { type: SET_VALUE_CURVE_AT_TIME, curve: curve, startFrame: startFrame, endFrame: endFrame };
             }
             break;
         }
 
-        remainSamples = endSample - startSample - processedSamples;
+        remainSamples = endFrame - startFrame - processedSamples;
       } // if (remainSamples === 0)
 
       var fillFrames = Math.min(blockSize - writeIndex, remainSamples);
@@ -9016,11 +8982,11 @@ var AudioParamDSP = {
         case SET_VALUE_CURVE_AT_TIME:
           {
             var _curve = schedParams.curve;
-            var schedRange = schedParams.endSample - schedParams.startSample;
-            var schedStartFrame = schedParams.startSample;
+            var schedRange = schedParams.endFrame - schedParams.startFrame;
+            var schedStartFrame = schedParams.startFrame;
 
             for (var _i6 = 0; _i6 < fillFrames; _i6++) {
-              var xx = (currentSample + writeIndex - schedStartFrame) / schedRange;
+              var xx = (quantumStartFrame + writeIndex - schedStartFrame) / schedRange;
               var ix = xx * (_curve.length - 1);
               var i0 = ix | 0;
               var i1 = i0 + 1;
@@ -9050,7 +9016,7 @@ var AudioParamDSP = {
     this._value = value;
     this._schedParams = schedParams;
     this._remainSamples = remainSamples;
-    this._expectedCurrentSample = nextSample;
+    this._quantumStartFrame = quantumEndFrame;
   }
 };
 
@@ -9086,14 +9052,14 @@ var computeCoefficients = {};
 var BiquadFilterNodeDSP = {
   dspInit: function dspInit() {
     this._kernels = [];
-    this._initCoefficients = false;
+    this._quantumStartFrame = -1;
     this._coefficients = [0, 0, 0, 0, 0];
     this._prevFrequency = 0;
     this._prevDetune = 0;
     this._prevQ = 0;
     this._prevGain = 0;
   },
-  dspSetNumberOfChannels: function dspSetNumberOfChannels(numberOfChannels) {
+  dspUpdateKernel: function dspUpdateKernel(numberOfChannels) {
     if (numberOfChannels < this._kernels.length) {
       this._kernels.splice(numberOfChannels);
     } else if (this._kernels.length < numberOfChannels) {
@@ -9101,28 +9067,87 @@ var BiquadFilterNodeDSP = {
         this._kernels.push(new BiquadFilterKernel(this, this._kernels.length));
       }
     }
+
+    switch (numberOfChannels) {
+      case 1:
+        this.dspProcess = this.dspProcess1;
+        break;
+      case 2:
+        this.dspProcess = this.dspProcess2;
+        break;
+      default:
+        this.dspProcess = this.dspProcessN;
+        break;
+    }
   },
-  dspProcess: function dspProcess() {
+  dspProcess1: function dspProcess1() {
+    var blockSize = this.blockSize;
+    var quantumStartFrame = this.context.currentSampleFrame;
+    var quantumEndFrame = quantumStartFrame + blockSize;
     var inputs = this.inputs[0].bus.getChannelData();
     var outputs = this.outputs[0].bus.getMutableData();
     var isCoefficientsUpdated = this.dspUpdateCoefficients();
+    var coefficients = this._coefficients;
     var kernels = this._kernels;
-    var inNumSamples = this.blockSize;
 
-    if (!this._initCoefficients) {
+    if (quantumStartFrame !== this._quantumStartFrame) {
+      kernels[0].processWithInitCoefficients(coefficients, inputs[0], outputs[0], blockSize);
+    } else if (isCoefficientsUpdated) {
+      kernels[0].processWithCoefficients(coefficients, inputs[0], outputs[0], blockSize);
+    } else {
+      kernels[0].process(inputs[0], outputs[0], blockSize);
+    }
+
+    this._quantumStartFrame = quantumEndFrame;
+  },
+  dspProcess2: function dspProcess2() {
+    var blockSize = this.blockSize;
+    var quantumStartFrame = this.context.currentSampleFrame;
+    var quantumEndFrame = quantumStartFrame + blockSize;
+    var inputs = this.inputs[0].bus.getChannelData();
+    var outputs = this.outputs[0].bus.getMutableData();
+    var isCoefficientsUpdated = this.dspUpdateCoefficients();
+    var coefficients = this._coefficients;
+    var kernels = this._kernels;
+
+    if (quantumStartFrame !== this._quantumStartFrame) {
+      kernels[0].processWithInitCoefficients(coefficients, inputs[0], outputs[0], blockSize);
+      kernels[1].processWithInitCoefficients(coefficients, inputs[1], outputs[1], blockSize);
+    } else if (isCoefficientsUpdated) {
+      kernels[0].processWithCoefficients(coefficients, inputs[0], outputs[0], blockSize);
+      kernels[1].processWithCoefficients(coefficients, inputs[1], outputs[1], blockSize);
+    } else {
+      kernels[0].process(inputs[0], outputs[0], blockSize);
+      kernels[1].process(inputs[1], outputs[1], blockSize);
+    }
+
+    this._quantumStartFrame = quantumEndFrame;
+  },
+  dspProcessN: function dspProcessN() {
+    var blockSize = this.blockSize;
+    var quantumStartFrame = this.context.currentSampleFrame;
+    var quantumEndFrame = quantumStartFrame + blockSize;
+    var inputs = this.inputs[0].bus.getChannelData();
+    var outputs = this.outputs[0].bus.getMutableData();
+    var isCoefficientsUpdated = this.dspUpdateCoefficients();
+    var coefficients = this._coefficients;
+    var kernels = this._kernels;
+
+    if (quantumStartFrame !== this._quantumStartFrame) {
       for (var i = 0, imax = kernels.length; i < imax; i++) {
-        kernels[i].processWithInitCoefficients(this._coefficients, inputs[i], outputs[i], inNumSamples);
+        kernels[i].processWithInitCoefficients(coefficients, inputs[i], outputs[i], blockSize);
       }
-      this._initCoefficients = true;
     } else if (isCoefficientsUpdated) {
       for (var _i = 0, _imax = kernels.length; _i < _imax; _i++) {
-        kernels[_i].processWithCoefficients(this._coefficients, inputs[_i], outputs[_i], inNumSamples);
+        kernels[_i].processWithCoefficients(coefficients, inputs[_i], outputs[_i], blockSize);
       }
     } else {
       for (var _i2 = 0, _imax2 = kernels.length; _i2 < _imax2; _i2++) {
-        kernels[_i2].process(inputs[_i2], outputs[_i2], inNumSamples);
+        kernels[_i2].process(inputs[_i2], outputs[_i2], blockSize);
       }
     }
+
+    this._quantumStartFrame = quantumEndFrame;
   },
   dspUpdateCoefficients: function dspUpdateCoefficients() {
     var frequency = this._frequency.getValue();
@@ -9567,100 +9592,218 @@ module.exports = ConvolverNodeDSP;
 },{}],78:[function(require,module,exports){
 "use strict";
 
-var AudioBus = require("../core/AudioBus");
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 var DelayNodeDSP = {
   dspInit: function dspInit(maxDelayTime) {
-    var frameToDelay = computeFrameToDelay(maxDelayTime, this.sampleRate, this.blockSize);
-
-    this._delayBus = new AudioBus(1, frameToDelay, this.sampleRate);
-    this._delayBusLength = frameToDelay;
-    this._delayIndex = 0;
-    this._delayIndexes = new Float32Array(this.blockSize);
+    this._kernels = [];
+    this._delayBufferLength = this.dspComputeDelayBufferLength(maxDelayTime);
+    this._delayIndices = new Float32Array(this.blockSize);
   },
-  dspSetNumberOfChannels: function dspSetNumberOfChannels(numberOfChannels) {
-    this._delayBus.setNumberOfChannels(numberOfChannels);
+  dspComputeDelayBufferLength: function dspComputeDelayBufferLength(delayTime) {
+    return Math.ceil(delayTime * this.sampleRate / this.blockSize) * this.blockSize + this.blockSize;
   },
-  dspProcess: function dspProcess() {
-    var delayBus = this._delayBus;
-    var inputBus = this.inputs[0].bus;
+  dspUpdateKernel: function dspUpdateKernel(numberOfChannels) {
+    if (numberOfChannels < this._kernels.length) {
+      this._kernels.splice(numberOfChannels);
+    } else if (this._kernels.length < numberOfChannels) {
+      while (numberOfChannels !== this._kernels.length) {
+        this._kernels.push(new DelayKernel(this, this._kernels.length));
+      }
+    }
 
-    delayBus.copyFromWithOffset(inputBus, this._delayIndex);
-
-    var delayTimeValues = this._delayTime.getSampleAccurateValues();
-
-    this.dspUpdateDelayIndexes(delayTimeValues);
-
-    var buffers = delayBus.getChannelData();
+    switch (numberOfChannels) {
+      case 1:
+        this.dspProcess = this.dspProcess1;
+        break;
+      case 2:
+        this.dspProcess = this.dspProcess2;
+        break;
+      default:
+        this.dspProcess = this.dspProcessN;
+        break;
+    }
+  },
+  dspProcess1: function dspProcess1() {
+    var blockSize = this.blockSize;
+    var inputs = this.inputs[0].bus.getChannelData();
     var outputs = this.outputs[0].bus.getMutableData();
-    var numberOfChannels = outputs.length;
-    var inNumSamples = this.blockSize;
-    var delayIndexes = this._delayIndexes;
+    var delayIndices = this._delayIndices;
+    var kernel = this._kernels[0];
 
-    for (var ch = 0; ch < numberOfChannels; ch++) {
-      this.dspKernelProcess(buffers[ch], outputs[ch], delayIndexes, inNumSamples);
-    }
-
-    this._delayIndex += this.blockSize;
-
-    if (this._delayIndex === this._delayBusLength) {
-      this._delayIndex = 0;
+    if (this._delayTime.hasSampleAccurateValues()) {
+      kernel.computeAccurateDelayIndices(delayIndices, this._delayTime.getSampleAccurateValues());
+      kernel.processWithAccurateDelayIndices(inputs[0], outputs[0], delayIndices, blockSize);
+    } else {
+      kernel.computeStaticDelayIndices(delayIndices, this._delayTime.getValue());
+      kernel.processWithStaticDelayIndices(inputs[0], outputs[0], delayIndices, blockSize);
     }
   },
-  dspUpdateDelayIndexes: function dspUpdateDelayIndexes(delayTimeValues) {
-    var baseIndex = this._delayIndex;
-    var sampleRate = this.sampleRate;
-    var delayIndexes = this._delayIndexes;
+  dspProcess2: function dspProcess2() {
+    var blockSize = this.blockSize;
+    var inputs = this.inputs[0].bus.getChannelData();
+    var outputs = this.outputs[0].bus.getMutableData();
+    var delayIndices = this._delayIndices;
+    var kernels = this._kernels;
 
-    for (var i = 0, imax = delayTimeValues.length; i < imax; i++) {
-      delayIndexes[i] = baseIndex + i - delayTimeValues[i] * sampleRate;
+    if (this._delayTime.hasSampleAccurateValues()) {
+      kernels[0].computeAccurateDelayIndices(delayIndices, this._delayTime.getSampleAccurateValues());
+      kernels[0].processWithAccurateDelayIndices(inputs[0], outputs[0], delayIndices, blockSize);
+      kernels[1].processWithAccurateDelayIndices(inputs[1], outputs[1], delayIndices, blockSize);
+    } else {
+      kernels[0].computeStaticDelayIndices(delayIndices, this._delayTime.getValue());
+      kernels[0].processWithStaticDelayIndices(inputs[0], outputs[0], delayIndices, blockSize);
+      kernels[1].processWithStaticDelayIndices(inputs[1], outputs[1], delayIndices, blockSize);
     }
   },
-  dspKernelProcess: function dspKernelProcess(delayBuffer, output, delayIndexes, inNumSamples) {
-    var length = delayBuffer.length;
+  dspProcessN: function dspProcessN() {
+    var blockSize = this.blockSize;
+    var inputs = this.inputs[0].bus.getChannelData();
+    var outputs = this.outputs[0].bus.getMutableData();
+    var delayIndices = this._delayIndices;
+    var kernels = this._kernels;
 
-    for (var i = 0; i < inNumSamples; i++) {
-      var idx = delayIndexes[i];
-      var id0 = idx | 0;
-      var dx = idx % 1;
+    if (this._delayTime.hasSampleAccurateValues()) {
+      kernels[0].computeAccurateDelayIndices(delayIndices, this._delayTime.getSampleAccurateValues());
 
-      if (dx === 0) {
-        output[i] = delayBuffer[tt(id0, length)];
-      } else {
-        var d0 = delayBuffer[tt(id0 + 1, length)];
-        var d1 = delayBuffer[tt(id0, length)];
-        var d2 = delayBuffer[tt(id0 - 1, length)];
-        var d3 = delayBuffer[tt(id0 - 2, length)];
+      for (var i = 0, imax = kernels.length; i < imax; i++) {
+        kernels[i].processWithAccurateDelayIndices(inputs[i], outputs[i], delayIndices, blockSize);
+      }
+    } else {
+      kernels[0].computeStaticDelayIndices(delayIndices, this._delayTime.getValue());
 
-        output[i] = cubicinterp(dx, d0, d1, d2, d3);
+      for (var _i = 0, _imax = kernels.length; _i < _imax; _i++) {
+        kernels[_i].processWithStaticDelayIndices(inputs[_i], outputs[_i], delayIndices, blockSize);
       }
     }
   }
 };
 
-function tt(index, length) {
-  if (index < 0) {
-    return length + index % length;
+var DelayKernel = function () {
+  function DelayKernel(delayNode) {
+    _classCallCheck(this, DelayKernel);
+
+    this._sampleRate = delayNode.sampleRate;
+    this._maxDelayTime = delayNode._maxDelayTime;
+    this._delayBufferLength = delayNode._delayBufferLength;
+    this._delayBuffer = new Float32Array(this._delayBufferLength);
+    this._virtualDelayIndex = 0;
   }
-  return index % length;
-}
 
-function cubicinterp(x, y0, y1, y2, y3) {
-  var c0 = y1;
-  var c1 = 0.5 * (y2 - y0);
-  var c2 = y0 - 2.5 * y1 + 2 * y2 - 0.5 * y3;
-  var c3 = 0.5 * (y3 - y0) + 1.5 * (y1 - y2);
+  _createClass(DelayKernel, [{
+    key: "computeStaticDelayIndices",
+    value: function computeStaticDelayIndices(delayIndices, delayTime) {
+      var sampleRate = this._sampleRate;
+      var maxDelayTime = this._maxDelayTime;
+      var delayBufferLength = this._delayBufferLength;
+      var virtualReadIndex = this._virtualDelayIndex;
 
-  return ((c3 * x + c2) * x + c1) * x + c0;
-}
+      delayTime = Math.max(0, Math.min(delayTime, maxDelayTime));
 
-function computeFrameToDelay(delayTime, sampleRate, blockSize) {
-  return Math.ceil(delayTime * sampleRate / blockSize) * blockSize + blockSize;
-}
+      var delayIndex = virtualReadIndex - delayTime * sampleRate;
+
+      if (delayIndex < 0) {
+        delayIndex += delayBufferLength;
+      }
+
+      for (var i = 0, imax = delayIndices.length; i < imax; i++) {
+        delayIndices[i] = delayIndex++;
+        if (delayBufferLength <= delayIndex) {
+          delayIndex -= delayBufferLength;
+        }
+      }
+
+      return delayIndices;
+    }
+  }, {
+    key: "computeAccurateDelayIndices",
+    value: function computeAccurateDelayIndices(delayIndices, delayTimes) {
+      var sampleRate = this._sampleRate;
+      var maxDelayTime = this._maxDelayTime;
+      var delayBufferLength = this._delayBufferLength;
+      var virtualReadIndex = this._virtualDelayIndex;
+
+      for (var i = 0, imax = delayIndices.length; i < imax; i++) {
+        var delayTime = Math.max(0, Math.min(delayTimes[i], maxDelayTime));
+
+        var delayIndex = virtualReadIndex + i - delayTime * sampleRate;
+
+        if (delayIndex < 0) {
+          delayIndex += delayBufferLength;
+        }
+
+        delayIndices[i] = delayIndex;
+      }
+
+      return delayIndices;
+    }
+  }, {
+    key: "processWithStaticDelayIndices",
+    value: function processWithStaticDelayIndices(input, output, delayIndices, inNumSamples) {
+      var delayBufferLength = this._delayBufferLength;
+      var delayBuffer = this._delayBuffer;
+
+      this._delayBuffer.set(input, this._virtualDelayIndex);
+
+      var ia = delayIndices[0] % 1;
+
+      if (ia === 0) {
+        for (var i = 0; i < inNumSamples; i++) {
+          output[i] = delayBuffer[delayIndices[i]];
+        }
+      } else {
+        for (var _i2 = 0; _i2 < inNumSamples; _i2++) {
+          var i0 = delayIndices[_i2] | 0;
+          var i1 = (i0 + 1) % delayBufferLength;
+
+          output[_i2] = delayBuffer[i0] + ia * (delayBuffer[i1] - delayBuffer[i0]);
+        }
+      }
+
+      this._virtualDelayIndex += inNumSamples;
+
+      if (this._virtualDelayIndex === delayBufferLength) {
+        this._virtualDelayIndex = 0;
+      }
+    }
+  }, {
+    key: "processWithAccurateDelayIndices",
+    value: function processWithAccurateDelayIndices(input, output, delayIndices, inNumSamples) {
+      var delayBufferLength = this._delayBufferLength;
+      var delayBuffer = this._delayBuffer;
+
+      delayBuffer.set(input, this._virtualDelayIndex);
+
+      for (var i = 0; i < inNumSamples; i++) {
+        var ix = delayIndices[i];
+        var i0 = ix | 0;
+        var ia = ix % 1;
+
+        if (ia === 0) {
+          output[i] = delayBuffer[i0];
+        } else {
+          var i1 = (i0 + 1) % delayBufferLength;
+
+          output[i] = delayBuffer[i0] + ia * (delayBuffer[i1] - delayBuffer[i0]);
+        }
+      }
+
+      this._virtualDelayIndex += inNumSamples;
+
+      if (this._virtualDelayIndex === delayBufferLength) {
+        this._virtualDelayIndex = 0;
+      }
+    }
+  }]);
+
+  return DelayKernel;
+}();
 
 module.exports = DelayNodeDSP;
 
-},{"../core/AudioBus":66}],79:[function(require,module,exports){
+},{}],79:[function(require,module,exports){
 "use strict";
 
 var DynamicsCompressorNodeDSP = {
@@ -9801,11 +9944,118 @@ module.exports = GainNodeDSP;
 },{}],81:[function(require,module,exports){
 "use strict";
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var IIRFilterNodeDSP = {
-  dspProcess: function dspProcess() {
-    this.outputs[0].bus.copyFrom(this.inputs[0].bus);
+  dspInit: function dspInit() {
+    this._kernels = [];
+  },
+  dspUpdateKernel: function dspUpdateKernel(numberOfChannels) {
+    if (numberOfChannels < this._kernels.length) {
+      this._kernels.splice(numberOfChannels);
+    } else if (this._kernels.length < numberOfChannels) {
+      while (numberOfChannels !== this._kernels.length) {
+        this._kernels.push(new IIRFilterKernel(this._feedforward, this._feedback));
+      }
+    }
+
+    switch (numberOfChannels) {
+      case 1:
+        this.dspProcess = this.dspProcess1;
+        break;
+      case 2:
+        this.dspProcess = this.dspProcess2;
+        break;
+      default:
+        this.dspProcess = this.dspProcessN;
+        break;
+    }
+  },
+  dspProcess1: function dspProcess1() {
+    var inputs = this.inputs[0].bus.getChannelData();
+    var outputs = this.outputs[0].bus.getMutableData();
+    var kernels = this._kernels;
+
+    kernels[0].process(inputs[0], outputs[0], this.blockSize);
+  },
+  dspProcess2: function dspProcess2() {
+    var blockSize = this.blockSize;
+    var inputs = this.inputs[0].bus.getChannelData();
+    var outputs = this.outputs[0].bus.getMutableData();
+    var kernels = this._kernels;
+
+    kernels[0].process(inputs[0], outputs[0], blockSize);
+    kernels[1].process(inputs[1], outputs[1], blockSize);
+  },
+  dspProcessN: function dspProcessN() {
+    var blockSize = this.blockSize;
+    var inputs = this.inputs[0].bus.getChannelData();
+    var outputs = this.outputs[0].bus.getMutableData();
+    var kernels = this._kernels;
+
+    for (var i = 0, imax = kernels.length; i < imax; i++) {
+      kernels[i].process(inputs[i], outputs[i], blockSize);
+    }
   }
 };
+
+var IIRFilterKernel = function () {
+  function IIRFilterKernel(feedforward, feedback) {
+    _classCallCheck(this, IIRFilterKernel);
+
+    this.a = toCoefficient(feedback, feedback[0]);
+    this.b = toCoefficient(feedforward, feedback[0]);
+    this.x = new Float32Array(this.b.length);
+    this.y = new Float32Array(this.a.length);
+  }
+
+  _createClass(IIRFilterKernel, [{
+    key: "process",
+    value: function process(input, output, inNumSamples) {
+      var a = this.a;
+      var b = this.b;
+      var x = this.x;
+      var y = this.y;
+      var alen = this.a.length - 1;
+      var blen = this.b.length;
+
+      for (var i = 0; i < inNumSamples; i++) {
+        x[blen - 1] = input[i];
+        y[alen] = 0;
+
+        for (var j = 0; j < blen; j++) {
+          y[alen] += b[j] * x[j];
+          x[j] = flushDenormalFloatToZero(x[j + 1]);
+        }
+
+        for (var _j = 0; _j < alen; _j++) {
+          y[alen] -= a[_j] * y[_j];
+          y[_j] = flushDenormalFloatToZero(y[_j + 1]);
+        }
+
+        output[i] = y[alen];
+      }
+    }
+  }]);
+
+  return IIRFilterKernel;
+}();
+
+function toCoefficient(filter, a0) {
+  var coeff = new Float32Array(filter.length);
+
+  for (var i = 0, imax = coeff.length; i < imax; i++) {
+    coeff[i] = filter[imax - i - 1] / a0;
+  }
+
+  return coeff;
+}
+
+function flushDenormalFloatToZero(f) {
+  return Math.abs(f) < 1.175494e-38 ? 0.0 : f;
+}
 
 module.exports = IIRFilterNodeDSP;
 
@@ -9816,38 +10066,37 @@ var OscillatorNodeDSP = {
   dspInit: function dspInit() {
     this._phase = 0;
   },
-  dspProcess: function dspProcess(currentSample) {
+  dspProcess: function dspProcess() {
     var _this = this;
 
-    var nextSample = currentSample + this.blockSize;
-
-    if (nextSample < this._startSample) {
-      return;
-    }
-
-    if (this._stopSample <= currentSample) {
-      return;
-    }
-
-    var sampleRate = this.sampleRate;
     var blockSize = this.blockSize;
-    var sampleOffset = Math.max(0, this._startSample - currentSample);
-    var endSample = Math.min(nextSample, this._stopSample);
-    var fillToFrame = endSample - currentSample;
+    var quantumStartFrame = this.context.currentSampleFrame;
+    var quantumEndFrame = quantumStartFrame + blockSize;
+    var sampleOffset = Math.max(0, this._startFrame - quantumStartFrame);
+    var fillToSample = Math.min(quantumEndFrame, this._stopFrame) - quantumStartFrame;
     var output = this.outputs[0].bus.getMutableData()[0];
 
     var writeIndex = 0;
 
     if (this._type === "sine") {
-      writeIndex = this.dspSine(output, sampleOffset, fillToFrame, sampleRate);
+      writeIndex = this.dspSine(output, sampleOffset, fillToSample, this.sampleRate);
     } else {
-      writeIndex = this.dspWave(output, sampleOffset, fillToFrame, sampleRate);
+      writeIndex = this.dspWave(output, sampleOffset, fillToSample, this.sampleRate);
     }
 
-    if (writeIndex < blockSize) {
+    // timeline
+    // |----------------|-------*--------|----------------|----------------|
+    //                  ^       ^        ^
+    //                  |------>|        quantumEndFrame
+    //                  | wrote |
+    //                  |       stopFrame
+    //                  quantumStartFrame
+    if (this._stopFrame <= quantumStartFrame + writeIndex) {
+      // rest samples fill zero
       while (writeIndex < blockSize) {
         output[writeIndex++] = 0;
       }
+
       this.context.addPostProcess(function () {
         _this.outputs[0].bus.zeros();
         _this.outputs[0].disable();
@@ -10030,32 +10279,33 @@ var ScriptProcessorNodeDSP = {
 
     this._eventItem = eventItem;
   },
-  dspProcess: function dspProcess(currentSample) {
+  dspProcess: function dspProcess() {
     var _this = this;
 
+    var blockSize = this.blockSize;
+    var quantumStartFrame = this.context.currentSampleFrame;
+    var quantumEndFrame = quantumStartFrame + blockSize;
     var inputs = this.inputs[0].bus.getChannelData();
     var outputs = this.outputs[0].bus.getMutableData();
     var inputChannelData = this._inputChannelData;
     var outputChannelData = this._outputChannelData;
     var numberOfInputChannels = inputs.length;
     var numberOfOutputChannels = outputs.length;
-    var blockSize = this.blockSize;
-    var writeIndex = this._writeIndex;
+    var copyFrom = this._writeIndex;
+    var copyTo = copyFrom + blockSize;
 
-    for (var i = 0; i < blockSize; i++) {
-      for (var ch = 0; ch < numberOfInputChannels; ch++) {
-        inputChannelData[ch][i + writeIndex] = inputs[ch][i];
-      }
-      for (var _ch = 0; _ch < numberOfOutputChannels; _ch++) {
-        outputs[_ch][i] = outputChannelData[_ch][i + writeIndex];
-      }
+    for (var ch = 0; ch < numberOfInputChannels; ch++) {
+      inputChannelData[ch].set(inputs[ch], copyFrom);
+    }
+    for (var _ch = 0; _ch < numberOfOutputChannels; _ch++) {
+      outputs[_ch].set(outputChannelData[_ch].subarray(copyFrom, copyTo));
     }
 
     this._writeIndex += blockSize;
 
     if (this._writeIndex === this._bufferSize) {
       (function () {
-        var playbackTime = (currentSample + blockSize) / _this.sampleRate;
+        var playbackTime = quantumEndFrame / _this.sampleRate;
 
         _this.context.addPostProcess(function () {
           for (var _ch2 = 0; _ch2 < numberOfOutputChannels; _ch2++) {
@@ -10184,47 +10434,105 @@ module.exports = StereoPannerNodeDSP;
 },{}],88:[function(require,module,exports){
 "use strict";
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var WaveShaperNodeDSP = {
-  dspProcess: function dspProcess() {
-    var inputBus = this.inputs[0].bus;
-    var outputBus = this.outputs[0].bus;
-
-    if (this._curve === null) {
-      outputBus.copyFrom(inputBus);
-      return;
+  dspInit: function dspInit() {
+    this._kernels = [];
+  },
+  dspUpdateKernel: function dspUpdateKernel(curve, numberOfChannels) {
+    if (curve === null) {
+      numberOfChannels = 0;
     }
-
-    var inputs = inputBus.getChannelData();
-    var outputs = outputBus.getMutableData();
-    var numberOfChannels = outputs.length;
-    var blockSize = this.blockSize;
-    var curve = this._curve;
-
-    for (var ch = 0; ch < numberOfChannels; ch++) {
-      for (var i = 0; i < blockSize; i++) {
-        outputs[ch][i] = this.dspApplyCurve(inputs[ch][i], curve);
+    if (numberOfChannels < this._kernels.length) {
+      this._kernels.splice(numberOfChannels);
+    } else if (this._kernels.length < numberOfChannels) {
+      while (numberOfChannels !== this._kernels.length) {
+        this._kernels.push(new WaveShaperKernel(this, this._kernels.length));
       }
     }
-  },
-  dspApplyCurve: function dspApplyCurve(x, curve) {
-    x = Math.max(-1, Math.min(x, 1));
-    x = (x + 1) * 0.5;
 
-    var ix = x * (curve.length - 1);
-    var i0 = ix | 0;
-    var i1 = i0 + 1;
-
-    if (curve.length <= i1) {
-      return curve[curve.length - 1];
+    switch (numberOfChannels) {
+      case 0:
+        this.dspProcess = this.dspProcess0;
+        break;
+      case 1:
+        this.dspProcess = this.dspProcess1;
+        break;
+      case 2:
+        this.dspProcess = this.dspProcess2;
+        break;
+      default:
+        this.dspProcess = this.dspProcessN;
+        break;
     }
+  },
+  dspProcess0: function dspProcess0() {
+    this.outputs[0].bus.copyFrom(this.inputs[0].bus);
+  },
+  dspProcess1: function dspProcess1() {
+    var inputBus = this.inputs[0].bus;
+    var outputBus = this.outputs[0].bus;
+    var inputs = inputBus.getChannelData();
+    var outputs = outputBus.getMutableData();
+    var kernels = this._kernels;
 
-    var y0 = curve[i0];
-    var y1 = curve[i1];
-    var a = ix % 1;
+    kernels[0].process(inputs[0], outputs[0], this._curve, this.blockSize);
+  },
+  dspProcess2: function dspProcess2() {
+    var inputBus = this.inputs[0].bus;
+    var outputBus = this.outputs[0].bus;
+    var inputs = inputBus.getChannelData();
+    var outputs = outputBus.getMutableData();
+    var blockSize = this.blockSize;
+    var curve = this._curve;
+    var kernels = this._kernels;
 
-    return y0 + a * (y1 - y0);
+    kernels[0].process(inputs[0], outputs[0], curve, blockSize);
+    kernels[1].process(inputs[1], outputs[1], curve, blockSize);
+  },
+  dspProcessN: function dspProcessN() {
+    var inputBus = this.inputs[0].bus;
+    var outputBus = this.outputs[0].bus;
+    var inputs = inputBus.getChannelData();
+    var outputs = outputBus.getMutableData();
+    var blockSize = this.blockSize;
+    var curve = this._curve;
+    var kernels = this._kernels;
+
+    for (var i = 0, imax = kernels.length; i < imax; i++) {
+      kernels[i].process(inputs[i], outputs[i], curve, blockSize);
+    }
   }
 };
+
+var WaveShaperKernel = function () {
+  function WaveShaperKernel() {
+    _classCallCheck(this, WaveShaperKernel);
+  }
+
+  _createClass(WaveShaperKernel, [{
+    key: "process",
+    value: function process(input, output, curve, inNumSamples) {
+      for (var i = 0; i < inNumSamples; i++) {
+        var x = (Math.max(-1, Math.min(input[i], 1)) + 1) * 0.5;
+        var ix = x * (curve.length - 1);
+        var i0 = ix | 0;
+        var i1 = i0 + 1;
+
+        if (curve.length <= i1) {
+          output[i] = curve[curve.length - 1];
+        } else {
+          output[i] = curve[i0] + ix % 1 * (curve[i1] - curve[i0]);
+        }
+      }
+    }
+  }]);
+
+  return WaveShaperKernel;
+}();
 
 module.exports = WaveShaperNodeDSP;
 
