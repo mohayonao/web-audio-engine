@@ -10,7 +10,9 @@ function makeTests(context, expectedValues, sched1, sched2) {
     sched1(param);
 
     for (let i = 0; i < 5; i++) {
-      param.dspProcess(i * 16);
+      context.currentSampleFrame = i * 16;
+
+      param.dspProcess();
 
       const expected = expectedValues.subarray(i * 16, (i + 1) * 16);
       const actual = param.getSampleAccurateValues();
@@ -26,7 +28,9 @@ function makeTests(context, expectedValues, sched1, sched2) {
     sched1(param);
 
     for (let i = 1; i < 5; i += 2) {
-      param.dspProcess(i * 16);
+      context.currentSampleFrame = i * 16;
+
+      param.dspProcess();
 
       const expected = expectedValues.subarray(i * 16, (i + 1) * 16);
       const actual = param.getSampleAccurateValues();
@@ -42,10 +46,13 @@ function makeTests(context, expectedValues, sched1, sched2) {
     sched1(param);
 
     for (let i = 0; i < 5; i++) {
-      param.dspProcess(i * 16);
+      context.currentSampleFrame = i * 16;
+      param.dspProcess();
     }
     sched2(param);
-    param.dspProcess(5 * 16);
+
+    context.currentSampleFrame = 5 * 16;
+    param.dspProcess();
 
     const expected = expectedValues.subarray(5 * 16, (5 + 1) * 16);
     const actual = param.getSampleAccurateValues();

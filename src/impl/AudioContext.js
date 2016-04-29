@@ -12,6 +12,7 @@ const AudioListener = require("./AudioListener");
  * @prop {number} blockSize
  * @prop {number} numberOfChannels
  * @prop {number} currentTime
+ * @prop {number} currentSampleFrame
  */
 class AudioContext extends EventTarget {
   /**
@@ -37,11 +38,11 @@ class AudioContext extends EventTarget {
     this.blockSize = blockSize;
     this.numberOfChannels = numberOfChannels;
     this.currentTime = 0;
+    this.currentSampleFrame = 0;
     this._destination = new AudioDestinationNode(this, { numberOfChannels });
     this._listener = new AudioListener(this);
     this._state = "suspended";
-    this._scheduledSourceNodes = [];
-    this._callbacksForPreProcess = [];
+    this._sched = [];
     this._callbacksForPostProcess = null;
     this._currentFrameIndex = 0;
   }
@@ -118,10 +119,8 @@ class AudioContext extends EventTarget {
   changeState(state) {
     this._state = state;
     return new Promise((resolve) => {
-      this.addPreProcess(() => {
-        this.dispatchEvent({ type: "statechange" });
-        resolve();
-      });
+      this.dispatchEvent({ type: "statechange" });
+      resolve();
     });
   }
 
@@ -129,41 +128,22 @@ class AudioContext extends EventTarget {
    * @return {Promise<void>}
    */
   notChangeState() {
-    return new Promise((resolve) => {
-      this.addPreProcess(resolve);
-    });
+    return Promise.resolve();
   }
 
   /**
-   * @param {AudioNode} node
-   */
-  addToScheduledSource(node) {
-    const index = this._scheduledSourceNodes.indexOf(node);
-
-    /* istanbul ignore else */
-    if (index === -1) {
-      this._scheduledSourceNodes.push(node);
-    }
-  }
-
-  /**
-   * @param {AudioNode} node
-   */
-  removeFromScheduledSource(node) {
-    const index = this._scheduledSourceNodes.indexOf(node);
-
-    /* istanbul ignore else */
-    if (index === -1) {
-      this._scheduledSourceNodes.splice(index, 1);
-    }
-  }
-
-  /**
+   * @param {number}   time
    * @param {function} task
    */
-  addPreProcess(task) {
-    assert(typeof task === "function");
-    this._callbacksForPreProcess.push(task);
+  sched(time, task) {
+    const deltaTime = Math.max(0, time - this.currentTime);
+    const schedIndex = Math.floor((deltaTime * this.sampleRate) / this.blockSize);
+
+    if (!this._sched[schedIndex]) {
+      this._sched[schedIndex] = [ task ];
+    } else {
+      this._sched[schedIndex].push(task);
+    }
   }
 
   /**
@@ -187,33 +167,25 @@ class AudioContext extends EventTarget {
    *
    */
   process() {
-    this.callTasks(this._callbacksForPreProcess);
-    this._callbacksForPreProcess = [];
-
     const destination = this._destination;
     const outputBus = destination.outputBus;
 
-    if (this._state === "running") {
-      const sampleRate = this.sampleRate;
-      const blockSize = this.blockSize;
-      const currentSample = this._currentFrameIndex * blockSize;
-      const scheduledSourceNodes = this._scheduledSourceNodes;
+    if (this._state !== "running") {
+      outputBus.zeros();
+    } else {
+      const tasks = this._sched.shift();
 
-      for (let i = scheduledSourceNodes.length - 1; i >= 0; i--) {
-        if (scheduledSourceNodes[i].checkSchedule(currentSample) === "running") {
-          scheduledSourceNodes.splice(i, 1);
-        }
+      if (tasks) {
+        this.callTasks(tasks);
       }
 
       this._callbacksForPostProcess = [];
 
-      destination.processIfNecessary(currentSample);
+      destination.processIfNecessary();
 
       this.callTasks(this._callbacksForPostProcess);
-      this.currentTime = (currentSample + blockSize) / sampleRate;
-      this._currentFrameIndex += 1;
-    } else {
-      outputBus.zeros();
+      this.currentSampleFrame += this.blockSize;
+      this.currentTime = this.currentSampleFrame / this.sampleRate;
     }
 
     return outputBus.audioData;
@@ -224,12 +196,12 @@ class AudioContext extends EventTarget {
    */
   reset() {
     this.currentTime = 0;
+    this.currentSampleFrame = 0;
     this._destination = new AudioDestinationNode(this, { numberOfChannels: this.numberOfChannels });
     this._listener = new AudioListener(this);
     this._state = "suspended";
-    this._callbacksForPreProcess = [];
+    this._sched = [];
     this._callbacksForPostProcess = null;
-    this._currentFrameIndex = 0;
   }
 }
 

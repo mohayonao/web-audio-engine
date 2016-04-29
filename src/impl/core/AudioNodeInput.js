@@ -233,37 +233,35 @@ class AudioNodeInput {
   }
 
   /**
-   * @param {*} e
    * @return {AudioBus}
    */
-  sumAllConnections(e) {
+  sumAllConnections() {
     const audioBus = this.bus;
     const outputs = this._outputs;
 
     audioBus.zeros();
 
     for (let i = 0, imax = outputs.length; i < imax; i++) {
-      audioBus.sumFrom(outputs[i].pull(e));
+      audioBus.sumFrom(outputs[i].pull());
     }
 
     return audioBus;
   }
 
   /**
-   * @param {*} e
    * @return {AudioBus}
    */
-  pull(e) {
+  pull() {
     if (this._outputs.length === 1) {
       const output = this._outputs[0];
 
       /* istanbul ignore else */
       if (output.getNumberOfChannels() === this.getNumberOfChannels()) {
-        return this.bus.copyFrom(output.pull(e));
+        return this.bus.copyFrom(output.pull());
       }
     }
 
-    return this.sumAllConnections(e);
+    return this.sumAllConnections();
   }
 }
 

@@ -144,7 +144,7 @@ describe("AudioParam", () => {
     function pluck(items) {
       const list = [];
 
-      [ "type", "startSample", "endSample", "startValue", "endValue" ].forEach((key) => {
+      [ "type", "startFrame", "endFrame", "startValue", "endValue" ].forEach((key) => {
         list.push(items[key]);
       });
 
@@ -315,7 +315,9 @@ describe("AudioParam", () => {
     it("static value", () => {
       [ 0, 0.25, 0.5, 0.5 ].forEach((value, i) => {
         param.setValue(value);
-        param.dspProcess(i * 16);
+
+        context.currentSampleFrame = i * 16;
+        param.dspProcess();
 
         const expected = new Float32Array(16).fill(value);
         const actual = param.getSampleAccurateValues();
@@ -334,7 +336,9 @@ describe("AudioParam", () => {
         node1.outputs[0].bus.getMutableData()[0].set(noise);
 
         param.setValue(value);
-        param.dspProcess(i * 16);
+
+        context.currentSampleFrame = i * 16;
+        param.dspProcess();
 
         const expected = new Float32Array(16).map((_, i) => value + noise[i]);
         const actual = param.getSampleAccurateValues();
@@ -349,7 +353,9 @@ describe("AudioParam", () => {
       param.linearRampToValueAtTime(1, 16/8000);
 
       param.setValue(1);
-      param.dspProcess(0);
+
+      context.currentSampleFrame = 0;
+      param.dspProcess();
 
       const expected = new Float32Array(16).map((_, i) => i / 16);
       const actual = param.getSampleAccurateValues();
@@ -368,7 +374,9 @@ describe("AudioParam", () => {
       param.linearRampToValueAtTime(1, 16/8000);
 
       param.setValue(1);
-      param.dspProcess(0);
+
+      context.currentSampleFrame = 0;
+      param.dspProcess();
 
       const expected = new Float32Array(16).map((_, i) => (i / 16) + noise[i]);
       const actual = param.getSampleAccurateValues();

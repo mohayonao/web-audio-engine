@@ -212,10 +212,9 @@ describe("AudioNodeOutput", () => {
 
       node.dspProcess = sinon.spy();
 
-      const retVal = output.pull(0);
+      const retVal = output.pull();
 
       assert(node.dspProcess.callCount === 1);
-      assert(node.dspProcess.calledWith(0));
       assert(retVal instanceof AudioBus);
     });
   });

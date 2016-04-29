@@ -18,6 +18,9 @@ class WaveShaperNode extends AudioNode {
     });
     this._curve = null;
     this._overSample = "none";
+
+    this.dspInit();
+    this.dspUpdateKernel(null, 1);
   }
 
   /**
@@ -34,6 +37,7 @@ class WaveShaperNode extends AudioNode {
     /* istanbul ignore else */
     if (value === null || value instanceof Float32Array) {
       this._curve = value;
+      this.dspUpdateKernel(this._curve, this.outputs[0].getNumberOfChannels());
     }
   }
 
@@ -58,6 +62,7 @@ class WaveShaperNode extends AudioNode {
    * @param {number} numberOfChannels
    */
   channelDidUpdate(numberOfChannels) {
+    this.dspUpdateKernel(this._curve, numberOfChannels);
     this.outputs[0].setNumberOfChannels(numberOfChannels);
   }
 }

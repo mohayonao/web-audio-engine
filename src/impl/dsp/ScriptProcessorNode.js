@@ -29,29 +29,30 @@ const ScriptProcessorNodeDSP = {
     this._eventItem = eventItem;
   },
 
-  dspProcess(currentSample) {
+  dspProcess() {
+    const blockSize = this.blockSize;
+    const quantumStartFrame = this.context.currentSampleFrame;
+    const quantumEndFrame = quantumStartFrame + blockSize;
     const inputs = this.inputs[0].bus.getChannelData();
     const outputs = this.outputs[0].bus.getMutableData();
     const inputChannelData = this._inputChannelData;
     const outputChannelData = this._outputChannelData;
     const numberOfInputChannels = inputs.length;
     const numberOfOutputChannels = outputs.length;
-    const blockSize = this.blockSize;
-    const writeIndex = this._writeIndex;
+    const copyFrom = this._writeIndex;
+    const copyTo = copyFrom + blockSize;
 
-    for (let i = 0; i < blockSize; i++) {
-      for (let ch = 0; ch < numberOfInputChannels; ch++) {
-        inputChannelData[ch][i + writeIndex] = inputs[ch][i];
-      }
-      for (let ch = 0; ch < numberOfOutputChannels; ch++) {
-        outputs[ch][i] = outputChannelData[ch][i + writeIndex];
-      }
+    for (let ch = 0; ch < numberOfInputChannels; ch++) {
+      inputChannelData[ch].set(inputs[ch], copyFrom);
+    }
+    for (let ch = 0; ch < numberOfOutputChannels; ch++) {
+      outputs[ch].set(outputChannelData[ch].subarray(copyFrom, copyTo));
     }
 
     this._writeIndex += blockSize;
 
     if (this._writeIndex === this._bufferSize) {
-      const playbackTime = (currentSample + blockSize) / this.sampleRate;
+      const playbackTime = quantumEndFrame / this.sampleRate;
 
       this.context.addPostProcess(() => {
         for (let ch = 0; ch < numberOfOutputChannels; ch++) {

@@ -237,10 +237,9 @@ describe("AudioNode", () => {
       node1.dspProcess = sinon.spy();
       param.dspProcess = sinon.spy();
 
-      node3.processIfNecessary(0);
+      node3.processIfNecessary();
 
-      assert(node1.dspProcess.calledWith(0));
-      assert(param.dspProcess.calledWith(0));
+      assert(param.dspProcess.callCount === 1);
     });
 
     it("feedback loop", () => {
@@ -256,10 +255,9 @@ describe("AudioNode", () => {
 
       node1.dspProcess = sinon.spy();
 
-      node3.processIfNecessary(0);
+      node3.processIfNecessary();
 
       assert(node1.dspProcess.callCount === 1);
-      assert(node1.dspProcess.calledWith(0));
     });
   });
 });

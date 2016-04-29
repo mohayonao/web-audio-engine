@@ -174,11 +174,13 @@ Executes encoding.
 - `ChannelSplitterNode`
 - `DelayNode` (noisy..)
 - `GainNode`
+- `IIRFIlterNode`
 - `OscillatorNode` (use wave-table synthesis, not use periodic wave)
 - `PeriodicWave`
 - `ScriptProcessorNode`
 - `StereoPannerNode`
 - `WaveShaperNode`
+- The other not implemented nodes will pass its input to its output without modification.
 
 ## Example
 
