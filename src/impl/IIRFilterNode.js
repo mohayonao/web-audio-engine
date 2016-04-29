@@ -1,5 +1,6 @@
 "use strict";
 
+const util = require("../util");
 const AudioNode = require("./AudioNode");
 const IIRFilterNodeDSP = require("./dsp/IIRFilterNode");
 
@@ -13,8 +14,8 @@ class IIRFilterNode extends AudioNode {
   constructor(context, opts) {
     opts = opts || /* istanbul ignore next */ {};
 
-    let feedforward = opts.feedforward;
-    let feedback = opts.feedback;
+    let feedforward = util.defaults(opts.feedforward, [ 0 ]);
+    let feedback = util.defaults(opts.feedback, [ 1 ]);
 
     super(context, {
       inputs: [ 1 ],
@@ -24,6 +25,9 @@ class IIRFilterNode extends AudioNode {
     });
     this._feedforward = feedforward;
     this._feedback = feedback;
+
+    this.dspInit();
+    this.dspUpdateKernel(1);
   }
 
   /**
@@ -54,6 +58,7 @@ class IIRFilterNode extends AudioNode {
    * @param {number} numberOfChannels
    */
   channelDidUpdate(numberOfChannels) {
+    this.dspUpdateKernel(numberOfChannels);
     this.outputs[0].setNumberOfChannels(numberOfChannels);
   }
 }
