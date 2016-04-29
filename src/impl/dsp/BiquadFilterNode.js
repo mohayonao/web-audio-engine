@@ -17,7 +17,7 @@ const computeCoefficients = {};
 const BiquadFilterNodeDSP = {
   dspInit() {
     this._kernels = [];
-    this._initCoefficients = false;
+    this._quantumStartFrame = -1;
     this._coefficients = [ 0, 0, 0, 0, 0 ];
     this._prevFrequency = 0;
     this._prevDetune = 0;
@@ -25,7 +25,7 @@ const BiquadFilterNodeDSP = {
     this._prevGain = 0;
   },
 
-  dspSetNumberOfChannels(numberOfChannels) {
+  dspUpdateKernel(numberOfChannels) {
     if (numberOfChannels < this._kernels.length) {
       this._kernels.splice(numberOfChannels);
     } else if (this._kernels.length < numberOfChannels) {
@@ -33,30 +33,92 @@ const BiquadFilterNodeDSP = {
         this._kernels.push(new BiquadFilterKernel(this, this._kernels.length));
       }
     }
+
     assert(numberOfChannels === this._kernels.length);
+
+    switch (numberOfChannels) {
+    case 1:
+      this.dspProcess = this.dspProcess1;
+      break;
+    case 2:
+      this.dspProcess = this.dspProcess2;
+      break;
+    default:
+      this.dspProcess = this.dspProcessN;
+      break;
+    }
   },
 
-  dspProcess() {
+  dspProcess1() {
+    const blockSize = this.blockSize;
+    const quantumStartFrame = this.context.currentSampleFrame;
+    const quantumEndFrame = quantumStartFrame + blockSize;
     const inputs = this.inputs[0].bus.getChannelData();
     const outputs = this.outputs[0].bus.getMutableData();
     const isCoefficientsUpdated = this.dspUpdateCoefficients();
+    const coefficients = this._coefficients;
     const kernels = this._kernels;
-    const inNumSamples = this.blockSize;
 
-    if (!this._initCoefficients) {
+    if (quantumStartFrame !== this._quantumStartFrame) {
+      kernels[0].processWithInitCoefficients(coefficients, inputs[0], outputs[0], blockSize);
+    } else if (isCoefficientsUpdated) {
+      kernels[0].processWithCoefficients(coefficients, inputs[0], outputs[0], blockSize);
+    } else {
+      kernels[0].process(inputs[0], outputs[0], blockSize);
+    }
+
+    this._quantumStartFrame = quantumEndFrame;
+  },
+
+  dspProcess2() {
+    const blockSize = this.blockSize;
+    const quantumStartFrame = this.context.currentSampleFrame;
+    const quantumEndFrame = quantumStartFrame + blockSize;
+    const inputs = this.inputs[0].bus.getChannelData();
+    const outputs = this.outputs[0].bus.getMutableData();
+    const isCoefficientsUpdated = this.dspUpdateCoefficients();
+    const coefficients = this._coefficients;
+    const kernels = this._kernels;
+
+    if (quantumStartFrame !== this._quantumStartFrame) {
+      kernels[0].processWithInitCoefficients(coefficients, inputs[0], outputs[0], blockSize);
+      kernels[1].processWithInitCoefficients(coefficients, inputs[1], outputs[1], blockSize);
+    } else if (isCoefficientsUpdated) {
+      kernels[0].processWithCoefficients(coefficients, inputs[0], outputs[0], blockSize);
+      kernels[1].processWithCoefficients(coefficients, inputs[1], outputs[1], blockSize);
+    } else {
+      kernels[0].process(inputs[0], outputs[0], blockSize);
+      kernels[1].process(inputs[1], outputs[1], blockSize);
+    }
+
+    this._quantumStartFrame = quantumEndFrame;
+  },
+
+  dspProcessN() {
+    const blockSize = this.blockSize;
+    const quantumStartFrame = this.context.currentSampleFrame;
+    const quantumEndFrame = quantumStartFrame + blockSize;
+    const inputs = this.inputs[0].bus.getChannelData();
+    const outputs = this.outputs[0].bus.getMutableData();
+    const isCoefficientsUpdated = this.dspUpdateCoefficients();
+    const coefficients = this._coefficients;
+    const kernels = this._kernels;
+
+    if (quantumStartFrame !== this._quantumStartFrame) {
       for (let i = 0, imax = kernels.length; i < imax; i++) {
-        kernels[i].processWithInitCoefficients(this._coefficients, inputs[i], outputs[i], inNumSamples);
+        kernels[i].processWithInitCoefficients(coefficients, inputs[i], outputs[i], blockSize);
       }
-      this._initCoefficients = true;
     } else if (isCoefficientsUpdated) {
       for (let i = 0, imax = kernels.length; i < imax; i++) {
-        kernels[i].processWithCoefficients(this._coefficients, inputs[i], outputs[i], inNumSamples);
+        kernels[i].processWithCoefficients(coefficients, inputs[i], outputs[i], blockSize);
       }
     } else {
       for (let i = 0, imax = kernels.length; i < imax; i++) {
-        kernels[i].process(inputs[i], outputs[i], inNumSamples);
+        kernels[i].process(inputs[i], outputs[i], blockSize);
       }
     }
+
+    this._quantumStartFrame = quantumEndFrame;
   },
 
   dspUpdateCoefficients() {

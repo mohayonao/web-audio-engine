@@ -22,7 +22,7 @@ class BiquadFilterNode extends AudioNode {
     this._gain = this.addParam("control", 0);
 
     this.dspInit();
-    this.dspSetNumberOfChannels(1);
+    this.dspUpdateKernel(1);
   }
 
   /**
@@ -85,7 +85,7 @@ class BiquadFilterNode extends AudioNode {
    * @param {number} numberOfChannels
    */
   channelDidUpdate(numberOfChannels) {
-    this.dspSetNumberOfChannels(numberOfChannels);
+    this.dspUpdateKernel(numberOfChannels);
     this.outputs[0].setNumberOfChannels(numberOfChannels);
   }
 

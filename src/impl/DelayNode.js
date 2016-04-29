@@ -25,6 +25,7 @@ class DelayNode extends AudioNode {
     this._delayTime = this.addParam("audio", 0);
 
     this.dspInit(this._maxDelayTime);
+    this.dspUpdateKernel(1);
   }
 
   /**
@@ -45,7 +46,7 @@ class DelayNode extends AudioNode {
    * @param {number} numberOfChannels
    */
   channelDidUpdate(numberOfChannels) {
-    this.dspSetNumberOfChannels(numberOfChannels);
+    this.dspUpdateKernel(numberOfChannels);
     this.outputs[0].setNumberOfChannels(numberOfChannels);
   }
 
