@@ -47,6 +47,16 @@
             </select>
           </div>
         </div>
+
+        <div class="form-group">
+          <label class="col-sm-1 control-label">target</label>
+          <div class="col-sm-11 checkbox">
+            <label>
+              <input type="checkbox" v-model="includeNative"> include the benchmark of the native Web Audio API
+            </label>
+          </div>
+        </div>
+
         <div class="form-group">
           <label class="col-sm-1 control-label">code</label>
           <div class="col-sm-11">
@@ -133,7 +143,7 @@
       context.startRendering();
     }
 
-    function benchmark(func, done) {
+    function benchmark(func, includeNative, done) {
       var suite = new Benchmark.Suite();
 
       suite.add("web-audio-engine", function(deferred) {
@@ -142,11 +152,13 @@
         });
       }, { defer: true });
 
-      suite.add("native Web Audio API", function(deferred) {
-        runInContext(OfflineAudioContext, func, function() {
-          deferred.resolve();
-        });
-      }, { defer: true });
+      if (includeNative) {
+        suite.add("native Web Audio API", function(deferred) {
+          runInContext(OfflineAudioContext, func, function() {
+            deferred.resolve();
+          });
+        }, { defer: true });
+      }
 
       suite.on("cycle", function(event) {
         var line = "" + event.target;
@@ -173,14 +185,14 @@
       return suite;
     }
 
-    function run(code, done) {
+    function run(code, includeNative, done) {
       var func = compile(code);
 
       if (typeof func !== "function") {
         return done();
       }
 
-      benchmark(func, function(suite) {
+      benchmark(func, includeNative, function(suite) {
         done();
       });
     }
@@ -189,6 +201,7 @@
       el: "#app",
       data: {
         isPlaying: false,
+        includeNative: true,
         selected: "simple-sine",
         list: [ "simple-sine", "simple-gain", "sched-sine" ],
         code: "",
@@ -202,7 +215,7 @@
           }
           this.isPlaying = true;
           this.result = navigator.userAgent + "\n";
-          run(this.code, function() {
+          run(this.code, this.includeNative, function() {
             _this.isPlaying = false;
           });
         },
@@ -218,6 +231,7 @@
     });
 
     if (!/firefox/i.test(navigator.userAgent)) {
+      vue.includeNative = false;
       document.getElementById("doesntWork").style.display = "block";
     }
 
