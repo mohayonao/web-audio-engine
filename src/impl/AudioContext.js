@@ -42,7 +42,7 @@ class AudioContext extends EventTarget {
     this._destination = new AudioDestinationNode(this, { numberOfChannels });
     this._listener = new AudioListener(this);
     this._state = "suspended";
-    this._sched = [];
+    this._sched = {};
     this._callbacksForPostProcess = null;
     this._currentFrameIndex = 0;
   }
@@ -136,13 +136,12 @@ class AudioContext extends EventTarget {
    * @param {function} task
    */
   sched(time, task) {
-    const deltaTime = Math.max(0, time - this.currentTime);
-    const schedIndex = Math.floor((deltaTime * this.sampleRate) / this.blockSize);
+    const schedSampleFrame = Math.floor((time * this.sampleRate) / this.blockSize) * this.blockSize;
 
-    if (!this._sched[schedIndex]) {
-      this._sched[schedIndex] = [ task ];
+    if (!this._sched[schedSampleFrame]) {
+      this._sched[schedSampleFrame] = [ task ];
     } else {
-      this._sched[schedIndex].push(task);
+      this._sched[schedSampleFrame].push(task);
     }
   }
 
@@ -173,10 +172,9 @@ class AudioContext extends EventTarget {
     if (this._state !== "running") {
       outputBus.zeros();
     } else {
-      const tasks = this._sched.shift();
-
-      if (tasks) {
-        this.callTasks(tasks);
+      if (this._sched[this.currentSampleFrame]) {
+        this.callTasks(this._sched[this.currentSampleFrame]);
+        delete this._sched[this.currentSampleFrame];
       }
 
       this._callbacksForPostProcess = [];
