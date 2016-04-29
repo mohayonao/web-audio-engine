@@ -54,9 +54,6 @@ describe("AudioContext", () => {
       assert(context.getState() === "suspended");
 
       context.resume();
-      assert(stateChangeSpy.callCount === 0);
-
-      context.process();
       assert(context.getState() === "running");
       assert(stateChangeSpy.callCount === 1);
 
@@ -70,9 +67,6 @@ describe("AudioContext", () => {
       assert(context.getState() === "running");
 
       context.suspend();
-      assert(stateChangeSpy.callCount === 0);
-
-      context.process();
       assert(context.getState() === "suspended");
       assert(stateChangeSpy.callCount === 1);
 
@@ -86,9 +80,6 @@ describe("AudioContext", () => {
       assert(context.getState() === "suspended");
 
       context.close();
-      assert(stateChangeSpy.callCount === 0);
-
-      context.process();
       assert(context.getState() === "closed");
       assert(stateChangeSpy.callCount === 1);
 
@@ -100,13 +91,11 @@ describe("AudioContext", () => {
   });
 
   describe("processing", () => {
-    let context, destination, eventTarget, eventItem;
+    let context, destination;
 
     before(() => {
       context = new AudioContext(contextOpts);
       destination = context.getDestination();
-      eventTarget = { dispatchEvent: sinon.spy() };
-      eventItem = { type: "bang" };
 
       context.resume();
     });
@@ -126,9 +115,6 @@ describe("AudioContext", () => {
 
     it("2: do post process and reserve pre process (for next process)", () => {
       const immediateSpy = sinon.spy(() => {
-        context.addPreProcess(() => {
-          eventTarget.dispatchEvent(eventItem);
-        });
       });
 
       assert(context.getCurrentTime() === 16 / 8000);
@@ -143,18 +129,6 @@ describe("AudioContext", () => {
       assert(context.getCurrentTime() === 32 / 8000);
       assert(immediateSpy.callCount === 1);
       assert(immediateSpy.calledAfter(destination.dspProcess));
-      assert(eventTarget.dispatchEvent.callCount === 0);
-    });
-
-    it("3: do pre process", () => {
-      assert(context.getCurrentTime() === 32 / 8000);
-
-      const retVal = context.process();
-
-      assert(retVal instanceof AudioData);
-      assert(eventTarget.dispatchEvent.callCount === 1);
-      assert(eventTarget.dispatchEvent.calledWith(eventItem));
-      assert(eventTarget.dispatchEvent.calledBefore(destination.dspProcess));
     });
   });
 

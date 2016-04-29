@@ -41,7 +41,6 @@ class AudioContext extends EventTarget {
     this._listener = new AudioListener(this);
     this._state = "suspended";
     this._scheduledSourceNodes = [];
-    this._callbacksForPreProcess = [];
     this._callbacksForPostProcess = null;
     this._currentFrameIndex = 0;
   }
@@ -118,10 +117,8 @@ class AudioContext extends EventTarget {
   changeState(state) {
     this._state = state;
     return new Promise((resolve) => {
-      this.addPreProcess(() => {
-        this.dispatchEvent({ type: "statechange" });
-        resolve();
-      });
+      this.dispatchEvent({ type: "statechange" });
+      resolve();
     });
   }
 
@@ -129,9 +126,7 @@ class AudioContext extends EventTarget {
    * @return {Promise<void>}
    */
   notChangeState() {
-    return new Promise((resolve) => {
-      this.addPreProcess(resolve);
-    });
+    return Promise.resolve();
   }
 
   /**
@@ -161,14 +156,6 @@ class AudioContext extends EventTarget {
   /**
    * @param {function} task
    */
-  addPreProcess(task) {
-    assert(typeof task === "function");
-    this._callbacksForPreProcess.push(task);
-  }
-
-  /**
-   * @param {function} task
-   */
   addPostProcess(task) {
     assert(typeof task === "function");
     this._callbacksForPostProcess.push(task);
@@ -187,9 +174,6 @@ class AudioContext extends EventTarget {
    *
    */
   process() {
-    this.callTasks(this._callbacksForPreProcess);
-    this._callbacksForPreProcess = [];
-
     const destination = this._destination;
     const outputBus = destination.outputBus;
 
