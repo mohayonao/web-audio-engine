@@ -244,7 +244,7 @@ describe("AudioNodeInput", () => {
 
       const input = node2.inputs[0];
 
-      input.pull(0);
+      input.pull();
 
       const actual = input.bus.getChannelData()[0];
       const expected = noise1;
@@ -270,7 +270,7 @@ describe("AudioNodeInput", () => {
 
       const input = node3.inputs[0];
 
-      input.pull(0);
+      input.pull();
 
       const actual = input.bus.getChannelData()[0];
       const expected = noise1.map((_, i) => noise1[i] + noise2[i]);

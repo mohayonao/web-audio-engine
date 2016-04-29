@@ -12,6 +12,7 @@ const AudioListener = require("./AudioListener");
  * @prop {number} blockSize
  * @prop {number} numberOfChannels
  * @prop {number} currentTime
+ * @prop {number} currentSampleFrame
  */
 class AudioContext extends EventTarget {
   /**
@@ -37,6 +38,7 @@ class AudioContext extends EventTarget {
     this.blockSize = blockSize;
     this.numberOfChannels = numberOfChannels;
     this.currentTime = 0;
+    this.currentSampleFrame = 0;
     this._destination = new AudioDestinationNode(this, { numberOfChannels });
     this._listener = new AudioListener(this);
     this._state = "suspended";
@@ -171,8 +173,6 @@ class AudioContext extends EventTarget {
     if (this._state !== "running") {
       outputBus.zeros();
     } else {
-      const blockSize = this.blockSize;
-      const currentSample = this._currentFrameIndex * blockSize;
       const tasks = this._sched.shift();
 
       if (tasks) {
@@ -181,11 +181,11 @@ class AudioContext extends EventTarget {
 
       this._callbacksForPostProcess = [];
 
-      destination.processIfNecessary(currentSample);
+      destination.processIfNecessary();
 
       this.callTasks(this._callbacksForPostProcess);
-      this.currentTime = (currentSample + blockSize) / this.sampleRate;
-      this._currentFrameIndex += 1;
+      this.currentSampleFrame += this.blockSize;
+      this.currentTime = this.currentSampleFrame / this.sampleRate;
     }
 
     return outputBus.audioData;
@@ -196,12 +196,12 @@ class AudioContext extends EventTarget {
    */
   reset() {
     this.currentTime = 0;
+    this.currentSampleFrame = 0;
     this._destination = new AudioDestinationNode(this, { numberOfChannels: this.numberOfChannels });
     this._listener = new AudioListener(this);
     this._state = "suspended";
     this._sched = [];
     this._callbacksForPostProcess = null;
-    this._currentFrameIndex = 0;
   }
 }
 

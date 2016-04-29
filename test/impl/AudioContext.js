@@ -102,9 +102,7 @@ describe("AudioContext", () => {
 
     it("1: time advances", () => {
       assert(context.getCurrentTime() === 0);
-      destination.dspProcess = sinon.spy((e) => {
-        assert(e === 0);
-      });
+      destination.dspProcess = sinon.spy();
 
       const retVal = context.process();
 
@@ -114,8 +112,7 @@ describe("AudioContext", () => {
     });
 
     it("2: do post process and reserve pre process (for next process)", () => {
-      const immediateSpy = sinon.spy(() => {
-      });
+      const immediateSpy = sinon.spy();
 
       assert(context.getCurrentTime() === 16 / 8000);
       destination.dspProcess = sinon.spy(() => {

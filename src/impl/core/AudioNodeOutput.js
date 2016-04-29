@@ -148,11 +148,10 @@ class AudioNodeOutput {
   }
 
   /**
-   * @param {*} e
    * @return {AudioBus}
    */
-  pull(e) {
-    this.node.processIfNecessary(e);
+  pull() {
+    this.node.processIfNecessary();
     return this.bus;
   }
 }

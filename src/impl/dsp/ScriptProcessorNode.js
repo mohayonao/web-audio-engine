@@ -29,7 +29,8 @@ const ScriptProcessorNodeDSP = {
     this._eventItem = eventItem;
   },
 
-  dspProcess(currentSample) {
+  dspProcess() {
+    const currentSample = this.context.currentSampleFrame;
     const inputs = this.inputs[0].bus.getChannelData();
     const outputs = this.outputs[0].bus.getMutableData();
     const inputChannelData = this._inputChannelData;

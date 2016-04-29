@@ -12,7 +12,8 @@ const AudioBufferSourceNodeDSP = {
     this._phase = Math.max(0, Math.min(this._offset, bufferDuration)) * bufferSampleRate;
   },
 
-  dspProcess(currentSample) {
+  dspProcess() {
+    const currentSample = this.context.currentSampleFrame;
     const blockSize = this.blockSize;
     const nextSample = currentSample + blockSize;
     const sampleOffset = Math.max(0, this._startSample - currentSample);

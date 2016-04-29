@@ -5,7 +5,8 @@ const OscillatorNodeDSP = {
     this._phase = 0;
   },
 
-  dspProcess(currentSample) {
+  dspProcess() {
+    const currentSample = this.context.currentSampleFrame;
     const blockSize = this.blockSize;
     const nextSample = currentSample + blockSize;
     const sampleOffset = Math.max(0, this._startSample - currentSample);

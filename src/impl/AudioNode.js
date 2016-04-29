@@ -37,10 +37,10 @@ class AudioNode extends EventTarget {
     this.sampleRate = context.sampleRate;
     this.inputs = [];
     this.outputs = [];
+    this.currentSampleFrame = -1;
 
     this._params = [];
     this._enabled = false;
-    this._lastProcessingSample = -1;
     this._disableSample = Infinity;
 
     inputs.forEach((numberOfChannels) => {
@@ -176,7 +176,7 @@ class AudioNode extends EventTarget {
    * @return {AudioParam}
    */
   addParam(rate, defaultValue) {
-    const param = new AudioParam(this, { rate, defaultValue });
+    const param = new AudioParam(this.context, { rate, defaultValue });
 
     this._params.push(param);
 
@@ -310,15 +310,15 @@ class AudioNode extends EventTarget {
   }
 
   /**
-   * @param {number} currentSample
+   *
    */
-  processIfNecessary(currentSample) {
-    if (currentSample <= this._lastProcessingSample) {
+  processIfNecessary() {
+    if (this.context.currentSampleFrame <= this.currentSampleFrame) {
       return;
     }
-    this._lastProcessingSample = currentSample;
+    this.currentSampleFrame = this.context.currentSampleFrame;
 
-    if (this._disableSample <= currentSample) {
+    if (this._disableSample <= this.currentSampleFrame) {
       const outputs = this.outputs;
 
       for (let i = 0, imax = outputs.length; i < imax; i++) {
@@ -334,16 +334,16 @@ class AudioNode extends EventTarget {
     const inputs = this.inputs;
 
     for (let i = 0, imax = inputs.length; i < imax; i++) {
-      inputs[i].pull(currentSample);
+      inputs[i].pull();
     }
 
     const params = this._params;
 
     for (let i = 0, imax = params.length; i < imax; i++) {
-      params[i].dspProcess(currentSample);
+      params[i].dspProcess();
     }
 
-    this.dspProcess(currentSample);
+    this.dspProcess();
   }
 
   dspInit() {}

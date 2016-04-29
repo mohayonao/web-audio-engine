@@ -21,11 +21,12 @@ const AudioParamDSP = {
     this._schedParams = {};
   },
 
-  dspProcess(currentSample) {
+  dspProcess() {
+    const currentSample = this.context.currentSampleFrame;
     const input = this.inputs[0];
     const inputBus = input.bus;
 
-    input.pull(currentSample);
+    input.pull();
 
     const hasEvents = !!this._timeline.length;
     const hasInput = !inputBus.isSilent;
