@@ -3905,7 +3905,7 @@ var AudioContext = function (_EventTarget) {
     _this._destination = new AudioDestinationNode(_this, { numberOfChannels: numberOfChannels });
     _this._listener = new AudioListener(_this);
     _this._state = "suspended";
-    _this._sched = [];
+    _this._sched = {};
     _this._callbacksForPostProcess = null;
     _this._currentFrameIndex = 0;
     return _this;
@@ -4036,13 +4036,12 @@ var AudioContext = function (_EventTarget) {
   }, {
     key: "sched",
     value: function sched(time, task) {
-      var deltaTime = Math.max(0, time - this.currentTime);
-      var schedIndex = Math.floor(deltaTime * this.sampleRate / this.blockSize);
+      var schedSampleFrame = Math.floor(time * this.sampleRate / this.blockSize) * this.blockSize;
 
-      if (!this._sched[schedIndex]) {
-        this._sched[schedIndex] = [task];
+      if (!this._sched[schedSampleFrame]) {
+        this._sched[schedSampleFrame] = [task];
       } else {
-        this._sched[schedIndex].push(task);
+        this._sched[schedSampleFrame].push(task);
       }
     }
 
@@ -4081,10 +4080,9 @@ var AudioContext = function (_EventTarget) {
       if (this._state !== "running") {
         outputBus.zeros();
       } else {
-        var tasks = this._sched.shift();
-
-        if (tasks) {
-          this.callTasks(tasks);
+        if (this._sched[this.currentSampleFrame]) {
+          this.callTasks(this._sched[this.currentSampleFrame]);
+          delete this._sched[this.currentSampleFrame];
         }
 
         this._callbacksForPostProcess = [];
