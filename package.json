@@ -51,7 +51,7 @@
   },
   "scripts": {
     "build": "npm-run-all build:*",
-    "build:browser": "mkdir -p build && BABEL_ENV=production browserify src -s WebAudioEngine -o build/web-audio-engine.js -t [ babelify --presets [ es2015 ] ]",
+    "build:browser": "mkdir -p build && BABEL_ENV=production browserify src -s WebAudioEngine -o build/web-audio-engine.js -t [ babelify ]",
     "build:to5": "mkdir -p lib && BABEL_ENV=production babel --out-dir=lib src",
     "clean": "rm -rf lib coverage .nyc_output npm-debug.log",
     "cover": "BABEL_ENV=coverage nyc --reporter text --reporter html mocha --require babel-register",
