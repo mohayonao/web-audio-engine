@@ -106,16 +106,30 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
    * @param {number} duration
    */
   start(when, offset, duration) {
-    /* istanbul ignore else */
-    if (super.start(when)) {
-      offset = offset|0;
-      this._offset = offset;
-      if (typeof duration !== "undefined") {
-        duration = Math.max(0, util.toNumber(duration));
-        this._stopSample = Math.round((this._startTime + duration) * this.sampleRate);
-      }
-      this.dspStart();
+    /* istanbul ignore next */
+    if (this._startTime !== Infinity) {
+      return;
     }
+
+    duration = util.defaults(duration, Infinity);
+
+    when = Math.max(this.context.currentTime, util.toNumber(when));
+    offset = Math.max(0, offset|0);
+    duration = Math.max(0, util.toNumber(duration));
+
+    this._startTime = when;
+    this._startSample = Math.round(when * this.sampleRate);
+    this._offset = offset;
+
+    if (duration !== Infinity) {
+      this._stopSample = Math.round((this._startTime + duration) * this.sampleRate);
+    }
+
+    this.context.sched(when, () => {
+      this.outputs[0].enable();
+    });
+
+    this.dspStart();
   }
 }
 

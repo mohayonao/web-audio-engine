@@ -6,35 +6,26 @@ const OscillatorNodeDSP = {
   },
 
   dspProcess(currentSample) {
-    const nextSample = currentSample + this.blockSize;
-
-    if (nextSample < this._startSample) {
-      return;
-    }
-
-    if (this._stopSample <= currentSample) {
-      return;
-    }
-
-    const sampleRate = this.sampleRate;
     const blockSize = this.blockSize;
+    const nextSample = currentSample + blockSize;
     const sampleOffset = Math.max(0, this._startSample - currentSample);
     const endSample = Math.min(nextSample, this._stopSample);
-    const fillToFrame = endSample - currentSample;
+    const fillToSample = endSample - currentSample;
     const output = this.outputs[0].bus.getMutableData()[0];
 
     let writeIndex = 0;
 
     if (this._type === "sine") {
-      writeIndex = this.dspSine(output, sampleOffset, fillToFrame, sampleRate);
+      writeIndex = this.dspSine(output, sampleOffset, fillToSample, this.sampleRate);
     } else {
-      writeIndex = this.dspWave(output, sampleOffset, fillToFrame, sampleRate);
+      writeIndex = this.dspWave(output, sampleOffset, fillToSample, this.sampleRate);
     }
 
-    if (writeIndex < blockSize) {
+    if (this._stopSample <= currentSample + writeIndex) {
       while (writeIndex < blockSize) {
         output[writeIndex++] = 0;
       }
+
       this.context.addPostProcess(() => {
         this.outputs[0].bus.zeros();
         this.outputs[0].disable();

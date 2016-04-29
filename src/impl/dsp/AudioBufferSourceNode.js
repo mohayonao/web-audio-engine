@@ -13,35 +13,27 @@ const AudioBufferSourceNodeDSP = {
   },
 
   dspProcess(currentSample) {
-    const nextSample = currentSample + this.blockSize;
-
-    if (nextSample < this._startSample) {
-      return;
-    }
-
-    if (this._stopSample <= currentSample) {
-      return;
-    }
-
-    const sampleRate = this.sampleRate;
     const blockSize = this.blockSize;
-    const frameOffset = Math.max(0, this._startSample - currentSample);
+    const nextSample = currentSample + blockSize;
+    const sampleOffset = Math.max(0, this._startSample - currentSample);
     const endSample = Math.min(nextSample, this._stopSample);
-    const fillToFrame = endSample - currentSample;
+    const fillToSample = endSample - currentSample;
     const outputs = this.outputs[0].bus.getMutableData();
-    const numberOfChannels = outputs.length;
 
     let writeIndex = 0;
 
-    writeIndex = this.dspBufferRendering(outputs, frameOffset, fillToFrame, sampleRate);
+    writeIndex = this.dspBufferRendering(outputs, sampleOffset, fillToSample, this.sampleRate);
 
-    if (writeIndex < blockSize) {
+    if (this._stopSample <= currentSample + writeIndex) {
+      const numberOfChannels = outputs.length;
+
       while (writeIndex < blockSize) {
         for (let ch = 0; ch < numberOfChannels; ch++) {
           outputs[ch][writeIndex] = 0;
         }
         writeIndex += 1;
       }
+
       this.context.addPostProcess(() => {
         this.outputs[0].bus.zeros();
         this.outputs[0].disable();
