@@ -1,4 +1,6 @@
 module.exports = function(context, util) {
+  var sched = new util.WebAudioScheduler({ context: context, timerAPI: global });
+
   function sample(list) {
     return list[(Math.random() * list.length)|0];
   }
@@ -7,13 +9,12 @@ module.exports = function(context, util) {
     return 440 * Math.pow(2, (value - 69) / 12);
   }
 
-  function synth(midi) {
+  function synth(t0, midi, dur) {
     var osc = context.createOscillator();
     var amp = context.createGain();
     var delay = context.createDelay(0.1);
     var out = context.createGain();
-    var t0 = context.currentTime;
-    var t1 = t0 + 0.125;
+    var t1 = t0 + dur;
 
     osc.type = "triangle";
     osc.frequency.value = mtof(midi);
@@ -52,20 +53,21 @@ module.exports = function(context, util) {
 
   var efx = createFeedbackDelay();
 
-  function compose() {
-    var midi = sample([ 64, 65, 65, 69, 72, 76 ]) + 12;
-    var duration = sample([ 2, 2, 3, 4 ]);
+  function compose(e) {
+    var t0 = e.playbackTime;
+    var midi = sample([ 64, 65, 65, 65, 69, 69, 72, 76 ]) + 12;
+    var dur = sample([ 0.125, 0.25, 0.25, 0.5 ]);
     var feedback = sample([ 0.4, 0.6, 0.8, 0.9, 0.975 ]);
-    var nextTime = (duration * 1000) * Math.random();
+    var nextTime = dur * sample([ 0.5, 1, 1, 1.5, 1.5, 2, 2, 4 ]);
 
-    efx.feedback.setTargetAtTime(feedback, context.currentTime, 1);
+    efx.feedback.setTargetAtTime(feedback, t0, 1);
 
-    synth(midi, duration).connect(efx.input);
+    synth(t0, midi, dur).connect(efx.input);
 
-    setTimeout(compose, nextTime);
+    sched.insert(t0 + nextTime, compose);
   }
 
   efx.output.connect(context.destination);
 
-  compose();
+  sched.start(compose);
 };

@@ -1,4 +1,6 @@
 module.exports = function(context, util) {
+  var sched = new util.WebAudioScheduler({ context: context, timerAPI: global });
+
   function sample(list) {
     return list[(Math.random() * list.length)|0];
   }
@@ -7,11 +9,10 @@ module.exports = function(context, util) {
     return 440 * Math.pow(2, (value - 69) / 12);
   }
 
-  function synth(midi, duration) {
+  function synth(t0, midi, dur) {
     var filter = context.createBiquadFilter();
     var gain = context.createGain();
-    var t0 = context.currentTime;
-    var t1 = t0 + duration;
+    var t1 = t0 + dur;
     var freq = mtof(midi);
 
     [ 1, 3/2, 15/8 ].forEach(function(ratio, index) {
@@ -41,15 +42,16 @@ module.exports = function(context, util) {
     gain.connect(context.destination);
   }
 
-  function compose() {
+  function compose(e) {
+    var t0 = e.playbackTime;
     var midi = sample([ 60, 60, 62, 64, 64, 67, 69 ]);
-    var duration = sample([ 2, 4, 8, 16 ]);
-    var nextTime = (duration * 1000) * Math.random();
+    var dur = sample([ 2, 4, 8, 16 ]);
+    var nextTime = dur * sample([ 0.25, 0.25, 0.5, 0.5, 0.5, 0.5, 1, 1.25 ]);
 
-    synth(midi, duration);
+    synth(t0, midi, dur);
 
-    setTimeout(compose, nextTime);
+    sched.insert(t0 + nextTime, compose);
   }
 
-  compose();
+  sched.start(compose);
 };

@@ -2,11 +2,13 @@ module.exports = function(context, util) {
   var sched = new util.WebAudioScheduler({ context: context, timerAPI: global });
 
   function metronome(e) {
-    sched.insert(e.playbackTime + 0.000, ticktack, { frequency: 880, amp: 1.0, duration: 1.00 });
-    sched.insert(e.playbackTime + 0.500, ticktack, { frequency: 440, amp: 0.4, duration: 0.25 });
-    sched.insert(e.playbackTime + 1.000, ticktack, { frequency: 440, amp: 0.5, duration: 0.25 });
-    sched.insert(e.playbackTime + 1.500, ticktack, { frequency: 440, amp: 0.4, duration: 0.25 });
-    sched.insert(e.playbackTime + 2.000, metronome);
+    var t0 = e.playbackTime;
+
+    sched.insert(t0 + 0.000, ticktack, { frequency: 880, amp: 1.0, duration: 1.00 });
+    sched.insert(t0 + 0.500, ticktack, { frequency: 440, amp: 0.4, duration: 0.25 });
+    sched.insert(t0 + 1.000, ticktack, { frequency: 440, amp: 0.5, duration: 0.25 });
+    sched.insert(t0 + 1.500, ticktack, { frequency: 440, amp: 0.4, duration: 0.25 });
+    sched.insert(t0 + 2.000, metronome);
   }
 
   function ticktack(e) {

@@ -5,6 +5,7 @@
   <title>web-audio-engine :: demo</title>
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/codemirror.min.css">
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Work+Sans:400,200">
   <script src="//cdnjs.cloudflare.com/ajax/libs/es6-shim/0.35.0/es6-shim.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/setImmediate/1.0.4/setImmediate.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/codemirror.min.js"></script>
@@ -13,25 +14,32 @@
   <script src="//mohayonao.github.io/web-audio-scheduler/build/web-audio-scheduler.min.js"></script>
   <script src="../build/web-audio-engine.js"></script>
   <style>
-  .btn { width: 100px; outline: none !important }
-  .CodeMirror { font-family: 'Courier', monospace; border: solid 1px #ddd; height: 800px }
-  #app { margin-top: 15px }
+    .header { font-family: "Work Sans", sans-serif }
+    .header h1 { font-size: 48px }
+    .header * { font-weight: 200 }
+    .btn { width: 100px; outline: none !important }
+    .error-message { color: #a94442; border: none; box-shadow: none }
+    .CodeMirror { font-family: 'Courier', monospace; border: solid 1px #ddd; height: 800px }
+    #app { margin-top: 15px }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
       <h1>web-audio-engine :: demo</h1>
-      <div>Pure JS implementation of the Web Audio API</div>
+      <div>
+        Pure JS implementation of the Web Audio API - <a href="https://github.com/mohayonao/web-audio-engine">GitHub</a>
+      </div>
     </div>
     <div id="app">
       <div class="form-horizontal">
         <div class="form-group">
           <label class="col-sm-1 control-label"></label>
-          <div class="col-sm-11">
+          <div class="col-sm-3">
             <button class="btn" v-bind:class="isPlaying ? 'btn-success' : 'btn-default'" v-on:click="run">Run</button>
             <button class="btn btn-default" v-on:click="stop">Stop</button>
           </div>
+          <div class="col-sm-8"><div class="form-control error-message">{{ error }}</div></div>
         </div>
         <div class="form-group">
           <label class="col-sm-1 control-label">api</label>
@@ -71,15 +79,6 @@
           this[i] = value;
         }
         return this;
-      };
-    }
-    if (typeof Float32Array.prototype.map !== "function") {
-      Float32Array.prototype.map = function(fn) {
-        var array = new Float32Array(this.length);
-        for (var i = 0, imax = this.length; i < imax; i++) {
-          array[i] = fn(this[i], i);
-        }
-        return array;
       };
     }
   })();
@@ -157,21 +156,12 @@
           context.decodeAudioData(arrayBuffer, resolve, reject);
         });
       }).catch(function(e) {
-        console.error(e);
+        setTimeout(function() { throw e }, 0);
       });
     }
 
-    function compile(source) {
-      try {
-        return eval(source);
-      } catch (e) {
-        console.error(e);
-        return null;
-      }
-    }
-
     function runInContext(engine, code) {
-      var composeFn = compile(code);
+      var composeFn = eval(code);
 
       stop();
 
@@ -194,9 +184,15 @@
 
       util.WebAudioScheduler = window.WebAudioScheduler;
       util.fetchAudioBuffer = fetchAudioBuffer.bind(null, context);
-      util.end = vue.stop.bind(vue);
+      util.exit = vue.stop.bind(vue);
 
-      (composeFn(context, util) || Promise.resolve()).then(function() {
+      var promise = composeFn(context, util);
+
+      if (!(promise && typeof promise.then === "function")) {
+        promise = Promise.resolve();
+      }
+
+      promise.then(function() {
         context.resume();
       });
     }
@@ -215,10 +211,12 @@
         isPlaying: false,
         engine: "web-audio-engine",
         selected: "sines",
-        list: [ "metronome", "sines", "filter", "delay", "drum" ]
+        list: [ "metronome", "sines", "filter", "delay", "chorus", "pan", "drum" ],
+        error: ""
       },
       methods: {
         run: function() {
+          this.error = "";
           runInContext(this.engine, editor.getValue());
           this.isPlaying = true;
         },
@@ -227,12 +225,16 @@
           this.isPlaying = false;
         },
         loadScript: function() {
-          var that = this;
           loadScript(this.selected).then(function(source) {
             editor.setValue(source);
           });
         }
       }
+    });
+
+    window.addEventListener("error", function(e) {
+      vue.error = "ERROR!: " + e.message;
+      vue.stop();
     });
 
     var editor = CodeMirror.fromTextArea(document.getElementById("code"), {

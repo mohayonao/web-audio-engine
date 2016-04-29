@@ -1,4 +1,6 @@
 module.exports = function(context, util) {
+  var sched = new util.WebAudioScheduler({ context: context, timerAPI: global });
+
   function sample(list) {
     return list[(Math.random() * list.length)|0];
   }
@@ -7,13 +9,12 @@ module.exports = function(context, util) {
     return 440 * Math.pow(2, (value - 69) / 12);
   }
 
-  function synth(midi, duration) {
+  function synth(t0, midi, dur) {
     var osc1 = context.createOscillator();
     var osc2 = context.createOscillator();
     var gain = context.createGain();
-    var t0 = context.currentTime;
-    var t1 = t0 + duration * 0.25;
-    var t2 = t1 + duration * 0.75;
+    var t1 = t0 + dur * 0.25;
+    var t2 = t1 + dur * 0.75;
 
     osc1.frequency.value = mtof(midi);
     osc1.detune.setValueAtTime(+4, t0);
@@ -35,15 +36,16 @@ module.exports = function(context, util) {
     gain.connect(context.destination);
   }
 
-  function compose() {
+  function compose(e) {
+    var t0 = e.playbackTime;
     var midi = sample([ 72, 72, 74, 76, 76, 79, 81 ]);
-    var duration = sample([ 2, 2, 4, 4, 4, 4, 8 ]);
-    var nextTime = (duration * 1000) * Math.random();
+    var dur = sample([ 2, 2, 4, 4, 4, 4, 8 ]);
+    var nextTime = dur * sample([ 0.125, 0.125, 0.25, 0.25, 0.25, 0.25, 0.5, 0.75 ]);
 
-    synth(midi, duration);
+    synth(t0, midi, dur);
 
-    setTimeout(compose, nextTime);
+    sched.insert(t0 + nextTime, compose);
   }
 
-  compose();
+  sched.start(compose);
 };
