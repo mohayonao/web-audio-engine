@@ -4,6 +4,7 @@
   <meta charset="utf-8">
   <title>web-audio-engine :: benchmark</title>
   <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Work+Sans:400,200">
   <script src="//cdnjs.cloudflare.com/ajax/libs/es6-shim/0.35.0/es6-shim.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/setImmediate/1.0.4/setImmediate.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.11.1/lodash.min.js"></script>
@@ -12,16 +13,22 @@
   <script src="//cdnjs.cloudflare.com/ajax/libs/vue/1.0.21/vue.min.js"></script>
   <script src="../build/web-audio-engine.js"></script>
   <style>
-  textarea { font-family: 'Courier', monospace }
-  .btn { width: 100px; outline: none !important }
-  #app { margin-top: 15px }
+    .header { font-family: "Work Sans", sans-serif }
+    .header h1 { font-size: 48px }
+    .header * { font-weight: 200 }
+    .btn { width: 100px; outline: none !important }
+    .error-message { color: #a94442; border: none; box-shadow: none }
+    .textarea { font-family: 'Courier', monospace }
+    #app { margin-top: 15px }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
       <h1>web-audio-engine :: benchmark</h1>
-      <div>Pure JS implementation of the Web Audio API</div>
+      <div>
+        Pure JS implementation of the Web Audio API - <a href="https://github.com/mohayonao/web-audio-engine">GitHub</a>
+      </div>
     </div>
     <div id="app">
       <div class="form-horizontal">
@@ -43,13 +50,13 @@
         <div class="form-group">
           <label class="col-sm-1 control-label">code</label>
           <div class="col-sm-11">
-            <textarea rows="15" class="form-control">{{ code }}</textarea>
+            <textarea rows="15" class="form-control textarea">{{ code }}</textarea>
           </div>
         </div>
         <div class="form-group">
           <label class="col-sm-1 control-label">result</label>
           <div class="col-sm-11">
-            <textarea rows="10" class="form-control">{{ result }}</textarea>
+            <textarea rows="10" class="form-control textarea">{{ result }}</textarea>
           </div>
         </div>
       </div>
@@ -63,15 +70,6 @@
           this[i] = value;
         }
         return this;
-      };
-    }
-    if (typeof Float32Array.prototype.map !== "function") {
-      Float32Array.prototype.map = function(fn) {
-        var array = new Float32Array(this.length);
-        for (var i = 0, imax = this.length; i < imax; i++) {
-          array[i] = fn(this[i], i);
-        }
-        return array;
       };
     }
   })();
