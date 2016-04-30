@@ -78,6 +78,8 @@
   window.addEventListener("DOMContentLoaded", function() {
     "use strict";
 
+    var demoList = [ "metronome", "sines", "filter", "delay", "chorus", "pan", "iir-filter", "drum" ];
+
     var audioContext = new AudioContext();
     var destination = audioContext.destination;
 
@@ -200,7 +202,7 @@
         isPlaying: false,
         engine: "web-audio-engine",
         selected: "sines",
-        list: [ "metronome", "sines", "filter", "delay", "chorus", "iir-filter", "arp", "drum" ],
+        list: demoList,
         error: ""
       },
       methods: {
