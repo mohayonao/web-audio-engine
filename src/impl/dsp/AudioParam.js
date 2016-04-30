@@ -1,6 +1,7 @@
 "use strict";
 
 const assert = require("assert");
+const util = require("../../util");
 const audioParamUtil = require("../../util/audioParamUtil");
 
 const SET_VALUE_AT_TIME = 1;
@@ -57,7 +58,7 @@ const AudioParamDSP = {
       if (value === 0) {
         this.outputBus.zeros();
       } else {
-        this.outputBus.getMutableData()[0].fill(value);
+        util.fill(this.outputBus.getMutableData()[0], value);
       }
       this._prevValue = value;
     }
