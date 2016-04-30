@@ -72,17 +72,6 @@
     </div>
   </div>
   <script>
-  (function() {
-    if (typeof Float32Array.prototype.fill !== "function") {
-      Float32Array.prototype.fill = function(value) {
-        for (var i = 0, imax = this.length; i < imax; i++) {
-          this[i] = value;
-        }
-        return this;
-      };
-    }
-  })();
-
   window.global = window;
   window.module = { exports: null };
   window.AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -211,7 +200,7 @@
         isPlaying: false,
         engine: "web-audio-engine",
         selected: "sines",
-        list: [ "metronome", "sines", "filter", "delay", "chorus", "pan", "iir-filter", "drum" ],
+        list: [ "metronome", "sines", "filter", "delay", "chorus", "iir-filter", "arp", "drum" ],
         error: ""
       },
       methods: {

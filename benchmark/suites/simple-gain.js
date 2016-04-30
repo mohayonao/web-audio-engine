@@ -8,6 +8,5 @@ module.exports = function(context) {
 
   amp.gain.setValueAtTime(1, 0);
   amp.gain.linearRampToValueAtTime(0, 1);
-
   amp.connect(context.destination);
 };
