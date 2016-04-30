@@ -73,16 +73,6 @@
     </div>
   </div>
   <script>
-  (function() {
-    if (typeof Float32Array.prototype.fill !== "function") {
-      Float32Array.prototype.fill = function(value) {
-        for (var i = 0, imax = this.length; i < imax; i++) {
-          this[i] = value;
-        }
-        return this;
-      };
-    }
-  })();
   window.global = window;
   window.module = { exports: null };
   window.OfflineAudioContext = window.OfflineAudioContext || window.webkitOfflineAudioContext;
@@ -202,8 +192,8 @@
       data: {
         isPlaying: false,
         includeNative: true,
-        selected: "simple-sine",
-        list: [ "simple-sine", "simple-gain", "sched-sine" ],
+        selected: "noop",
+        list: [ "noop", "simple-sine", "simple-saw", "simple-gain", "sched-param", "sched-sine" ],
         code: "",
         result: ""
       },
