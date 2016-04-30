@@ -7087,25 +7087,25 @@ var PeriodicWave = function () {
           break;
         case "sawtooth":
           this._real = new Float32Array(length);
-          this._imag = new Float32Array(length).map(function (_, n) {
+          this._imag = new Float32Array(Array.from({ length: length }, function (_, n) {
             return n === 0 ? 0 : Math.pow(-1, n + 1) * (2 / (n * Math.PI));
-          });
+          }));
           this._name = "sawtooth";
           this.dspBuildWaveTable();
           break;
         case "triangle":
           this._real = new Float32Array(length);
-          this._imag = new Float32Array(length).map(function (_, n) {
+          this._imag = new Float32Array(Array.from({ length: length }, function (_, n) {
             return n === 0 ? 0 : 8 * Math.sin(n * Math.PI / 2) / Math.pow(n * Math.PI, 2);
-          });
+          }));
           this._name = "triangle";
           this.dspBuildWaveTable();
           break;
         case "square":
           this._real = new Float32Array(length);
-          this._imag = new Float32Array(length).map(function (_, n) {
+          this._imag = new Float32Array(Array.from({ length: length }, function (_, n) {
             return n === 0 ? 0 : 2 / (n * Math.PI) * (1 - Math.pow(-1, n));
-          });
+          }));
           this._name = "square";
           this.dspBuildWaveTable();
           break;
@@ -7498,6 +7498,7 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+var util = require("../../util");
 var AudioData = require("./AudioData");
 var DSPAlgorithm = {};
 
@@ -7622,7 +7623,7 @@ var AudioBus = function () {
         var channelData = this.audioData.channelData;
 
         for (var i = 0, imax = channelData.length; i < imax; i++) {
-          channelData[i].fill(0);
+          util.fill(channelData[i], 0);
         }
       }
       this.isSilent = true;
@@ -7939,7 +7940,7 @@ function isValidChannelInterpretation(value) {
 
 module.exports = AudioBus;
 
-},{"./AudioData":67}],67:[function(require,module,exports){
+},{"../../util":95,"./AudioData":67}],67:[function(require,module,exports){
 "use strict";
 
 /**
@@ -8702,6 +8703,7 @@ module.exports = AudioDestinationDSP;
 },{}],73:[function(require,module,exports){
 "use strict";
 
+var util = require("../../util");
 var audioParamUtil = require("../../util/audioParamUtil");
 
 var SET_VALUE_AT_TIME = 1;
@@ -8754,7 +8756,7 @@ var AudioParamDSP = {
       if (value === 0) {
         this.outputBus.zeros();
       } else {
-        this.outputBus.getMutableData()[0].fill(value);
+        util.fill(this.outputBus.getMutableData()[0], value);
       }
       this._prevValue = value;
     }
@@ -9028,7 +9030,7 @@ AudioParamDSP.AUDIO = AUDIO;
 
 module.exports = AudioParamDSP;
 
-},{"../../util/audioParamUtil":91}],74:[function(require,module,exports){
+},{"../../util":95,"../../util/audioParamUtil":91}],74:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -10250,6 +10252,7 @@ module.exports = PeriodicWaveDSP;
 },{}],85:[function(require,module,exports){
 "use strict";
 
+var util = require("../../util");
 var AudioBuffer = require("../AudioBuffer");
 
 var ScriptProcessorNodeDSP = {
@@ -10307,7 +10310,7 @@ var ScriptProcessorNodeDSP = {
 
         _this.context.addPostProcess(function () {
           for (var _ch2 = 0; _ch2 < numberOfOutputChannels; _ch2++) {
-            outputChannelData[_ch2].fill(0);
+            util.fill(outputChannelData[_ch2], 0);
           }
           _this._eventItem.playbackTime = playbackTime;
           _this.dispatchEvent(_this._eventItem);
@@ -10320,7 +10323,7 @@ var ScriptProcessorNodeDSP = {
 
 module.exports = ScriptProcessorNodeDSP;
 
-},{"../AudioBuffer":39}],86:[function(require,module,exports){
+},{"../../util":95,"../AudioBuffer":39}],86:[function(require,module,exports){
 "use strict";
 
 var SpatialPannerNodeDSP = {
@@ -10871,6 +10874,24 @@ function defaults(value, defaultValue) {
   return typeof value !== "undefined" ? value : defaultValue;
 }
 module.exports.defaults = defaults;
+
+/**
+ * @param {number[]} list
+ * @param {number}   value
+ * @return {number[]}
+ */
+function fill(list, value) {
+  if (list.fill) {
+    return list.fill(value);
+  }
+
+  for (var i = 0, imax = list.length; i < imax; i++) {
+    list[i] = value;
+  }
+
+  return list;
+}
+module.exports.fill = fill;
 
 /**
  * @param {*} value
