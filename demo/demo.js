@@ -28,9 +28,10 @@ function opts2argv(argv, opts) {
 
   Object.keys(opts).forEach((key) => {
     if (key !== "_") {
-      argv.push("--" + key);
       if (typeof opts[key] !== "boolean") {
-        argv.push("" + opts[key]);
+        argv.push("--" + key, "" + opts[key]);
+      } else if (opts[key]) {
+        argv.push("--" + key);
       }
     }
   });
