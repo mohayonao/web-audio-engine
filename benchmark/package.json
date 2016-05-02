@@ -2,34 +2,10 @@
   "name": "@web-audio-engine/benchnmark",
   "description": "benchnmark",
   "version": "0.0.0",
-  "cliOptions": {
-    "prepend": "Usage cmd [options] benchmark-suite",
-    "options": [
-      {
-        "option": "help",
-        "alias": "h",
-        "type": "Boolean",
-        "description": "display help"
-      },
-      {
-        "option": "list",
-        "alias": "l",
-        "type": "Boolean",
-        "description": "display benchmark suite"
-      },
-      {
-        "option": "target",
-        "alias": "t",
-        "type": "[String]",
-        "description": "target api version"
-      }
-    ]
-  },
   "dependencies": {
-    "benchmark": "^2.1.0",
-    "optionator": "^0.8.1"
+    "benchmark": "^2.1.0"
   },
   "license": "MIT",
-  "main": "run.js",
+  "main": "main.js",
   "private": true
 }
