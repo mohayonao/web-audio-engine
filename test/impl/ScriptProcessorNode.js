@@ -80,6 +80,8 @@ describe("ScriptProcessorNode", () => {
   });
 
   describe("processing", () => {
+    const channelData = [ new Float32Array(16), new Float32Array(16) ];
+
     let node1, node2, onaudioprocess;
     let noise1, noise2, noise3;
 
@@ -118,7 +120,7 @@ describe("ScriptProcessorNode", () => {
       for (let i = 0; i < 16; i++) {
         node1.outputs[0].bus.getMutableData()[0].set(noise1.subarray(i * 16, i * 16 + 16));
         node1.outputs[0].bus.getMutableData()[1].set(noise2.subarray(i * 16, i * 16 + 16));
-        context.process();
+        context.process(channelData, 0);
       }
 
       assert(onaudioprocess.callCount === 1);
@@ -135,7 +137,7 @@ describe("ScriptProcessorNode", () => {
       for (let i = 0; i < 16; i++) {
         node1.outputs[0].bus.getMutableData()[0].set(noise2.subarray(i * 16, i * 16 + 16));
         node1.outputs[0].bus.getMutableData()[1].set(noise1.subarray(i * 16, i * 16 + 16));
-        context.process();
+        context.process(channelData, 0);
         actual.set(node2.outputs[0].bus.getChannelData()[0], i * 16);
       }
       assert(deepEqual(actual, noise3));

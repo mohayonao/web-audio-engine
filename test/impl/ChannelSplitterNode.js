@@ -58,6 +58,8 @@ describe("ChannelSplitterNode", () => {
   });
 
   describe("processing", () => {
+    const channelData = [ new Float32Array(16), new Float32Array(16) ];
+
     it("works", () => {
       const node1 = new AudioNode(context, { outputs: [ 4 ] });
       const node2 = new ChannelSplitterNode(context, { numberOfOutputs: 6 });
@@ -76,7 +78,7 @@ describe("ChannelSplitterNode", () => {
       node1.outputs[0].bus.getMutableData()[2].set(noise1);
       node1.outputs[0].bus.getMutableData()[3].set(noise2);
 
-      context.process();
+      context.process(channelData, 0);
 
       const actual = [ 0, 1, 2, 3, 4, 5 ].map(ch => node2.outputs[ch].bus.getChannelData()[0]);
       const isSilent = [ 0, 1, 2, 3, 4, 5 ].map(ch => node2.outputs[ch].bus.isSilent);
@@ -106,7 +108,7 @@ describe("ChannelSplitterNode", () => {
         node2.outputs[ch].bus.getMutableData()[0].set(np.random_sample(16));
       });
 
-      context.process();
+      context.process(channelData, 0);
 
       const actual = [ 0, 1, 2, 3, 4, 5 ].map(ch => node2.outputs[ch].bus.getChannelData()[0]);
       const isSilent = [ 0, 1, 2, 3, 4, 5 ].map(ch => node2.outputs[ch].bus.isSilent);

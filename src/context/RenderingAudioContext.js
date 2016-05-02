@@ -64,11 +64,7 @@ class RenderingAudioContext extends AudioContext {
     impl.changeState("running");
 
     for (let i = 0; i < iterations; i++) {
-      const audioData = impl.process();
-
-      for (let ch = 0; ch < numberOfChannels; ch++) {
-        buffers[ch].set(audioData.channelData[ch], i * blockSize);
-      }
+      impl.process(buffers, i * blockSize);
     }
 
     this._rendered.push(buffers);
