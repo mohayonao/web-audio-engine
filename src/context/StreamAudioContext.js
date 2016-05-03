@@ -35,6 +35,7 @@ class StreamAudioContext extends AudioContext {
 
     const encoder = createEncoder(numberOfChannels, blockSize, bitDepth, floatingPoint);
 
+    util.defineProp(this, "_numberOfChannels", numberOfChannels);
     util.defineProp(this, "_encoder", encoder);
     util.defineProp(this, "_blockSize", blockSize);
     util.defineProp(this, "_stream", noopWriter);
@@ -94,26 +95,26 @@ class StreamAudioContext extends AudioContext {
     const encoder = this._encoder;
     const impl = this._impl;
     const aheadTime = 0.1;
+    const channelData = Array.from({ length: this._numberOfChannels }, () => new Float32Array(this._blockSize));
 
     const renderingProcess = () => {
-      if (this.state !== "running") {
-        return;
-      }
-      const contextElapsed = this.currentTime - contextStartTime;
-      const timerElapsed = (Date.now() - timerStartTime) / 1000;
+      if (impl.state === "running") {
+        const contextElapsed = impl.currentTime - contextStartTime;
+        const timerElapsed = (Date.now() - timerStartTime) / 1000;
 
-      if (contextElapsed < timerElapsed + aheadTime) {
-        if (this._isPlaying) {
-          const buffer = encoder.encode(impl.process());
+        if (this._isPlaying && contextElapsed < timerElapsed + aheadTime) {
+          impl.process(channelData, 0);
+
+          const buffer = encoder.encode(channelData);
 
           if (!this._stream.write(buffer)) {
             this._stream.once("drain", renderingProcess);
             return;
           }
         }
-      }
 
-      setImmediate(renderingProcess);
+        setImmediate(renderingProcess);
+      }
     };
     this._isPlaying = true;
     setImmediate(renderingProcess);
@@ -142,12 +143,11 @@ function createEncoder(numberOfChannels, length, bitDepth, floatingPoint) {
   const allocBuffer = Buffer.alloc ? Buffer.alloc : (size) => new Buffer(size);
 
   return {
-    encode(audioData) {
-      const channelData = audioData.channelData;
+    encode(channelData) {
       const buffer = allocBuffer(bufferLength);
       const writer = createBufferWriter(buffer);
 
-      for (let i = 0, imax = audioData.length; i < imax; i++) {
+      for (let i = 0, imax = length; i < imax; i++) {
         for (let ch = 0; ch < numberOfChannels; ch++) {
           writer[methodName](channelData[ch][i]);
         }

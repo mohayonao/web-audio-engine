@@ -2,8 +2,6 @@
 
 const util = require("../util");
 const AudioNode = require("./AudioNode");
-const AudioNodeOutput = require("./core/AudioNodeOutput");
-const AudioDestinationNodeDSP = require("./dsp/AudioDestinationNode");
 
 /**
  * @prop {AudioNodeOutput} output
@@ -29,11 +27,8 @@ class AudioDestinationNode extends AudioNode {
       channelCountMode: "explicit"
     });
 
-    this._numberOfChannels = numberOfChannels;
-    this.output = new AudioNodeOutput({ node: this, index: 0, numberOfChannels: numberOfChannels });
-    this.outputBus = this.output.bus;
-    this.outputBus.setChannelInterpretation("speakers");
-    this.output.enable();
+    this._numberOfChannels = numberOfChannels|0;
+    this._destinationChannelData = this.inputs[0].bus.getChannelData();
   }
 
   /**
@@ -50,8 +45,24 @@ class AudioDestinationNode extends AudioNode {
     value = util.clip(value|0, 1, this.getMaxChannelCount());
     super.setChannelCount(value);
   }
-}
 
-Object.assign(AudioDestinationNode.prototype, AudioDestinationNodeDSP);
+  /**
+   * @param {Float32Array[]} channelData
+   * @param {number}         offset
+   */
+  process(channelData, offset) {
+    const inputs = this.inputs;
+    const destinationChannelData = this._destinationChannelData;
+    const numberOfChannels = channelData.length;
+
+    for (let i = 0, imax = inputs.length; i < imax; i++) {
+      inputs[i].pull();
+    }
+
+    for (let ch = 0; ch < numberOfChannels; ch++) {
+      channelData[ch].set(destinationChannelData[ch], offset);
+    }
+  }
+}
 
 module.exports = AudioDestinationNode;

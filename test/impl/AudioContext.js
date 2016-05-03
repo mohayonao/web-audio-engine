@@ -6,7 +6,6 @@ const attrTester = require("../helpers/attrTester");
 const AudioContext = require("../../src/impl/AudioContext");
 const AudioDestinationNode = require("../../src/impl/AudioDestinationNode");
 const AudioListener = require("../../src/impl/AudioListener");
-const AudioData = require("../../src/impl/core/AudioData");
 
 const contextOpts = { sampleRate: 8000, blockSize: 16 };
 const testSpec = {};
@@ -101,40 +100,44 @@ describe("AudioContext", () => {
     });
 
     it("1: time advances", () => {
+      const channelData = [new Float32Array(16), new Float32Array(16) ];
+
       assert(context.getCurrentTime() === 0);
-      destination.dspProcess = sinon.spy();
+      destination.process = sinon.spy();
 
-      const retVal = context.process();
+      context.process(channelData, 0);
 
-      assert(retVal instanceof AudioData);
-      assert(destination.dspProcess.callCount === 1);
+      assert(destination.process.callCount === 1);
+      assert(destination.process.calledWith(channelData, 0));
       assert(context.getCurrentTime() === 16 / 8000);
     });
 
     it("2: do post process and reserve pre process (for next process)", () => {
+      const channelData = [ new Float32Array(16), new Float32Array(16) ];
       const immediateSpy = sinon.spy();
 
       assert(context.getCurrentTime() === 16 / 8000);
-      destination.dspProcess = sinon.spy(() => {
+      destination.process = sinon.spy(() => {
         context.addPostProcess(immediateSpy);
       });
 
-      const retVal = context.process();
+      context.process(channelData, 0);
 
-      assert(retVal instanceof AudioData);
-      assert(destination.dspProcess.callCount === 1);
+      assert(destination.process.callCount === 1);
+      assert(destination.process.calledWith(channelData, 0));
       assert(context.getCurrentTime() === 32 / 8000);
       assert(immediateSpy.callCount === 1);
-      assert(immediateSpy.calledAfter(destination.dspProcess));
+      assert(immediateSpy.calledAfter(destination.process));
     });
   });
 
   describe("reset", () => {
     it("works", () => {
       const context = new AudioContext(contextOpts);
+      const channelData = [ new Float32Array(16), new Float32Array(16) ];
 
       context.resume();
-      context.process();
+      context.process(channelData, 0);
 
       assert(context.getState() === "running");
       assert(context.currentTime !== 0);

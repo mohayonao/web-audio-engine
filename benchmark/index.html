@@ -79,6 +79,8 @@
   window.addEventListener("DOMContentLoaded", function() {
     "use strict";
 
+    var benchmarkList = [ "noop", "simple-sine", "simple-saw", "simple-gain", "sched-param", "sched-sine" ];
+
     function fetch(url) {
       return new Promise(function(resolve, reject) {
         var xhr = new XMLHttpRequest();
@@ -104,7 +106,7 @@
     }
 
     function loadScript(name) {
-      return fetch("./suites/" + name + ".js").then(function(res) {
+      return fetch("./browser-benchmark/" + name + ".js").then(function(res) {
         return res.text();
       });
     }
@@ -122,7 +124,7 @@
       var context = new OfflineAudioContext(2, 44100, 44100);
 
       // for web-audio-engine
-      context._renderingIterations = 65536;
+      context._renderingIterations = Infinity;
 
       func(context);
 
@@ -143,7 +145,7 @@
       }, { defer: true });
 
       if (includeNative) {
-        suite.add("native Web Audio API", function(deferred) {
+        suite.add("native Web Audio", function(deferred) {
           runInContext(OfflineAudioContext, func, function() {
             deferred.resolve();
           });
@@ -193,7 +195,7 @@
         isPlaying: false,
         includeNative: true,
         selected: "noop",
-        list: [ "noop", "simple-sine", "simple-saw", "simple-gain", "sched-param", "sched-sine" ],
+        list: benchmarkList,
         code: "",
         result: ""
       },

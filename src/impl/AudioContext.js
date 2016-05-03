@@ -30,18 +30,18 @@ class AudioContext extends EventTarget {
     let blockSize = util.defaults(opts.blockSize, config.blockSize);
     let numberOfChannels = util.defaults(opts.channels || opts.numberOfChannels, config.numberOfChannels);
 
-    sampleRate = util.toValidSampleRate(opts.sampleRate);
-    blockSize = util.toValidBlockSize(opts.blockSize, sampleRate);
-    numberOfChannels = util.toValidNumberOfChannels(opts.numberOfChannels);
+    sampleRate = util.toValidSampleRate(sampleRate);
+    blockSize = util.toValidBlockSize(blockSize);
+    numberOfChannels = util.toValidNumberOfChannels(numberOfChannels);
 
-    this.sampleRate = sampleRate;
-    this.blockSize = blockSize;
-    this.numberOfChannels = numberOfChannels;
+    this.sampleRate = sampleRate|0;
+    this.blockSize = blockSize|0;
+    this.numberOfChannels = numberOfChannels|0;
     this.currentTime = 0;
     this.currentSampleFrame = 0;
+    this.state = "suspended";
     this._destination = new AudioDestinationNode(this, { numberOfChannels });
     this._listener = new AudioListener(this);
-    this._state = "suspended";
     this._sched = {};
     this._callbacksForPostProcess = null;
     this._currentFrameIndex = 0;
@@ -79,14 +79,14 @@ class AudioContext extends EventTarget {
    * @return {string}
    */
   getState() {
-    return this._state;
+    return this.state;
   }
 
   /**
    * @return {Promise<void>}
    */
   suspend() {
-    if (this._state === "running") {
+    if (this.state === "running") {
       return this.changeState("suspended");
     }
     return this.notChangeState();
@@ -96,7 +96,7 @@ class AudioContext extends EventTarget {
    * @return {Promise<void>}
    */
   resume() {
-    if (this._state === "suspended") {
+    if (this.state === "suspended") {
       return this.changeState("running");
     }
     return this.notChangeState();
@@ -106,7 +106,7 @@ class AudioContext extends EventTarget {
    * @return {Promise<void>}
    */
   close() {
-    if (this._state !== "closed") {
+    if (this.state !== "closed") {
       return this.changeState("closed");
     }
     return this.notChangeState();
@@ -117,7 +117,7 @@ class AudioContext extends EventTarget {
    * @return {Promise<void>}
    */
   changeState(state) {
-    this._state = state;
+    this.state = state;
     return new Promise((resolve) => {
       this.dispatchEvent({ type: "statechange" });
       resolve();
@@ -136,7 +136,7 @@ class AudioContext extends EventTarget {
    * @param {function} task
    */
   sched(time, task) {
-    const schedSampleFrame = Math.floor((time * this.sampleRate) / this.blockSize) * this.blockSize;
+    const schedSampleFrame = (Math.floor((time * this.sampleRate) / this.blockSize) * this.blockSize)|0;
 
     if (!this._sched[schedSampleFrame]) {
       this._sched[schedSampleFrame] = [ task ];
@@ -150,43 +150,56 @@ class AudioContext extends EventTarget {
    */
   addPostProcess(task) {
     assert(typeof task === "function");
-    this._callbacksForPostProcess.push(task);
-  }
-
-  /**
-   * @param {function[]} tasks
-   */
-  callTasks(tasks) {
-    for (let i = 0, imax = tasks.length; i < imax; i++) {
-      tasks[i]();
+    if (this._callbacksForPostProcess === null) {
+      this._callbacksForPostProcess = [ task ];
+    } else {
+      this._callbacksForPostProcess.push(task);
     }
   }
 
   /**
-   *
+   * @param {Float32Array[]} channelData
+   * @param {number}         offset
    */
-  process() {
+  process(channelData, offset) {
     const destination = this._destination;
-    const outputBus = destination.outputBus;
 
-    if (this._state !== "running") {
-      outputBus.zeros();
+    if (this.state !== "running") {
+      const numberOfChannels = channelData.length;
+      const offsetEnd = offset + this.blockSize;
+
+      for (let ch = 0; ch < numberOfChannels; ch++) {
+        util.fillRange(channelData[ch], offset, offsetEnd);
+      }
     } else {
-      if (this._sched[this.currentSampleFrame]) {
-        this.callTasks(this._sched[this.currentSampleFrame]);
-        delete this._sched[this.currentSampleFrame];
+      const sched = this._sched;
+      const currentSampleFrame = this.currentSampleFrame|0;
+
+      if (sched[currentSampleFrame]) {
+        const tasks = sched[currentSampleFrame];
+
+        for (let i = 0, imax = tasks.length; i < imax; i++) {
+          tasks[i]();
+        }
+
+        delete sched[currentSampleFrame];
       }
 
-      this._callbacksForPostProcess = [];
+      destination.process(channelData, offset);
 
-      destination.processIfNecessary();
+      if (this._callbacksForPostProcess !== null) {
+        const tasks = this._callbacksForPostProcess;
 
-      this.callTasks(this._callbacksForPostProcess);
+        for (let i = 0, imax = tasks.length; i < imax; i++) {
+          tasks[i]();
+        }
+
+        this._callbacksForPostProcess = null;
+      }
+
       this.currentSampleFrame += this.blockSize;
       this.currentTime = this.currentSampleFrame / this.sampleRate;
     }
-
-    return outputBus.audioData;
   }
 
   /**
@@ -195,9 +208,9 @@ class AudioContext extends EventTarget {
   reset() {
     this.currentTime = 0;
     this.currentSampleFrame = 0;
+    this.state = "suspended";
     this._destination = new AudioDestinationNode(this, { numberOfChannels: this.numberOfChannels });
     this._listener = new AudioListener(this);
-    this._state = "suspended";
     this._sched = [];
     this._callbacksForPostProcess = null;
   }

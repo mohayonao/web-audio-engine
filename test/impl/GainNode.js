@@ -62,6 +62,8 @@ describe("GainNode", () => {
   });
 
   describe("processing", () => {
+    const channelData = [ new Float32Array(16), new Float32Array(16) ];
+
     describe("channel: mono", () => {
       let node1, node2;
 
@@ -80,7 +82,7 @@ describe("GainNode", () => {
         it("input: silent", () => {
           node1.outputs[0].bus.zeros();
           node2.getGain().setValue(1);
-          context.process();
+          context.process(channelData, 0);
 
           const actual = node2.outputs[0].bus.getChannelData()[0];
           const expected = np.zeros(16);
@@ -94,7 +96,7 @@ describe("GainNode", () => {
 
           node1.outputs[0].bus.getMutableData()[0].set(noise);
           node2.getGain().setValue(0);
-          context.process();
+          context.process(channelData, 0);
 
           const actual = node2.outputs[0].bus.getChannelData()[0];
           const expected = np.zeros(16);
@@ -108,7 +110,7 @@ describe("GainNode", () => {
 
           node1.outputs[0].bus.getMutableData()[0].set(noise);
           node2.getGain().setValue(1);
-          context.process();
+          context.process(channelData, 0);
 
           const actual = node2.outputs[0].bus.getChannelData()[0];
           const expected = noise;
@@ -122,7 +124,7 @@ describe("GainNode", () => {
 
           node1.outputs[0].bus.getMutableData()[0].set(noise);
           node2.getGain().setValue(2);
-          context.process();
+          context.process(channelData, 0);
 
           const actual = node2.outputs[0].bus.getChannelData()[0];
           const expected = noise.map(x => x * 2);
@@ -138,7 +140,7 @@ describe("GainNode", () => {
           node1.outputs[0].bus.getMutableData()[0].set(noise);
           node2.getGain().setValueAtTime(0, 0);
           node2.getGain().linearRampToValueAtTime(1, 16/8000);
-          context.process();
+          context.process(channelData, 0);
 
           const actual = node2.outputs[0].bus.getChannelData()[0];
           const expected = noise.map((x, i) => x * (i / 16));
@@ -166,7 +168,7 @@ describe("GainNode", () => {
           it("input: silent", () => {
             node1.outputs[0].bus.zeros();
             node2.getGain().setValue(1);
-            context.process();
+            context.process(channelData, 0);
 
             const actualL = node2.outputs[0].bus.getChannelData()[0];
             const actualR = node2.outputs[0].bus.getChannelData()[1];
@@ -185,7 +187,7 @@ describe("GainNode", () => {
             node1.outputs[0].bus.getMutableData()[0].set(noiseL);
             node1.outputs[0].bus.getMutableData()[1].set(noiseR);
             node2.getGain().setValue(0);
-            context.process();
+            context.process(channelData, 0);
 
             const actualL = node2.outputs[0].bus.getChannelData()[0];
             const actualR = node2.outputs[0].bus.getChannelData()[1];
@@ -204,7 +206,7 @@ describe("GainNode", () => {
             node1.outputs[0].bus.getMutableData()[0].set(noiseL);
             node1.outputs[0].bus.getMutableData()[1].set(noiseR);
             node2.getGain().setValue(1);
-            context.process();
+            context.process(channelData, 0);
 
             const actualL = node2.outputs[0].bus.getChannelData()[0];
             const actualR = node2.outputs[0].bus.getChannelData()[1];
@@ -223,7 +225,7 @@ describe("GainNode", () => {
             node1.outputs[0].bus.getMutableData()[0].set(noiseL);
             node1.outputs[0].bus.getMutableData()[1].set(noiseR);
             node2.getGain().setValue(2);
-            context.process();
+            context.process(channelData, 0);
 
             const actualL = node2.outputs[0].bus.getChannelData()[0];
             const actualR = node2.outputs[0].bus.getChannelData()[1];
@@ -244,7 +246,7 @@ describe("GainNode", () => {
             node1.outputs[0].bus.getMutableData()[1].set(noiseR);
             node2.getGain().setValueAtTime(0, 0);
             node2.getGain().linearRampToValueAtTime(1, 16/8000);
-            context.process();
+            context.process(channelData, 0);
 
             const actualL = node2.outputs[0].bus.getChannelData()[0];
             const actualR = node2.outputs[0].bus.getChannelData()[1];
@@ -284,7 +286,7 @@ describe("GainNode", () => {
             node1.outputs[0].bus.getMutableData()[2].set(noiseSL);
             node1.outputs[0].bus.getMutableData()[3].set(noiseSR);
             node2.getGain().setValue(2);
-            context.process();
+            context.process(channelData, 0);
 
             const actualL = node2.outputs[0].bus.getChannelData()[0];
             const actualR = node2.outputs[0].bus.getChannelData()[1];
@@ -315,7 +317,7 @@ describe("GainNode", () => {
             node1.outputs[0].bus.getMutableData()[3].set(noiseSR);
             node2.getGain().setValueAtTime(0, 0);
             node2.getGain().linearRampToValueAtTime(1, 16/8000);
-            context.process();
+            context.process(channelData, 0);
 
             const actualL = node2.outputs[0].bus.getChannelData()[0];
             const actualR = node2.outputs[0].bus.getChannelData()[1];

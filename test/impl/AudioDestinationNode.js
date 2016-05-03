@@ -66,39 +66,36 @@ describe("AudioDestinationNode", () => {
 
   describe("processing", () => {
     it("silent", () => {
+      const channelData = [ new Float32Array(16).fill(Math.random), new Float32Array(16).fill(Math.random) ];
       const node1 = new AudioNode(context, { outputs: [ 2 ] });
       const node2 = new AudioDestinationNode(context, { numberOfChannels: 2 });
-      const outputBus = node2.output.bus;
+      // const outputBus = node2.output.bus;
 
       node1.outputs[0].bus.zeros();
       node1.enableOutputsIfNecessary();
       node1.connect(node2);
 
-      outputBus.getMutableData();
+      node2.process(channelData, 0);
 
-      node2.processIfNecessary();
-
-      assert(outputBus.isSilent === true);
-      assert(deepEqual(outputBus.getChannelData()[0], np.zeros(16)));
-      assert(deepEqual(outputBus.getChannelData()[1], np.zeros(16)));
+      assert(deepEqual(channelData[0], np.zeros(16)));
+      assert(deepEqual(channelData[1], np.zeros(16)));
     });
     it("noise", () => {
+      const channelData = [ new Float32Array(16), new Float32Array(16) ];
       const node1 = new AudioNode(context, { outputs: [ 2 ] });
       const node2 = new AudioDestinationNode(context, { numberOfChannels: 2 });
       const noise1 = np.random_sample(16);
       const noise2 = np.random_sample(16);
-      const outputBus = node2.output.bus;
 
       node1.outputs[0].bus.getMutableData()[0].set(noise1);
       node1.outputs[0].bus.getMutableData()[1].set(noise2);
       node1.enableOutputsIfNecessary();
       node1.connect(node2);
 
-      node2.processIfNecessary();
+      node2.process(channelData, 0);
 
-      assert(outputBus.isSilent === false);
-      assert(deepEqual(outputBus.getChannelData()[0], noise1));
-      assert(deepEqual(outputBus.getChannelData()[1], noise2));
+      assert(deepEqual(channelData[0], noise1));
+      assert(deepEqual(channelData[1], noise2));
     });
   });
 });

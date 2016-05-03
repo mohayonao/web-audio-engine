@@ -3,7 +3,7 @@
 [![NPM Version](http://img.shields.io/npm/v/web-audio-engine.svg?style=flat-square)](https://www.npmjs.org/package/web-audio-engine)
 [![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](http://mohayonao.mit-license.org/)
 
-This library implements the [Web Audio API](https://www.w3.org/TR/webaudio/) specification on Pure JavaScript.
+> Pure JS implementation of the [Web Audio API](https://www.w3.org/TR/webaudio/)
 
 ## Installation
 
@@ -245,6 +245,17 @@ $ node demo -o out.wav sines
 Currently, this benchmark doesn't work in Chrome or Safari, please use Firefox.
 
 - http://mohayonao.github.io/web-audio-engine/benchmark/
+
+## Offline Benchmark
+
+```
+$ git clone git@github.com:mohayonao/web-audio-engine.git
+$ cd web-audio-engine
+$ npm install && npm run build
+$ cd benchmark
+$ npm install
+$ node .
+```
 
 ## License
 

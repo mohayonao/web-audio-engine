@@ -123,12 +123,11 @@ function suspendRendering() {
 }
 
 function doneRendering(audioData) {
-  const numberOfChannels = audioData.numberOfChannels;
   const length = this._length;
 
-  for (let ch = 0; ch < numberOfChannels; ch++) {
-    audioData.channelData[ch] = audioData.channelData[ch].subarray(0, length);
-  }
+  audioData.channelData = audioData.channelData.map((channelData) => {
+    return channelData.subarray(0, length);
+  });
   audioData.length = length;
 
   const audioBuffer = audioDataUtil.toAudioBuffer(audioData, AudioBuffer);
@@ -142,33 +141,33 @@ function doneRendering(audioData) {
 
 function render(impl) {
   const audioData = this._audioData;
-  const numberOfChannels = audioData.numberOfChannels;
   const audioDataLength = audioData.length;
   const channelData = audioData.channelData;
   const blockSize = impl.blockSize;
+  const renderingIterations = this._renderingIterations;
+
+  let writeIndex = this._writeIndex;
 
   const loop = () => {
-    let n = this._renderingIterations;
+    const remainIterations = ((audioDataLength - writeIndex) / blockSize);
+    const iterations = Math.min(renderingIterations, remainIterations)|0;
 
-    while (n--) {
-      if (this._suspendedTime <= this.currentTime) {
+    for (let i = 0; i < iterations; i++) {
+      if (this._suspendedTime <= impl.currentTime) {
+        this._writeIndex = writeIndex;
         return suspendRendering.call(this);
-      }
-
-      const processedChannelData = impl.process().channelData;
-
-      for (let ch = 0; ch < numberOfChannels; ch++) {
-        channelData[ch].set(processedChannelData[ch], this._writeIndex);
-      }
-
-      this._writeIndex += blockSize;
-
-      if (this._writeIndex === audioDataLength) {
-        return doneRendering.call(this, audioData);
+      } else {
+        impl.process(channelData, writeIndex);
+        writeIndex += blockSize;
       }
     }
+    this._writeIndex = writeIndex;
 
-    setImmediate(loop);
+    if (writeIndex === audioDataLength) {
+      doneRendering.call(this, audioData);
+    } else {
+      setImmediate(loop);
+    }
   };
 
   impl.changeState("running");

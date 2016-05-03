@@ -80,18 +80,17 @@ class WebAudioContext extends AudioContext {
 DSPAlgorithm[0] = (impl, numberOfChannels, bufferSize) => {
   const blockSize = impl.blockSize;
   const iterations = bufferSize / blockSize;
+  const channelData = new Array(numberOfChannels);
 
   return (e) => {
-    const channelData = new Array(numberOfChannels);
+    const outputBuffer = e.outputBuffer;
+
+    for (let ch = 0; ch < numberOfChannels; ch++) {
+      channelData[ch] = outputBuffer.getChannelData(ch);
+    }
 
     for (let i = 0; i < iterations; i++) {
-      const audioData = impl.process();
-
-      for (let ch = 0; ch < numberOfChannels; ch++) {
-        const output = channelData[ch] || (channelData[ch] = e.outputBuffer.getChannelData(ch));
-
-        output.set(audioData.channelData[ch], i * blockSize);
-      }
+      impl.process(channelData, i * blockSize);
     }
   };
 };
@@ -101,12 +100,10 @@ DSPAlgorithm[1] = (impl, numberOfChannels, bufferSize) => {
   const iterations = bufferSize / blockSize;
 
   return (e) => {
-    const output = e.outputBuffer.getChannelData(0);
+    const channelData = [ e.outputBuffer.getChannelData(0) ];
 
     for (let i = 0; i < iterations; i++) {
-      const audioData = impl.process();
-
-      output.set(audioData.channelData[0], i * blockSize);
+      impl.process(channelData, i * blockSize);
     }
   };
 };
@@ -116,14 +113,11 @@ DSPAlgorithm[2] = (impl, numberOfChannels, bufferSize) => {
   const iterations = bufferSize / blockSize;
 
   return (e) => {
-    const outputL = e.outputBuffer.getChannelData(0);
-    const outputR = e.outputBuffer.getChannelData(1);
+    const outputBuffer = e.outputBuffer;
+    const channelData = [ outputBuffer.getChannelData(0), outputBuffer.getChannelData(1) ]
 
     for (let i = 0; i < iterations; i++) {
-      const audioData = impl.process();
-
-      outputL.set(audioData.channelData[0], i * blockSize);
-      outputR.set(audioData.channelData[1], i * blockSize);
+      impl.process(channelData, i * blockSize);
     }
   };
 };

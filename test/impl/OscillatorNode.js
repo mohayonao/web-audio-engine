@@ -77,13 +77,14 @@ describe("OscillatorNode", () => {
   });
 
   describe("processing", () => {
+    const channelData = [ new Float32Array(16), new Float32Array(16) ];
+
     before(() => {
       context.resume();
     });
 
     it("start - stop", () => {
       const node = new OscillatorNode(context);
-      const output = context.getDestination().output.bus.getChannelData()[0];
       const onended = sinon.spy();
 
       node.start((16+4)/8000);
@@ -91,24 +92,31 @@ describe("OscillatorNode", () => {
       node.connect(context.getDestination());
       node.addEventListener("ended", onended);
 
-      context.process();
-      assert(deepEqual(output, np.zeros(16)));
+      context.process(channelData, 0);
+      assert(deepEqual(channelData[0], np.zeros(16)));
+      assert(deepEqual(channelData[1], np.zeros(16)));
 
-      context.process();
-      assert(deepEqual(output.subarray(0, 5), np.zeros(5)));
-      assert(output.subarray(5).every(x => x !== 0));
+      context.process(channelData, 0);
+      assert(deepEqual(channelData[0].subarray(0, 5), np.zeros(5)));
+      assert(deepEqual(channelData[1].subarray(0, 5), np.zeros(5)));
+      assert(channelData[0].subarray(5).every(x => x !== 0));
+      assert(channelData[1].subarray(5).every(x => x !== 0));
 
-      context.process();
-      assert(output.every(x => x !== 0));
+      context.process(channelData, 0);
+      assert(channelData[0].every(x => x !== 0));
+      assert(channelData[1].every(x => x !== 0));
       assert(onended.callCount === 0);
 
-      context.process();
-      assert(output.subarray(0, 2).every(x => x !== 0));
-      assert(deepEqual(output.subarray(2), np.zeros(14)));
+      context.process(channelData, 0);
+      assert(channelData[0].subarray(0, 2).every(x => x !== 0));
+      assert(channelData[1].subarray(0, 2).every(x => x !== 0));
+      assert(deepEqual(channelData[0].subarray(2), np.zeros(14)));
+      assert(deepEqual(channelData[1].subarray(2), np.zeros(14)));
       assert(onended.callCount === 1);
 
-      context.process();
-      assert(deepEqual(output, np.zeros(16)));
+      context.process(channelData, 0);
+      assert(deepEqual(channelData[0], np.zeros(16)));
+      assert(deepEqual(channelData[1], np.zeros(16)));
       assert(onended.callCount === 1);
     });
   });

@@ -76,6 +76,8 @@ describe("WaveShaperNode", () => {
   });
 
   describe("processing", () => {
+    const channelData = [ new Float32Array(16), new Float32Array(16) ];
+
     it("works", () => {
       const node1 = new AudioNode(context, { outputs: [ 2 ] });
       const node2 = new WaveShaperNode(context);
@@ -92,7 +94,7 @@ describe("WaveShaperNode", () => {
 
       node2.setCurve(curve);
 
-      context.process();
+      context.process(channelData, 0);
 
       const actual = node2.outputs[0].bus.getChannelData();
       const expected = [ noise1.map(Math.abs), noise2.map(Math.abs) ];
@@ -114,7 +116,7 @@ describe("WaveShaperNode", () => {
       node1.outputs[0].bus.getMutableData()[0].set(noise1);
       node1.outputs[0].bus.getMutableData()[1].set(noise2);
 
-      context.process();
+      context.process(channelData, 0);
 
       const actual = node2.outputs[0].bus.getChannelData();
       const expected = [ noise1, noise2 ];
