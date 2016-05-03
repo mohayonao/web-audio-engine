@@ -45,6 +45,12 @@
   ],
   "license": "MIT",
   "main": "index.js",
+  "nyc": {
+    "exclude": [
+      "src/impl/dsp/*.js",
+      "test/**/*.js"
+    ]
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/mohayonao/web-audio-engine.git"
