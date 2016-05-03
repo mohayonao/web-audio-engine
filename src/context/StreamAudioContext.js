@@ -3,8 +3,8 @@
 const util = require("../util");
 const config = require("../config");
 const AudioContext = require("../api/AudioContext");
-const Buffer = global.Buffer;
-const setImmediate = global.setImmediate || /* istanbul ignore next */ (fn => setTimeout(fn, 0));
+const PCMEncoder = require("../util/PCMEncoder");
+const setImmediate = require("../util/setImmediate");
 const noopWriter = { write: () => true };
 
 class StreamAudioContext extends AudioContext {
@@ -33,13 +33,22 @@ class StreamAudioContext extends AudioContext {
 
     super({ sampleRate, blockSize, numberOfChannels });
 
-    const encoder = createEncoder(numberOfChannels, blockSize, bitDepth, floatingPoint);
+    const format = { sampleRate, channels: numberOfChannels, bitDepth, float: floatingPoint };
+    const encoder = PCMEncoder.create(blockSize, format);
 
     util.defineProp(this, "_numberOfChannels", numberOfChannels);
     util.defineProp(this, "_encoder", encoder);
     util.defineProp(this, "_blockSize", blockSize);
     util.defineProp(this, "_stream", noopWriter);
     util.defineProp(this, "_isPlaying", false);
+    util.defineProp(this, "_format", format);
+  }
+
+  /**
+   * @return {number}
+   */
+  get numberOfChannels() {
+    return this._impl.numberOfChannels;
   }
 
   /**
@@ -47,6 +56,13 @@ class StreamAudioContext extends AudioContext {
    */
   get blockSize() {
     return this._impl.blockSize;
+  }
+
+  /**
+   * @return {object}
+   */
+  get format() {
+    return this._format;
   }
 
   /**
@@ -62,6 +78,7 @@ class StreamAudioContext extends AudioContext {
    * @return {Promise<void>}
    */
   resume() {
+    /* istanbul ignore else */
     if (this.state === "suspended") {
       this._resume();
     }
@@ -72,6 +89,7 @@ class StreamAudioContext extends AudioContext {
    * @return {Promise<void>}
    */
   suspend() {
+    /* istanbul ignore else */
     if (this.state === "running") {
       this._suspend();
     }
@@ -83,6 +101,7 @@ class StreamAudioContext extends AudioContext {
    * @return {Promise<void>}
    */
   close() {
+    /* istanbul ignore else */
     if (this.state !== "closed") {
       this._close();
     }
@@ -98,11 +117,11 @@ class StreamAudioContext extends AudioContext {
     const channelData = Array.from({ length: this._numberOfChannels }, () => new Float32Array(this._blockSize));
 
     const renderingProcess = () => {
-      if (impl.state === "running") {
+      if (this._isPlaying) {
         const contextElapsed = impl.currentTime - contextStartTime;
         const timerElapsed = (Date.now() - timerStartTime) / 1000;
 
-        if (this._isPlaying && contextElapsed < timerElapsed + aheadTime) {
+        if (contextElapsed < timerElapsed + aheadTime) {
           impl.process(channelData, 0);
 
           const buffer = encoder.encode(channelData);
@@ -126,79 +145,11 @@ class StreamAudioContext extends AudioContext {
 
   _close() {
     this._suspend();
+    /* istanbul ignore else */
     if (this._stream !== null) {
-      this._stream.end();
       this._stream = null;
     }
   }
-}
-
-function createEncoder(numberOfChannels, length, bitDepth, floatingPoint) {
-  bitDepth = floatingPoint ? 32 : bitDepth;
-  floatingPoint = floatingPoint ? "f" : "";
-
-  const bytes = bitDepth >> 3;
-  const bufferLength = numberOfChannels * length * bytes;
-  const methodName = "pcm" + bitDepth + floatingPoint;
-  const allocBuffer = Buffer.alloc ? Buffer.alloc : (size) => new Buffer(size);
-
-  return {
-    encode(channelData) {
-      const buffer = allocBuffer(bufferLength);
-      const writer = createBufferWriter(buffer);
-
-      for (let i = 0, imax = length; i < imax; i++) {
-        for (let ch = 0; ch < numberOfChannels; ch++) {
-          writer[methodName](channelData[ch][i]);
-        }
-      }
-
-      return buffer;
-    }
-  };
-}
-
-function createBufferWriter(buffer) {
-  let pos = 0;
-
-  return {
-    pcm8(value) {
-      value = Math.max(-1, Math.min(value, +1));
-      value = (value * 0.5 + 0.5) * 128;
-      buffer.writeUInt8(value|0, pos);
-      pos += 1;
-    },
-    pcm16(value) {
-      value = Math.max(-1, Math.min(value, +1));
-      value = value < 0 ? value * 32768 : value * 32767;
-      buffer.writeInt16LE(value|0, pos);
-      pos += 2;
-    },
-    pcm24(value) {
-      value = Math.max(-1, Math.min(value, +1));
-      value = value < 0 ? 0x1000000 + value * 8388608 : value * 8388607;
-      value = value|0;
-
-      const x0 = (value >>  0) & 0xFF;
-      const x1 = (value >>  8) & 0xFF;
-      const x2 = (value >> 16) & 0xFF;
-
-      buffer.writeUInt8(x0, pos + 0);
-      buffer.writeUInt8(x1, pos + 1);
-      buffer.writeUInt8(x2, pos + 2);
-      pos += 3;
-    },
-    pcm32(value) {
-      value = Math.max(-1, Math.min(value, +1));
-      value = value < 0 ? value * 2147483648 : value * 2147483647;
-      buffer.writeInt32LE(value|0, pos);
-      pos += 4;
-    },
-    pcm32f(value) {
-      buffer.writeFloatLE(value, pos);
-      pos += 4;
-    }
-  };
 }
 
 module.exports = StreamAudioContext;
