@@ -75,17 +75,10 @@ function getExponentialRampToValueAtTime(t, v0, v1, t0, t1) {
   if (t1 <= t) {
     return v1;
   }
-  if (v0 === v1) {
-    return v0;
-  }
 
   a = (t - t0) / (t1 - t0);
 
-  if ((0 < v0 && 0 < v1) || (v0 < 0 && v1 < 0)) {
-    return v0 * Math.pow(v1 / v0, a);
-  }
-
-  return 0;
+  return v0 * Math.pow(v1 / v0, a);
 }
 
 function getTargetValueAtTime(t, v0, v1, t0, timeConstant) {
@@ -98,10 +91,6 @@ function getTargetValueAtTime(t, v0, v1, t0, timeConstant) {
 function getValueCurveAtTime(t, curve, t0, duration) {
   var x, ix, i0, i1;
   var y0, y1, a;
-
-  if (curve.length === 0) {
-    return 0;
-  }
 
   x = (t - t0) / duration;
   ix = x * (curve.length - 1);

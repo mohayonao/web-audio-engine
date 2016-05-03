@@ -10,7 +10,7 @@ const resampler = require("./resampler");
  * @return {Promise<AudioData>}
  */
 function decode(decodeFn, audioData, opts) {
-  opts = opts || /* istanbul ignore next */ {};
+  opts = opts /* istanbul ignore next */ || {};
 
   return new Promise((resolve, reject) => {
     return decodeFn(audioData, opts).then((result) => {

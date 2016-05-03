@@ -6,7 +6,7 @@ const decoderUtil = require("../../src/util/decoderUtil");
 
 describe("util/decoderUtil", () => {
   describe("decode(decodeFn: function, audioData: arrayBuffer, opts?: object): Promise<AudioData>", () => {
-    it("should return promise and resolve", () => {
+    it("should return promise and resolve - without resampling", () => {
       const source = new Uint8Array(128);
       const sampleRate = 44100;
       const channelData = [ new Float32Array(128), new Float32Array(128) ];
@@ -14,7 +14,7 @@ describe("util/decoderUtil", () => {
         return Promise.resolve({ sampleRate, channelData });
       });
 
-      return decoderUtil.decode(decodeFn, source, { sampleRate: 44100 }).then((audioData) => {
+      return decoderUtil.decode(decodeFn, source).then((audioData) => {
         assert(decodeFn.callCount === 1);
         assert(decodeFn.calledWith(source));
         assert(audioData.sampleRate === 44100);
