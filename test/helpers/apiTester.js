@@ -16,6 +16,12 @@ function makeTests(context, opts) {
     return true;
   });
 
+  it("create", () => {
+    const target = createInstance(context);
+
+    assert(target instanceof opts.class);
+  });
+
   targetPropertyNames.forEach((name) => {
     const desc = Object.getOwnPropertyDescriptor(proto, name);
 
