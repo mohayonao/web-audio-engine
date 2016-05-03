@@ -830,7 +830,7 @@ var AudioBuffer = function () {
 
 module.exports = AudioBuffer;
 
-},{"../impl":88,"../util":94}],6:[function(require,module,exports){
+},{"../impl":88,"../util":101}],6:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1169,7 +1169,7 @@ var AudioContext = function (_EventTarget) {
 
 module.exports = AudioContext;
 
-},{"../decoder":36,"../impl":88,"../util":94,"./AnalyserNode":4,"./AudioBuffer":5,"./AudioBufferSourceNode":6,"./AudioDestinationNode":8,"./AudioListener":9,"./BiquadFilterNode":13,"./ChannelMergerNode":14,"./ChannelSplitterNode":15,"./ConvolverNode":16,"./DelayNode":17,"./DynamicsCompressorNode":18,"./EventTarget":19,"./GainNode":20,"./IIRFilterNode":21,"./OscillatorNode":22,"./PannerNode":23,"./PeriodicWave":24,"./ScriptProcessorNode":25,"./SpatialPannerNode":27,"./StereoPannerNode":28,"./WaveShaperNode":29}],8:[function(require,module,exports){
+},{"../decoder":36,"../impl":88,"../util":101,"./AnalyserNode":4,"./AudioBuffer":5,"./AudioBufferSourceNode":6,"./AudioDestinationNode":8,"./AudioListener":9,"./BiquadFilterNode":13,"./ChannelMergerNode":14,"./ChannelSplitterNode":15,"./ConvolverNode":16,"./DelayNode":17,"./DynamicsCompressorNode":18,"./EventTarget":19,"./GainNode":20,"./IIRFilterNode":21,"./OscillatorNode":22,"./PannerNode":23,"./PeriodicWave":24,"./ScriptProcessorNode":25,"./SpatialPannerNode":27,"./StereoPannerNode":28,"./WaveShaperNode":29}],8:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1239,7 +1239,7 @@ var AudioListener = function () {
 
 module.exports = AudioListener;
 
-},{"../util":94}],10:[function(require,module,exports){
+},{"../util":101}],10:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1327,7 +1327,7 @@ var AudioNode = function (_EventTarget) {
 
 module.exports = AudioNode;
 
-},{"../util":94,"./EventTarget":19}],11:[function(require,module,exports){
+},{"../util":101,"./EventTarget":19}],11:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -1400,7 +1400,7 @@ var AudioParam = function () {
 
 module.exports = AudioParam;
 
-},{"../util":94}],12:[function(require,module,exports){
+},{"../util":101}],12:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2051,7 +2051,7 @@ var PeriodicWave = function PeriodicWave(context, opts) {
 
 module.exports = PeriodicWave;
 
-},{"../impl":88,"../util":94}],25:[function(require,module,exports){
+},{"../impl":88,"../util":101}],25:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2186,7 +2186,7 @@ var SpatialListener = function () {
 
 module.exports = SpatialListener;
 
-},{"../util":94,"./AudioParam":11}],27:[function(require,module,exports){
+},{"../util":101,"./AudioParam":11}],27:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2452,7 +2452,6 @@ module.exports = {
 };
 
 },{}],32:[function(require,module,exports){
-(function (global){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2467,9 +2466,7 @@ var util = require("../util");
 var audioDataUtil = require("../util/audioDataUtil");
 var AudioContext = require("../api/AudioContext");
 var AudioBuffer = require("../api/AudioBuffer");
-var setImmediate = global.setImmediate || /* istanbul ignore next */function (fn) {
-  return setTimeout(fn, 0);
-};
+var setImmediate = require("../util/setImmediate");
 
 var OfflineAudioContext = function (_AudioContext) {
   _inherits(OfflineAudioContext, _AudioContext);
@@ -2517,7 +2514,16 @@ var OfflineAudioContext = function (_AudioContext) {
      * @return {Promise<void>}
      */
     value: function resume() {
-      if (this.state === "suspended" && this._renderingPromise !== null) {
+      /* istanbul ignore next */
+      if (this._impl.state === "closed") {
+        return Promise.reject(new TypeError("cannot startRendering when an OfflineAudioContext is closed"));
+      }
+      /* istanbul ignore next */
+      if (this._renderingPromise === null) {
+        return Promise.reject(new TypeError("cannot resume an offline context that has not started"));
+      }
+      /* istanbul ignore else */
+      if (this._impl.state === "suspended") {
         render.call(this, this._impl);
       }
       return Promise.resolve();
@@ -2533,15 +2539,21 @@ var OfflineAudioContext = function (_AudioContext) {
     value: function suspend(time) {
       var _this2 = this;
 
+      /* istanbul ignore next */
+      if (this._impl.state === "closed") {
+        return Promise.reject(new TypeError("cannot startRendering when an OfflineAudioContext is closed"));
+      }
+      /* istanbul ignore next */
+      if (this._suspendPromise !== null) {
+        return Promise.reject(new TypeError("cannot schedule more than one suspend"));
+      }
+
       time = Math.max(0, util.toNumber(time));
 
       this._suspendedTime = time;
-
-      if (this._suspendPromise === null) {
-        this._suspendPromise = new Promise(function (resolve) {
-          _this2._suspendResolve = resolve;
-        });
-      }
+      this._suspendPromise = new Promise(function (resolve) {
+        _this2._suspendResolve = resolve;
+      });
 
       return this._suspendPromise;
     }
@@ -2554,7 +2566,7 @@ var OfflineAudioContext = function (_AudioContext) {
   }, {
     key: "close",
     value: function close() {
-      return Promise.reject();
+      return Promise.reject(new TypeError("cannot close an OfflineAudioContext"));
     }
 
     /**
@@ -2566,19 +2578,27 @@ var OfflineAudioContext = function (_AudioContext) {
     value: function startRendering() {
       var _this3 = this;
 
-      if (this._renderingPromise === null) {
-        this._renderingPromise = new Promise(function (resolve) {
-          var numberOfChannels = _this3._numberOfChannels;
-          var length = _this3._length;
-          var sampleRate = _this3.sampleRate;
-          var blockSize = _this3._impl.blockSize;
-
-          _this3._audioData = createRenderingAudioData(numberOfChannels, length, sampleRate, blockSize);
-          _this3._renderingResolve = resolve;
-
-          render.call(_this3, _this3._impl);
-        });
+      /* istanbul ignore next */
+      if (this._impl.state === "closed") {
+        return Promise.reject(new TypeError("cannot startRendering when an OfflineAudioContext is closed"));
       }
+      /* istanbul ignore next */
+      if (this._renderingPromise !== null) {
+        return Promise.reject(new TypeError("cannot call startRendering more than once"));
+      }
+
+      this._renderingPromise = new Promise(function (resolve) {
+        var numberOfChannels = _this3._numberOfChannels;
+        var length = _this3._length;
+        var sampleRate = _this3.sampleRate;
+        var blockSize = _this3._impl.blockSize;
+
+        _this3._audioData = createRenderingAudioData(numberOfChannels, length, sampleRate, blockSize);
+        _this3._renderingResolve = resolve;
+
+        render.call(_this3, _this3._impl);
+      });
+
       return this._renderingPromise;
     }
   }, {
@@ -2611,12 +2631,10 @@ function createRenderingAudioData(numberOfChannels, length, sampleRate, blockSiz
 }
 
 function suspendRendering() {
-  if (this._suspendResolve !== null) {
-    this._suspendResolve();
-    this._suspendedTime = Infinity;
-    this._suspendPromise = this._suspendResolve = null;
-    this._impl.changeState("suspended");
-  }
+  this._suspendResolve();
+  this._suspendedTime = Infinity;
+  this._suspendPromise = this._suspendResolve = null;
+  this._impl.changeState("suspended");
 }
 
 function doneRendering(audioData) {
@@ -2676,8 +2694,7 @@ function render(impl) {
 
 module.exports = OfflineAudioContext;
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../api/AudioBuffer":5,"../api/AudioContext":7,"../util":94,"../util/audioDataUtil":89}],33:[function(require,module,exports){
+},{"../api/AudioBuffer":5,"../api/AudioContext":7,"../util":101,"../util/audioDataUtil":92,"../util/setImmediate":103}],33:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2724,7 +2741,7 @@ var RenderingAudioContext = function (_AudioContext) {
 
     var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(RenderingAudioContext).call(this, { sampleRate: sampleRate, blockSize: blockSize, numberOfChannels: numberOfChannels }));
 
-    util.defineProp(_this, "_format", { sampleRate: sampleRate, numberOfChannels: numberOfChannels, bitDepth: bitDepth, floatingPoint: floatingPoint });
+    util.defineProp(_this, "_format", { sampleRate: sampleRate, channels: numberOfChannels, bitDepth: bitDepth, float: floatingPoint });
     util.defineProp(_this, "_rendered", []);
     return _this;
   }
@@ -2746,6 +2763,7 @@ var RenderingAudioContext = function (_AudioContext) {
 
       var duration = time - this.currentTime;
 
+      /* istanbul ignore next */
       if (duration <= 0) {
         return;
       }
@@ -2754,7 +2772,7 @@ var RenderingAudioContext = function (_AudioContext) {
       var blockSize = impl.blockSize;
       var iterations = Math.ceil(duration * this.sampleRate / blockSize);
       var bufferLength = blockSize * iterations;
-      var numberOfChannels = this._format.numberOfChannels;
+      var numberOfChannels = this._format.channels;
       var buffers = Array.from({ length: numberOfChannels }, function () {
         return new Float32Array(bufferLength);
       });
@@ -2777,7 +2795,7 @@ var RenderingAudioContext = function (_AudioContext) {
   }, {
     key: "exportAsAudioData",
     value: function exportAsAudioData() {
-      var numberOfChannels = this._format.numberOfChannels;
+      var numberOfChannels = this._format.channels;
       var length = this._rendered.reduce(function (length, buffers) {
         return length + buffers[0].length;
       }, 0);
@@ -2811,9 +2829,29 @@ var RenderingAudioContext = function (_AudioContext) {
       return encoder.encode(audioData, opts);
     }
   }, {
+    key: "numberOfChannels",
+    get: function get() {
+      return this._impl.numberOfChannels;
+    }
+
+    /**
+     * @return {number}
+     */
+
+  }, {
     key: "blockSize",
     get: function get() {
       return this._impl.blockSize;
+    }
+
+    /**
+     * @return {object}
+     */
+
+  }, {
+    key: "format",
+    get: function get() {
+      return this._format;
     }
   }]);
 
@@ -2822,8 +2860,7 @@ var RenderingAudioContext = function (_AudioContext) {
 
 module.exports = RenderingAudioContext;
 
-},{"../api/AudioContext":7,"../config":31,"../encoder":37,"../util":94}],34:[function(require,module,exports){
-(function (global){
+},{"../api/AudioContext":7,"../config":31,"../encoder":37,"../util":101}],34:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -2839,10 +2876,8 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 var util = require("../util");
 var config = require("../config");
 var AudioContext = require("../api/AudioContext");
-var Buffer = global.Buffer;
-var setImmediate = global.setImmediate || /* istanbul ignore next */function (fn) {
-  return setTimeout(fn, 0);
-};
+var PCMEncoder = require("../util/PCMEncoder");
+var setImmediate = require("../util/setImmediate");
 var noopWriter = { write: function write() {
     return true;
   } };
@@ -2878,13 +2913,15 @@ var StreamAudioContext = function (_AudioContext) {
 
     var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(StreamAudioContext).call(this, { sampleRate: sampleRate, blockSize: blockSize, numberOfChannels: numberOfChannels }));
 
-    var encoder = createEncoder(numberOfChannels, blockSize, bitDepth, floatingPoint);
+    var format = { sampleRate: sampleRate, channels: numberOfChannels, bitDepth: bitDepth, float: floatingPoint };
+    var encoder = PCMEncoder.create(blockSize, format);
 
     util.defineProp(_this, "_numberOfChannels", numberOfChannels);
     util.defineProp(_this, "_encoder", encoder);
     util.defineProp(_this, "_blockSize", blockSize);
     util.defineProp(_this, "_stream", noopWriter);
     util.defineProp(_this, "_isPlaying", false);
+    util.defineProp(_this, "_format", format);
     return _this;
   }
 
@@ -2913,6 +2950,7 @@ var StreamAudioContext = function (_AudioContext) {
   }, {
     key: "resume",
     value: function resume() {
+      /* istanbul ignore else */
       if (this.state === "suspended") {
         this._resume();
       }
@@ -2926,6 +2964,7 @@ var StreamAudioContext = function (_AudioContext) {
   }, {
     key: "suspend",
     value: function suspend() {
+      /* istanbul ignore else */
       if (this.state === "running") {
         this._suspend();
       }
@@ -2939,6 +2978,7 @@ var StreamAudioContext = function (_AudioContext) {
   }, {
     key: "close",
     value: function close() {
+      /* istanbul ignore else */
       if (this.state !== "closed") {
         this._close();
       }
@@ -2959,11 +2999,11 @@ var StreamAudioContext = function (_AudioContext) {
       });
 
       var renderingProcess = function renderingProcess() {
-        if (impl.state === "running") {
+        if (_this2._isPlaying) {
           var contextElapsed = impl.currentTime - contextStartTime;
           var timerElapsed = (Date.now() - timerStartTime) / 1000;
 
-          if (_this2._isPlaying && contextElapsed < timerElapsed + aheadTime) {
+          if (contextElapsed < timerElapsed + aheadTime) {
             impl.process(channelData, 0);
 
             var buffer = encoder.encode(channelData);
@@ -2989,95 +3029,44 @@ var StreamAudioContext = function (_AudioContext) {
     key: "_close",
     value: function _close() {
       this._suspend();
+      /* istanbul ignore else */
       if (this._stream !== null) {
-        this._stream.end();
         this._stream = null;
       }
     }
   }, {
+    key: "numberOfChannels",
+    get: function get() {
+      return this._impl.numberOfChannels;
+    }
+
+    /**
+     * @return {number}
+     */
+
+  }, {
     key: "blockSize",
     get: function get() {
       return this._impl.blockSize;
+    }
+
+    /**
+     * @return {object}
+     */
+
+  }, {
+    key: "format",
+    get: function get() {
+      return this._format;
     }
   }]);
 
   return StreamAudioContext;
 }(AudioContext);
 
-function createEncoder(numberOfChannels, length, bitDepth, floatingPoint) {
-  bitDepth = floatingPoint ? 32 : bitDepth;
-  floatingPoint = floatingPoint ? "f" : "";
-
-  var bytes = bitDepth >> 3;
-  var bufferLength = numberOfChannels * length * bytes;
-  var methodName = "pcm" + bitDepth + floatingPoint;
-  var allocBuffer = Buffer.alloc ? Buffer.alloc : function (size) {
-    return new Buffer(size);
-  };
-
-  return {
-    encode: function encode(channelData) {
-      var buffer = allocBuffer(bufferLength);
-      var writer = createBufferWriter(buffer);
-
-      for (var i = 0, imax = length; i < imax; i++) {
-        for (var ch = 0; ch < numberOfChannels; ch++) {
-          writer[methodName](channelData[ch][i]);
-        }
-      }
-
-      return buffer;
-    }
-  };
-}
-
-function createBufferWriter(buffer) {
-  var pos = 0;
-
-  return {
-    pcm8: function pcm8(value) {
-      value = Math.max(-1, Math.min(value, +1));
-      value = (value * 0.5 + 0.5) * 128;
-      buffer.writeUInt8(value | 0, pos);
-      pos += 1;
-    },
-    pcm16: function pcm16(value) {
-      value = Math.max(-1, Math.min(value, +1));
-      value = value < 0 ? value * 32768 : value * 32767;
-      buffer.writeInt16LE(value | 0, pos);
-      pos += 2;
-    },
-    pcm24: function pcm24(value) {
-      value = Math.max(-1, Math.min(value, +1));
-      value = value < 0 ? 0x1000000 + value * 8388608 : value * 8388607;
-      value = value | 0;
-
-      var x0 = value >> 0 & 0xFF;
-      var x1 = value >> 8 & 0xFF;
-      var x2 = value >> 16 & 0xFF;
-
-      buffer.writeUInt8(x0, pos + 0);
-      buffer.writeUInt8(x1, pos + 1);
-      buffer.writeUInt8(x2, pos + 2);
-      pos += 3;
-    },
-    pcm32: function pcm32(value) {
-      value = Math.max(-1, Math.min(value, +1));
-      value = value < 0 ? value * 2147483648 : value * 2147483647;
-      buffer.writeInt32LE(value | 0, pos);
-      pos += 4;
-    },
-    pcm32f: function pcm32f(value) {
-      buffer.writeFloatLE(value, pos);
-      pos += 4;
-    }
-  };
-}
-
 module.exports = StreamAudioContext;
 
-}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../api/AudioContext":7,"../config":31,"../util":94}],35:[function(require,module,exports){
+},{"../api/AudioContext":7,"../config":31,"../util":101,"../util/PCMEncoder":91,"../util/setImmediate":103}],35:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3234,7 +3223,7 @@ DSPAlgorithm[2] = function (impl, numberOfChannels, bufferSize) {
 
 module.exports = WebAudioContext;
 
-},{"../api/AudioContext":7,"../config":31,"../util":94}],36:[function(require,module,exports){
+},{"../api/AudioContext":7,"../config":31,"../util":101}],36:[function(require,module,exports){
 "use strict";
 
 var WavDecoder = require("wav-decoder");
@@ -3274,7 +3263,7 @@ function decode(audioData, opts) {
 
 module.exports = { get: get, set: set, decode: decode };
 
-},{"./api/AudioBuffer":5,"./util/audioDataUtil":89,"./util/decoderUtil":91,"wav-decoder":2}],37:[function(require,module,exports){
+},{"./api/AudioBuffer":5,"./util/audioDataUtil":92,"./util/decoderUtil":95,"wav-decoder":2}],37:[function(require,module,exports){
 "use strict";
 
 var WavEncoder = require("wav-encoder");
@@ -3310,7 +3299,7 @@ function encode(audioData, opts) {
 
 module.exports = { get: get, set: set, encode: encode };
 
-},{"./util/encoderUtil":93,"wav-encoder":3}],38:[function(require,module,exports){
+},{"./util/encoderUtil":98,"wav-encoder":3}],38:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3516,7 +3505,7 @@ Object.assign(AnalyserNode.prototype, AnalyserNodeDSP);
 
 module.exports = AnalyserNode;
 
-},{"../util":94,"./AudioNode":44,"./dsp/AnalyserNode":70}],39:[function(require,module,exports){
+},{"../util":101,"./AudioNode":44,"./dsp/AnalyserNode":70}],39:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3644,7 +3633,7 @@ var AudioBuffer = function () {
 
 module.exports = AudioBuffer;
 
-},{"../util":94,"./core/AudioData":67}],40:[function(require,module,exports){
+},{"../util":101,"./core/AudioData":67}],40:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -3838,7 +3827,7 @@ Object.assign(AudioBufferSourceNode.prototype, AudioBufferSourceNodeDSP);
 
 module.exports = AudioBufferSourceNode;
 
-},{"../util":94,"./AudioBuffer":39,"./AudioScheduledSourceNode":46,"./dsp/AudioBufferSourceNode":71}],41:[function(require,module,exports){
+},{"../util":101,"./AudioBuffer":39,"./AudioScheduledSourceNode":46,"./dsp/AudioBufferSourceNode":71}],41:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -4120,7 +4109,7 @@ var AudioContext = function (_EventTarget) {
 
 module.exports = AudioContext;
 
-},{"../config":31,"../util":94,"./AudioDestinationNode":42,"./AudioListener":43,"./EventTarget":56}],42:[function(require,module,exports){
+},{"../config":31,"../util":101,"./AudioDestinationNode":42,"./AudioListener":43,"./EventTarget":56}],42:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -4220,7 +4209,7 @@ var AudioDestinationNode = function (_AudioNode) {
 
 module.exports = AudioDestinationNode;
 
-},{"../util":94,"./AudioNode":44}],43:[function(require,module,exports){
+},{"../util":101,"./AudioNode":44}],43:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -4725,7 +4714,7 @@ var AudioNode = function (_EventTarget) {
 
 module.exports = AudioNode;
 
-},{"../util":94,"./AudioParam":45,"./EventTarget":56,"./core/AudioNodeInput":68,"./core/AudioNodeOutput":69}],45:[function(require,module,exports){
+},{"../util":101,"./AudioParam":45,"./EventTarget":56,"./core/AudioNodeInput":68,"./core/AudioNodeOutput":69}],45:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -5306,7 +5295,7 @@ Object.assign(AudioParam.prototype, AudioParamDSP);
 
 module.exports = AudioParam;
 
-},{"../util":94,"./core/AudioBus":66,"./core/AudioNodeInput":68,"./dsp/AudioParam":72}],46:[function(require,module,exports){
+},{"../util":101,"./core/AudioBus":66,"./core/AudioNodeInput":68,"./dsp/AudioParam":72}],46:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -5388,7 +5377,7 @@ var AudioScheduledSourceNode = function (_AudioSourceNode) {
 
 module.exports = AudioScheduledSourceNode;
 
-},{"../util":94,"./AudioSourceNode":47}],47:[function(require,module,exports){
+},{"../util":101,"./AudioSourceNode":47}],47:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -5600,7 +5589,7 @@ var AudioWorkerNode = function (_AudioNode) {
 
 module.exports = AudioWorkerNode;
 
-},{"../util":94,"./AudioNode":44}],49:[function(require,module,exports){
+},{"../util":101,"./AudioNode":44}],49:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -5844,7 +5833,7 @@ var BasePannerNode = function (_AudioNode) {
 
 module.exports = BasePannerNode;
 
-},{"../util":94,"./AudioNode":44}],50:[function(require,module,exports){
+},{"../util":101,"./AudioNode":44}],50:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -6158,7 +6147,7 @@ Object.assign(ChannelMergerNode.prototype, ChannelMergerNodeDSP);
 
 module.exports = ChannelMergerNode;
 
-},{"../util":94,"./AudioNode":44,"./dsp/ChannelMergerNode":74}],52:[function(require,module,exports){
+},{"../util":101,"./AudioNode":44,"./dsp/ChannelMergerNode":74}],52:[function(require,module,exports){
 "use strict";
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -6204,7 +6193,7 @@ Object.assign(ChannelSplitterNode.prototype, ChannelSplitterNodeDSP);
 
 module.exports = ChannelSplitterNode;
 
-},{"../util":94,"./AudioNode":44,"./dsp/ChannelSplitterNode":75}],53:[function(require,module,exports){
+},{"../util":101,"./AudioNode":44,"./dsp/ChannelSplitterNode":75}],53:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -6336,7 +6325,7 @@ Object.assign(ConvolverNode.prototype, ConvolverNodeDSP);
 
 module.exports = ConvolverNode;
 
-},{"../util":94,"./AudioBuffer":39,"./AudioNode":44,"./dsp/ConvolverNode":76}],54:[function(require,module,exports){
+},{"../util":101,"./AudioBuffer":39,"./AudioNode":44,"./dsp/ConvolverNode":76}],54:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -6432,7 +6421,7 @@ Object.assign(DelayNode.prototype, DelayNodeDSP);
 
 module.exports = DelayNode;
 
-},{"../util":94,"./AudioNode":44,"./dsp/DelayNode":77}],55:[function(require,module,exports){
+},{"../util":101,"./AudioNode":44,"./dsp/DelayNode":77}],55:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -6781,7 +6770,7 @@ Object.assign(IIRFilterNode.prototype, IIRFilterNodeDSP);
 
 module.exports = IIRFilterNode;
 
-},{"../util":94,"./AudioNode":44,"./dsp/IIRFilterNode":80}],59:[function(require,module,exports){
+},{"../util":101,"./AudioNode":44,"./dsp/IIRFilterNode":80}],59:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -6925,7 +6914,7 @@ Object.assign(OscillatorNode.prototype, OscillatorNodeDSP);
 
 module.exports = OscillatorNode;
 
-},{"../util":94,"./AudioScheduledSourceNode":46,"./PeriodicWave":61,"./dsp/OscillatorNode":81}],60:[function(require,module,exports){
+},{"../util":101,"./AudioScheduledSourceNode":46,"./PeriodicWave":61,"./dsp/OscillatorNode":81}],60:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -7245,7 +7234,7 @@ Object.assign(ScriptProcessorNode.prototype, ScriptProcessorNodeDSP);
 
 module.exports = ScriptProcessorNode;
 
-},{"../util":94,"./AudioNode":44,"./dsp/ScriptProcessorNode":84}],63:[function(require,module,exports){
+},{"../util":101,"./AudioNode":44,"./dsp/ScriptProcessorNode":84}],63:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -7955,7 +7944,7 @@ function isValidChannelInterpretation(value) {
 
 module.exports = AudioBus;
 
-},{"../../util":94,"./AudioData":67}],67:[function(require,module,exports){
+},{"../../util":101,"./AudioData":67}],67:[function(require,module,exports){
 "use strict";
 
 /**
@@ -8376,7 +8365,7 @@ function isValidChannelCountMode(value) {
 
 module.exports = AudioNodeInput;
 
-},{"../../util":94,"./AudioBus":66}],69:[function(require,module,exports){
+},{"../../util":101,"./AudioBus":66}],69:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -9034,7 +9023,7 @@ AudioParamDSP.AUDIO = AUDIO;
 
 module.exports = AudioParamDSP;
 
-},{"../../util":94,"../../util/audioParamUtil":90}],73:[function(require,module,exports){
+},{"../../util":101,"../../util/audioParamUtil":93}],73:[function(require,module,exports){
 "use strict";
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
@@ -10327,7 +10316,7 @@ var ScriptProcessorNodeDSP = {
 
 module.exports = ScriptProcessorNodeDSP;
 
-},{"../../util":94,"../AudioBuffer":39}],85:[function(require,module,exports){
+},{"../../util":101,"../AudioBuffer":39}],85:[function(require,module,exports){
 "use strict";
 
 var SpatialPannerNodeDSP = {
@@ -10574,6 +10563,213 @@ module.exports = WaveShaperNodeDSP;
 },{"./AnalyserNode":38,"./AudioBuffer":39,"./AudioBufferSourceNode":40,"./AudioContext":41,"./AudioDestinationNode":42,"./AudioListener":43,"./AudioNode":44,"./AudioParam":45,"./AudioWorkerNode":48,"./BiquadFilterNode":50,"./ChannelMergerNode":51,"./ChannelSplitterNode":52,"./ConvolverNode":53,"./DelayNode":54,"./DynamicsCompressorNode":55,"./GainNode":57,"./IIRFilterNode":58,"./OscillatorNode":59,"./PannerNode":60,"./PeriodicWave":61,"./ScriptProcessorNode":62,"./SpatialPannerNode":63,"./StereoPannerNode":64,"./WaveShaperNode":65}],89:[function(require,module,exports){
 "use strict";
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var PCMArrayBufferWriter = function () {
+  function PCMArrayBufferWriter(buffer) {
+    _classCallCheck(this, PCMArrayBufferWriter);
+
+    this._view = new DataView(buffer);
+    this._pos = 0;
+  }
+
+  _createClass(PCMArrayBufferWriter, [{
+    key: "pcm8",
+    value: function pcm8(value) {
+      value = Math.max(-1, Math.min(value, +1));
+      value = (value * 0.5 + 0.5) * 128;
+      this._view.setUint8(this._pos, value | 0);
+      this._pos += 1;
+    }
+  }, {
+    key: "pcm16",
+    value: function pcm16(value) {
+      value = Math.max(-1, Math.min(value, +1));
+      value = value < 0 ? value * 32768 : value * 32767;
+      this._view.setInt16(this._pos, value | 0, true);
+      this._pos += 2;
+    }
+  }, {
+    key: "pcm32",
+    value: function pcm32(value) {
+      value = Math.max(-1, Math.min(value, +1));
+      value = value < 0 ? value * 2147483648 : value * 2147483647;
+      this._view.setInt32(this._pos, value | 0, true);
+      this._pos += 4;
+    }
+  }, {
+    key: "pcm32f",
+    value: function pcm32f(value) {
+      this._view.setFloat32(this._pos, value, true);
+      this._pos += 4;
+    }
+  }]);
+
+  return PCMArrayBufferWriter;
+}();
+
+module.exports = PCMArrayBufferWriter;
+
+},{}],90:[function(require,module,exports){
+"use strict";
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var PCMBufferWriter = function () {
+  function PCMBufferWriter(buffer) {
+    _classCallCheck(this, PCMBufferWriter);
+
+    this._buffer = buffer;
+    this._pos = 0;
+  }
+
+  _createClass(PCMBufferWriter, [{
+    key: "pcm8",
+    value: function pcm8(value) {
+      value = Math.max(-1, Math.min(value, +1));
+      value = (value * 0.5 + 0.5) * 128;
+      this._buffer.writeUInt8(value | 0, this._pos);
+      this._pos += 1;
+    }
+  }, {
+    key: "pcm16",
+    value: function pcm16(value) {
+      value = Math.max(-1, Math.min(value, +1));
+      value = value < 0 ? value * 32768 : value * 32767;
+      this._buffer.writeInt16LE(value | 0, this._pos);
+      this._pos += 2;
+    }
+  }, {
+    key: "pcm32",
+    value: function pcm32(value) {
+      value = Math.max(-1, Math.min(value, +1));
+      value = value < 0 ? value * 2147483648 : value * 2147483647;
+      this._buffer.writeInt32LE(value | 0, this._pos);
+      this._pos += 4;
+    }
+  }, {
+    key: "pcm32f",
+    value: function pcm32f(value) {
+      this._buffer.writeFloatLE(value, this._pos);
+      this._pos += 4;
+    }
+  }]);
+
+  return PCMBufferWriter;
+}();
+
+module.exports = PCMBufferWriter;
+
+},{}],91:[function(require,module,exports){
+(function (global){
+"use strict";
+
+var Buffer = global.Buffer;
+var PCMArrayBufferWriter = require("./PCMArrayBufferWriter");
+var PCMBufferWriter = require("./PCMBufferWriter");
+var PCMWriter = getPCMWriter();
+var alloc = getAllocFunction();
+
+function create(length, format) {
+  var bitDepth = resolveBitDepth(format.bitDepth, format.float);
+  var methodName = resolveWriteMethodName(bitDepth, format.float);
+  var bytes = format.bitDepth >> 3;
+  var numberOfChannels = format.channels;
+  var bufferLength = numberOfChannels * length * bytes;
+
+  if (numberOfChannels === 1) {
+    return {
+      encode: function encode(channelData) {
+        var buffer = alloc(bufferLength);
+        var writer = new PCMWriter(buffer);
+        var output = channelData[0];
+
+        for (var i = 0, imax = length; i < imax; i++) {
+          writer[methodName](output[i]);
+        }
+
+        return buffer;
+      }
+    };
+  }
+
+  if (numberOfChannels === 2) {
+    return {
+      encode: function encode(channelData) {
+        var buffer = alloc(bufferLength);
+        var writer = new PCMWriter(buffer);
+        var outputL = channelData[0];
+        var outputR = channelData[1];
+
+        for (var i = 0, imax = length; i < imax; i++) {
+          writer[methodName](outputL[i]);
+          writer[methodName](outputR[i]);
+        }
+
+        return buffer;
+      }
+    };
+  }
+
+  return {
+    encode: function encode(channelData) {
+      var buffer = alloc(bufferLength);
+      var writer = new PCMWriter(buffer);
+
+      for (var i = 0, imax = length; i < imax; i++) {
+        for (var ch = 0; ch < numberOfChannels; ch++) {
+          writer[methodName](channelData[ch][i]);
+        }
+      }
+
+      return buffer;
+    }
+  };
+}
+
+/* istanbul ignore next */
+function resolveBitDepth(bitDepth, float) {
+  return float ? 32 : bitDepth;
+}
+
+/* istanbul ignore next */
+function resolveWriteMethodName(bitDepth, float) {
+  if (float) {
+    return "pcm32f";
+  }
+  return "pcm" + bitDepth;
+}
+
+/* istanbul ignore next */
+function getPCMWriter() {
+  return Buffer ? PCMBufferWriter : PCMArrayBufferWriter;
+}
+
+/* istanbul ignore next */
+function getAllocFunction() {
+  return Buffer ? Buffer.alloc ? Buffer.alloc : newBuffer : newArrayBuffer;
+}
+
+/* istanbul ignore next */
+function newBuffer(size) {
+  return new Buffer(size);
+}
+
+/* istanbul ignore next */
+function newArrayBuffer(size) {
+  return new Uint8Array(size).buffer;
+}
+
+module.exports = { create: create };
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{"./PCMArrayBufferWriter":89,"./PCMBufferWriter":90}],92:[function(require,module,exports){
+"use strict";
+
 /**
  * @param {*} data
  * @return {boolean}
@@ -10664,7 +10860,7 @@ function toAudioBuffer(data, AudioBuffer) {
 
 module.exports = { isAudioData: isAudioData, toAudioData: toAudioData, isAudioBuffer: isAudioBuffer, toAudioBuffer: toAudioBuffer };
 
-},{}],90:[function(require,module,exports){
+},{}],93:[function(require,module,exports){
 "use strict";
 
 var SET_VALUE_AT_TIME = 1;
@@ -10742,17 +10938,10 @@ function getExponentialRampToValueAtTime(t, v0, v1, t0, t1) {
   if (t1 <= t) {
     return v1;
   }
-  if (v0 === v1) {
-    return v0;
-  }
 
   a = (t - t0) / (t1 - t0);
 
-  if (0 < v0 && 0 < v1 || v0 < 0 && v1 < 0) {
-    return v0 * Math.pow(v1 / v0, a);
-  }
-
-  return 0;
+  return v0 * Math.pow(v1 / v0, a);
 }
 
 function getTargetValueAtTime(t, v0, v1, t0, timeConstant) {
@@ -10765,10 +10954,6 @@ function getTargetValueAtTime(t, v0, v1, t0, timeConstant) {
 function getValueCurveAtTime(t, curve, t0, duration) {
   var x, ix, i0, i1;
   var y0, y1, a;
-
-  if (curve.length === 0) {
-    return 0;
-  }
 
   x = (t - t0) / duration;
   ix = x * (curve.length - 1);
@@ -10788,7 +10973,22 @@ function getValueCurveAtTime(t, curve, t0, duration) {
 
 module.exports = { computeValueAtTime: computeValueAtTime, getLinearRampToValueAtTime: getLinearRampToValueAtTime, getExponentialRampToValueAtTime: getExponentialRampToValueAtTime, getTargetValueAtTime: getTargetValueAtTime, getValueCurveAtTime: getValueCurveAtTime };
 
-},{}],91:[function(require,module,exports){
+},{}],94:[function(require,module,exports){
+"use strict";
+
+/**
+ * @param {number} value
+ * @param {number} minValue
+ * @param {number} maxValue
+ */
+
+function clip(value, minValue, maxValue) {
+  return Math.max(minValue, Math.min(value, maxValue));
+}
+
+module.exports = clip;
+
+},{}],95:[function(require,module,exports){
 "use strict";
 
 var audioDataUtil = require("./audioDataUtil");
@@ -10801,7 +11001,7 @@ var resampler = require("./resampler");
  * @return {Promise<AudioData>}
  */
 function decode(decodeFn, audioData, opts) {
-  opts = opts || /* istanbul ignore next */{};
+  opts = opts /* istanbul ignore next */ || {};
 
   return new Promise(function (resolve, reject) {
     return decodeFn(audioData, opts).then(function (result) {
@@ -10818,7 +11018,21 @@ function decode(decodeFn, audioData, opts) {
 
 module.exports = { decode: decode };
 
-},{"./audioDataUtil":89,"./resampler":95}],92:[function(require,module,exports){
+},{"./audioDataUtil":92,"./resampler":102}],96:[function(require,module,exports){
+"use strict";
+
+/**
+ * @param {*} value
+ * @param {*) defaultValue
+ */
+
+function defaults(value, defaultValue) {
+  return typeof value !== "undefined" ? value : defaultValue;
+}
+
+module.exports = defaults;
+
+},{}],97:[function(require,module,exports){
 "use strict";
 
 /**
@@ -10833,7 +11047,7 @@ function defineProp(target, name, value) {
 
 module.exports = defineProp;
 
-},{}],93:[function(require,module,exports){
+},{}],98:[function(require,module,exports){
 "use strict";
 
 var audioDataUtil = require("./audioDataUtil");
@@ -10844,7 +11058,7 @@ var audioDataUtil = require("./audioDataUtil");
  * @param {object}    opts
  */
 function encode(encodeFn, audioData, opts) {
-  opts = opts || /* istanbul ignore next */{};
+  opts = opts /* istanbul ignore next */ || {};
   if (!audioDataUtil.isAudioData(audioData)) {
     audioData = audioDataUtil.toAudioData(audioData);
   }
@@ -10853,37 +11067,15 @@ function encode(encodeFn, audioData, opts) {
 
 module.exports = { encode: encode };
 
-},{"./audioDataUtil":89}],94:[function(require,module,exports){
+},{"./audioDataUtil":92}],99:[function(require,module,exports){
 "use strict";
-
-module.exports.defineProp = require("./defineProp");
-module.exports.toAudioTime = require("./toAudioTime");
-module.exports.toValidBitDepth = require("./toValidBitDepth");
-
-/**
- * @param {number} value
- * @param {number} minValue
- * @param {number} maxValue
- */
-function clip(value, minValue, maxValue) {
-  return Math.max(minValue, Math.min(value, maxValue));
-}
-module.exports.clip = clip;
-
-/**
- * @param {*} value
- * @param {*) defaultValue
- */
-function defaults(value, defaultValue) {
-  return typeof value !== "undefined" ? value : defaultValue;
-}
-module.exports.defaults = defaults;
 
 /**
  * @param {number[]} list
  * @param {number}   value
  * @return {number[]}
  */
+
 function fill(list, value) {
   if (list.fill) {
     return list.fill(value);
@@ -10895,7 +11087,11 @@ function fill(list, value) {
 
   return list;
 }
-module.exports.fill = fill;
+
+module.exports = fill;
+
+},{}],100:[function(require,module,exports){
+"use strict";
 
 /**
  * @param {number[]} list
@@ -10904,6 +11100,7 @@ module.exports.fill = fill;
  * @param {number}   end
  * @return {number[]}
  */
+
 function fillRange(list, value, start, end) {
   if (list.fill) {
     return list.fill(value, start, end);
@@ -10915,82 +11112,28 @@ function fillRange(list, value, start, end) {
 
   return list;
 }
-module.exports.fillRange = fillRange;
 
-/**
- * @param {*} value
- * @return {Array}
- */
-function toArrayIfNeeded(value) {
-  return Array.isArray(value) ? value : [value];
-}
-module.exports.toArrayIfNeeded = toArrayIfNeeded;
+module.exports = fillRange;
 
-/**
- * @param {object} value
- * @return {object}
- */
-function toImpl(value) {
-  return value._impl || value;
-}
-module.exports.toImpl = toImpl;
+},{}],101:[function(require,module,exports){
+"use strict";
 
-/**
- * @param {*} value
- * @return {number}
- */
-function toNumber(value) {
-  return +value || 0;
-}
-module.exports.toNumber = toNumber;
+module.exports.clip = require("./clip");
+module.exports.defaults = require("./defaults");
+module.exports.defineProp = require("./defineProp");
+module.exports.fill = require("./fill");
+module.exports.fillRange = require("./fillRange");
+module.exports.toArrayIfNeeded = require("./toArrayIfNeeded");
+module.exports.toAudioTime = require("./toAudioTime");
+module.exports.toImpl = require("./toImpl");
+module.exports.toNumber = require("./toNumber");
+module.exports.toPowerOfTwo = require("./toPowerOfTwo");
+module.exports.toValidBitDepth = require("./toValidBitDepth");
+module.exports.toValidBlockSize = require("./toValidBlockSize");
+module.exports.toValidNumberOfChannels = require("./toValidNumberOfChannels");
+module.exports.toValidSampleRate = require("./toValidSampleRate");
 
-/**
- * @param {number}   value
- * @param {function} round
- * @return {number}
- */
-function toPowerOfTwo(value, round) {
-  round = round || Math.round;
-  return 1 << round(Math.log(value) / Math.log(2));
-}
-module.exports.toPowerOfTwo = toPowerOfTwo;
-
-var MIN_SAMPLERATE = 3000;
-var MAX_SAMPLERATE = 192000;
-
-/**
- * @param {number} value
- * @return {number}
- */
-function toValidSampleRate(value) {
-  return clip(toNumber(value), MIN_SAMPLERATE, MAX_SAMPLERATE);
-}
-module.exports.toValidSampleRate = toValidSampleRate;
-
-var MIN_BLOCK_SIZE = 8;
-var MAX_BLOCK_SIZE = 1024;
-
-/**
- * @param {number} value
- * @return {number}
- */
-function toValidBlockSize(value) {
-  return clip(toPowerOfTwo(value), MIN_BLOCK_SIZE, MAX_BLOCK_SIZE);
-}
-module.exports.toValidBlockSize = toValidBlockSize;
-
-var MAX_NUMBER_OF_CHANNELS = 32;
-
-/**
- * @param {number} value
- * @return {number}
- */
-function toValidNumberOfChannels(value) {
-  return clip(value | 0, 1, MAX_NUMBER_OF_CHANNELS);
-}
-module.exports.toValidNumberOfChannels = toValidNumberOfChannels;
-
-},{"./defineProp":92,"./toAudioTime":96,"./toValidBitDepth":97}],95:[function(require,module,exports){
+},{"./clip":94,"./defaults":96,"./defineProp":97,"./fill":99,"./fillRange":100,"./toArrayIfNeeded":104,"./toAudioTime":105,"./toImpl":106,"./toNumber":107,"./toPowerOfTwo":108,"./toValidBitDepth":109,"./toValidBlockSize":110,"./toValidNumberOfChannels":111,"./toValidSampleRate":112}],102:[function(require,module,exports){
 "use strict";
 
 /**
@@ -11029,7 +11172,30 @@ function resample(audioData, sampleRate) {
 
 module.exports = { resample: resample };
 
-},{}],96:[function(require,module,exports){
+},{}],103:[function(require,module,exports){
+(function (global){
+"use strict";
+
+module.exports = global.setImmediate /* istanbul ignore next */ || function (fn) {
+  return setTimeout(fn, 0);
+};
+
+}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
+},{}],104:[function(require,module,exports){
+"use strict";
+
+/**
+ * @param {*} value
+ * @return {Array}
+ */
+
+function toArrayIfNeeded(value) {
+  return Array.isArray(value) ? value : [value];
+}
+
+module.exports = toArrayIfNeeded;
+
+},{}],105:[function(require,module,exports){
 "use strict";
 
 /**
@@ -11039,9 +11205,7 @@ module.exports = { resample: resample };
 
 function toAudioTime(str) {
   if (Number.isFinite(+str)) {
-    var time = Math.max(0, +str);
-
-    return Number.isFinite(time) ? time : 0;
+    return Math.max(0, +str);
   }
 
   var matched = ("" + str).match(/^(?:(\d\d+):)?(\d\d?):(\d\d?(?:\.\d+)?)$/);
@@ -11059,7 +11223,51 @@ function toAudioTime(str) {
 
 module.exports = toAudioTime;
 
-},{}],97:[function(require,module,exports){
+},{}],106:[function(require,module,exports){
+"use strict";
+
+/**
+ * @param {object} value
+ * @return {object}
+ */
+
+function toImpl(value) {
+  return value._impl || value;
+}
+
+module.exports = toImpl;
+
+},{}],107:[function(require,module,exports){
+"use strict";
+
+/**
+ * @param {*} value
+ * @return {number}
+ */
+
+function toNumber(value) {
+  return +value || 0;
+}
+
+module.exports = toNumber;
+
+},{}],108:[function(require,module,exports){
+"use strict";
+
+/**
+ * @param {number}   value
+ * @param {function} round
+ * @return {number}
+ */
+
+function toPowerOfTwo(value, round) {
+  round = round || Math.round;
+  return 1 << round(Math.log(value) / Math.log(2));
+}
+
+module.exports = toPowerOfTwo;
+
+},{}],109:[function(require,module,exports){
 "use strict";
 "use stirct";
 
@@ -11070,7 +11278,7 @@ module.exports = toAudioTime;
 
 function toValidBitDepth(value) {
   value = value | 0;
-  if (value === 8 || value === 16 || value === 24 || value === 32) {
+  if (value === 8 || value === 16 || value === 32) {
     return value;
   }
   return 16;
@@ -11078,7 +11286,60 @@ function toValidBitDepth(value) {
 
 module.exports = toValidBitDepth;
 
-},{}],98:[function(require,module,exports){
+},{}],110:[function(require,module,exports){
+"use strict";
+
+var clip = require("./clip");
+var toPowerOfTwo = require("./toPowerOfTwo");
+var MIN_BLOCK_SIZE = 8;
+var MAX_BLOCK_SIZE = 1024;
+
+/**
+ * @param {number} value
+ * @return {number}
+ */
+function toValidBlockSize(value) {
+  return clip(toPowerOfTwo(value), MIN_BLOCK_SIZE, MAX_BLOCK_SIZE);
+}
+
+module.exports = toValidBlockSize;
+
+},{"./clip":94,"./toPowerOfTwo":108}],111:[function(require,module,exports){
+"use strict";
+
+var toNumber = require("./toNumber");
+var clip = require("./clip");
+var MAX_NUMBER_OF_CHANNELS = 32;
+
+/**
+ * @param {number} value
+ * @return {number}
+ */
+function toValidNumberOfChannels(value) {
+  return clip(toNumber(value), 1, MAX_NUMBER_OF_CHANNELS) | 0;
+}
+
+module.exports = toValidNumberOfChannels;
+
+},{"./clip":94,"./toNumber":107}],112:[function(require,module,exports){
+"use strict";
+
+var toNumber = require("./toNumber");
+var clip = require("./clip");
+var MIN_SAMPLERATE = 3000;
+var MAX_SAMPLERATE = 192000;
+
+/**
+ * @param {number} value
+ * @return {number}
+ */
+function toValidSampleRate(value) {
+  return clip(toNumber(value), MIN_SAMPLERATE, MAX_SAMPLERATE) | 0;
+}
+
+module.exports = toValidSampleRate;
+
+},{"./clip":94,"./toNumber":107}],113:[function(require,module,exports){
 "use strict";
 
 var OfflineAudioContext = require("./context/OfflineAudioContext");
@@ -11098,5 +11359,5 @@ module.exports = {
   api: api, impl: impl, decoder: decoder, encoder: encoder
 };
 
-},{"./api":30,"./context/OfflineAudioContext":32,"./context/RenderingAudioContext":33,"./context/StreamAudioContext":34,"./context/WebAudioContext":35,"./decoder":36,"./encoder":37,"./impl":88}]},{},[98])(98)
+},{"./api":30,"./context/OfflineAudioContext":32,"./context/RenderingAudioContext":33,"./context/StreamAudioContext":34,"./context/WebAudioContext":35,"./decoder":36,"./encoder":37,"./impl":88}]},{},[113])(113)
 });
