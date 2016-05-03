@@ -31,8 +31,15 @@ class RenderingAudioContext extends AudioContext {
 
     super({ sampleRate, blockSize, numberOfChannels });
 
-    util.defineProp(this, "_format", { sampleRate, numberOfChannels, bitDepth, floatingPoint });
+    util.defineProp(this, "_format", { sampleRate, channels: numberOfChannels, bitDepth, float: floatingPoint });
     util.defineProp(this, "_rendered", []);
+  }
+
+  /**
+   * @return {number}
+   */
+  get numberOfChannels() {
+    return this._impl.numberOfChannels;
   }
 
   /**
@@ -43,6 +50,13 @@ class RenderingAudioContext extends AudioContext {
   }
 
   /**
+   * @return {object}
+   */
+  get format() {
+    return this._format;
+  }
+
+  /**
    * @param {number|string} time
    */
   processTo(time) {
@@ -50,6 +64,7 @@ class RenderingAudioContext extends AudioContext {
 
     const duration = time - this.currentTime;
 
+    /* istanbul ignore next */
     if (duration <= 0) {
       return;
     }
@@ -58,7 +73,7 @@ class RenderingAudioContext extends AudioContext {
     const blockSize = impl.blockSize;
     const iterations = Math.ceil(duration * this.sampleRate / blockSize);
     const bufferLength = blockSize * iterations;
-    const numberOfChannels = this._format.numberOfChannels;
+    const numberOfChannels = this._format.channels;
     const buffers = Array.from({ length: numberOfChannels }, () => new Float32Array(bufferLength));
 
     impl.changeState("running");
@@ -76,7 +91,7 @@ class RenderingAudioContext extends AudioContext {
    * @return {AudioData}
    */
   exportAsAudioData() {
-    const numberOfChannels = this._format.numberOfChannels;
+    const numberOfChannels = this._format.channels;
     const length = this._rendered.reduce((length, buffers) => length + buffers[0].length, 0);
     const sampleRate = this._format.sampleRate;
     const channelData = Array.from({ length: numberOfChannels }, () => new Float32Array(length));

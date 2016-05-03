@@ -1,6 +1,7 @@
 "use strict";
 
 const assert = require("power-assert");
+const deepEqual = require("deep-equal");
 const RenderingAudioContext = require("../../src/context/RenderingAudioContext");
 
 describe("RenderingAudioContext", () => {
@@ -8,6 +9,23 @@ describe("RenderingAudioContext", () => {
     const context = new RenderingAudioContext();
 
     assert(context instanceof RenderingAudioContext);
+  });
+
+  it("should return a RenderingAudioContext instance with options", () => {
+    const context = new RenderingAudioContext({
+      sampleRate: 8000, numberOfChannels: 1, blockSize: 256, bitDepth: 8
+    });
+
+    assert(context instanceof RenderingAudioContext);
+    assert(context.sampleRate === 8000);
+    assert(context.numberOfChannels === 1);
+    assert(context.blockSize === 256);
+    assert(deepEqual(context.format, {
+      sampleRate: 8000,
+      channels: 1,
+      bitDepth: 8,
+      float: false
+    }));
   });
 
   it("should advance current time when rendered", () => {

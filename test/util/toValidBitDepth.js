@@ -7,7 +7,6 @@ describe("util.toValidBitDepth()", () => {
   it("return valid bit depth", () => {
     assert(toValidBitDepth(8) === 8);
     assert(toValidBitDepth(16) === 16);
-    assert(toValidBitDepth(24) === 24);
     assert(toValidBitDepth(32) === 32);
   });
 

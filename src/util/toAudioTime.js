@@ -6,9 +6,7 @@
  */
 function toAudioTime(str) {
   if (Number.isFinite(+str)) {
-    const time = Math.max(0, +str);
-
-    return Number.isFinite(time) ? time : 0;
+    return Math.max(0, +str);
   }
 
   const matched = ("" + str).match(/^(?:(\d\d+):)?(\d\d?):(\d\d?(?:\.\d+)?)$/);

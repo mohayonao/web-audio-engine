@@ -4,7 +4,7 @@ const util = require("../util");
 const audioDataUtil = require("../util/audioDataUtil");
 const AudioContext = require("../api/AudioContext");
 const AudioBuffer = require("../api/AudioBuffer");
-const setImmediate = global.setImmediate || /* istanbul ignore next */ (fn => setTimeout(fn, 0));
+const setImmediate = require("../util/setImmediate");
 
 class OfflineAudioContext extends AudioContext {
   /**
@@ -52,7 +52,16 @@ class OfflineAudioContext extends AudioContext {
    * @return {Promise<void>}
    */
   resume() {
-    if (this.state === "suspended" && this._renderingPromise !== null) {
+    /* istanbul ignore next */
+    if (this._impl.state === "closed") {
+      return Promise.reject(new TypeError("cannot startRendering when an OfflineAudioContext is closed"));
+    }
+    /* istanbul ignore next */
+    if (this._renderingPromise === null) {
+      return Promise.reject(new TypeError("cannot resume an offline context that has not started"));
+    }
+    /* istanbul ignore else */
+    if (this._impl.state === "suspended") {
       render.call(this, this._impl);
     }
     return Promise.resolve();
@@ -63,15 +72,21 @@ class OfflineAudioContext extends AudioContext {
    * @return {Promise<void>}
    */
   suspend(time) {
+    /* istanbul ignore next */
+    if (this._impl.state === "closed") {
+      return Promise.reject(new TypeError("cannot startRendering when an OfflineAudioContext is closed"));
+    }
+    /* istanbul ignore next */
+    if (this._suspendPromise !== null) {
+      return Promise.reject(new TypeError("cannot schedule more than one suspend"));
+    }
+
     time = Math.max(0, util.toNumber(time));
 
     this._suspendedTime = time;
-
-    if (this._suspendPromise === null) {
-      this._suspendPromise = new Promise((resolve) => {
-        this._suspendResolve = resolve;
-      });
-    }
+    this._suspendPromise = new Promise((resolve) => {
+      this._suspendResolve = resolve;
+    });
 
     return this._suspendPromise;
   }
@@ -81,26 +96,34 @@ class OfflineAudioContext extends AudioContext {
    */
   /* istanbul ignore next */
   close() {
-    return Promise.reject();
+    return Promise.reject(new TypeError("cannot close an OfflineAudioContext"));
   }
 
   /**
    * @return {Promise<AudioBuffer>}
    */
   startRendering() {
-    if (this._renderingPromise === null) {
-      this._renderingPromise = new Promise((resolve) => {
-        const numberOfChannels = this._numberOfChannels;
-        const length = this._length;
-        const sampleRate = this.sampleRate;
-        const blockSize = this._impl.blockSize;
-
-        this._audioData = createRenderingAudioData(numberOfChannels, length, sampleRate, blockSize);
-        this._renderingResolve = resolve;
-
-        render.call(this, this._impl);
-      });
+    /* istanbul ignore next */
+    if (this._impl.state === "closed") {
+      return Promise.reject(new TypeError("cannot startRendering when an OfflineAudioContext is closed"));
     }
+    /* istanbul ignore next */
+    if (this._renderingPromise !== null) {
+      return Promise.reject(new TypeError("cannot call startRendering more than once"));
+    }
+
+    this._renderingPromise = new Promise((resolve) => {
+      const numberOfChannels = this._numberOfChannels;
+      const length = this._length;
+      const sampleRate = this.sampleRate;
+      const blockSize = this._impl.blockSize;
+
+      this._audioData = createRenderingAudioData(numberOfChannels, length, sampleRate, blockSize);
+      this._renderingResolve = resolve;
+
+      render.call(this, this._impl);
+    });
+
     return this._renderingPromise;
   }
 }
@@ -114,12 +137,10 @@ function createRenderingAudioData(numberOfChannels, length, sampleRate, blockSiz
 }
 
 function suspendRendering() {
-  if (this._suspendResolve !== null) {
-    this._suspendResolve();
-    this._suspendedTime = Infinity;
-    this._suspendPromise = this._suspendResolve = null;
-    this._impl.changeState("suspended");
-  }
+  this._suspendResolve();
+  this._suspendedTime = Infinity;
+  this._suspendPromise = this._suspendResolve = null;
+  this._impl.changeState("suspended");
 }
 
 function doneRendering(audioData) {

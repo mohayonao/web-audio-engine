@@ -13,8 +13,7 @@ describe("OfflineAudioContext", () => {
 
   it("should emit a 'complete' event with AudioBuffer after rendering", (done) => {
     const context = new OfflineAudioContext(2, 1000, 44100);
-
-    context.oncomplete = (e) => {
+    const oncomplete = (e) => {
       const audioBuffer = e.renderedBuffer;
 
       assert(audioBuffer instanceof AudioBuffer);
@@ -23,6 +22,10 @@ describe("OfflineAudioContext", () => {
       assert(audioBuffer.sampleRate === 44100);
       done();
     };
+
+    context.oncomplete = oncomplete;
+
+    assert(context.oncomplete === oncomplete);
 
     context.startRendering();
   });
@@ -54,7 +57,7 @@ describe("OfflineAudioContext", () => {
   });
 
   it("should suspend rendering", (done) => {
-    const context = new OfflineAudioContext(2, 1000, 44100);
+    const context = new OfflineAudioContext(2, 44100, 44100);
 
     context.suspend(300/44100).then(() => {
       assert(context.state === "suspended");
