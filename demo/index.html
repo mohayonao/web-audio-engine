@@ -7,6 +7,7 @@
   <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/codemirror.min.css">
   <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Work+Sans:400,200">
   <script src="//cdnjs.cloudflare.com/ajax/libs/es6-shim/0.35.0/es6-shim.min.js"></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/fetch/1.0.0/fetch.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/setImmediate/1.0.4/setImmediate.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/codemirror.min.js"></script>
   <script src="//cdnjs.cloudflare.com/ajax/libs/codemirror/5.13.4/mode/javascript/javascript.min.js"></script>
@@ -35,12 +36,13 @@
       <div class="form-horizontal">
         <div class="form-group">
           <label class="col-sm-1 control-label"></label>
-          <div class="col-sm-3">
+          <div class="col-sm-4">
             <button class="btn" v-bind:class="isPlaying ? 'btn-success' : 'btn-default'" v-on:click="run">Run</button>
             <button class="btn btn-default" v-on:click="stop">Stop</button>
           </div>
-          <div class="col-sm-8"><div class="form-control error-message">{{ error }}</div></div>
+          <div class="col-sm-6"><div class="form-control error-message">{{ error }}</div></div>
         </div>
+
         <div class="form-group">
           <label class="col-sm-1 control-label">api</label>
           <div class="col-sm-11">
@@ -54,6 +56,7 @@
             </div>
           </div>
         </div>
+
         <div class="form-group">
           <label class="col-sm-1 control-label">demo</label>
           <div class="col-sm-11">
@@ -62,6 +65,7 @@
             </select>
           </div>
         </div>
+
         <div class="form-group">
           <label class="col-sm-1 control-label">code</label>
           <div class="col-sm-11">
@@ -79,7 +83,6 @@
     "use strict";
 
     var demoList = [ "metronome", "sines", "filter", "delay", "chorus", "pan", "iir-filter", "drum" ];
-
     var audioContext = new AudioContext();
     var destination = audioContext.destination;
 
@@ -103,30 +106,6 @@
       timerAPI.timerIds.push(timerAPI.setTimeout.apply(window, arguments));
       return timerAPI.timerIds[timerAPI.timerIds.length - 1];
     };
-
-    function fetch(url) {
-      return new Promise(function(resolve, reject) {
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", url);
-        if (/\.(wav|mp3|ogg|aif)$/.test(url)) {
-          xhr.responseType = "arraybuffer";
-        }
-        xhr.onload = function() {
-          if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-              resolve({
-                text: function() { return xhr.response; },
-                arrayBuffer: function() { return xhr.response; }
-              });
-            } else {
-              reject(new TypeError(xhr.statusText));
-            }
-          }
-        };
-        xhr.onerror = function() { reject(new TypeError(xhr.statusText)); };
-        xhr.send();
-      });
-    }
 
     function loadScript(name) {
       return fetch("./sources/" + name + ".js").then(function(res) {
