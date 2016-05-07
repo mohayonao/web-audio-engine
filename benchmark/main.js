@@ -4,7 +4,6 @@ const fs = require("fs");
 const vm = require("vm");
 const readline = require("readline");
 
-const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 const files = fs.readdirSync(`${ __dirname }/suites`)
   .filter(filename => /\.js$/.test(filename))
   .sort();
@@ -16,25 +15,39 @@ function showList() {
 }
 
 function chooseBenchmark(callback) {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+
   showList();
-  rl.question("choose benchmark? ", (answer) => {
-    console.log("----------------------------------------");
-    run(answer|0);
+
+  rl.question("choose benchmark? ", (indices) => {
+    run(indices);
+    rl.close();
   });
 }
 
-function run(index) {
-  if (!files[index]) {
-    chooseBenchmark();
-  } else {
-    console.log(files[index]);
-    require(`${ __dirname }/suites/${ files[index] }`);
-    rl.close();
+function run(indices) {
+  const names = Array.prototype.concat.apply([], indices.split(/\s+/g).map(collectBenchmark));
+
+  return names.reduce((promise, name) => {
+    return promise.then(() => {
+      const func = require(`${ __dirname }/suites/${ name }`);
+
+      console.log("-- " + name + " " + "-".repeat(Math.max(0, 71 - (name.length))));
+
+      return new Promise((resolve) => { func(resolve); });
+    });
+  }, Promise.resolve());
+}
+
+function collectBenchmark(index) {
+  if (/^\d+$/.test(index)) {
+    return [ files[index] ];
   }
+  return files.filter(name => name.indexOf(index) !== -1);
 }
 
 if (process.argv[2]) {
-  run(process.argv[2]|0)
+  run(process.argv.slice(2).join(" "));
 } else {
   chooseBenchmark();
 }

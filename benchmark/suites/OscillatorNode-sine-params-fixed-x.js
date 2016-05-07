@@ -5,34 +5,30 @@ const waeSrc = require("../../src");
 const waeLib = require("../../lib");
 const waeBld = require("../../build/web-audio-engine");
 
-function run(done) {
+function run(numberOfChannels) {
   const suite = new benchmark.Suite();
 
   function setup(wae) {
     return {
-      wae,
-      defer: true,
+      wae, numberOfChannels,
       setup() {
         const wae = this.wae;
+        const context = new wae.impl.AudioContext();
+        const osc = new wae.impl.OscillatorNode(context);
+
+        osc.setType("sine");
+        osc.start(0);
+        osc.getFrequency().value = 440;
       },
-      fn(deffered) {
-        const context = new wae.OfflineAudioContext(2, 44100, 44100);
-        const osc = context.createOscillator();
-
-        osc.start(0.25);
-        osc.stop(0.75);
-        osc.connect(context.destination);
-
-        context.startRendering().then(() => {
-          deffered.resolve();
-        });
+      fn() {
+        osc.dspProcess();
       }
     };
   }
 
-  suite.add("src", setup(waeSrc));
-  suite.add("lib", setup(waeLib));
-  suite.add("bld", setup(waeBld));
+  suite.add(`src ${ numberOfChannels }ch`, setup(waeSrc));
+  suite.add(`lib ${ numberOfChannels }ch`, setup(waeLib));
+  suite.add(`bld ${ numberOfChannels }ch`, setup(waeBld));
 
   suite.on("cycle", (e) => {
     console.log(e.target.toString());
@@ -41,14 +37,18 @@ function run(done) {
   suite.on("complete", () => {
     console.log("* Fastest is " + suite.filter("fastest").map("name"));
     console.log();
-    done();
   });
 
-  suite.run({ async: true });
+  suite.on("error", (e) => {
+    console.error(e);
+  });
+
+  suite.run();
 }
 
 module.exports = (done) => {
-  run(done);
+  run(1);
+  done();
 };
 
 if (module.parent === null) {

@@ -5,32 +5,47 @@ const waeSrc = require("../../src");
 const waeLib = require("../../lib");
 const waeBld = require("../../build/web-audio-engine");
 
-const suite = new benchmark.Suite();
+function run(done) {
+  const suite = new benchmark.Suite();
 
-function run(wae, done) {
-  const context = new wae.OfflineAudioContext(2, 44100, 44100);
+  function setup(wae) {
+    return {
+      wae,
+      defer: true,
+      setup() {
+        const wae = this.wae;
+      },
+      fn(deffered) {
+        const context = new wae.OfflineAudioContext(2, 44100, 44100);
 
-  context.startRendering().then(done);
+        context.startRendering().then(() => {
+          deffered.resolve();
+        });
+      }
+    };
+  }
+
+  suite.add("src", setup(waeSrc));
+  suite.add("lib", setup(waeLib));
+  suite.add("bld", setup(waeBld));
+
+  suite.on("cycle", (e) => {
+    console.log(e.target.toString());
+  });
+
+  suite.on("complete", () => {
+    console.log("* Fastest is " + suite.filter("fastest").map("name"));
+    console.log();
+    done();
+  });
+
+  suite.run({ async: true });
 }
 
-suite.add("src", (deffered) => {
-  run(waeSrc, deffered.resolve.bind(deffered));
-}, { defer: true });
+module.exports = (done) => {
+  run(done);
+};
 
-suite.add("lib", (deffered) => {
-  run(waeLib, deffered.resolve.bind(deffered));
-}, { defer: true });
-
-suite.add("bld", (deffered) => {
-  run(waeBld, deffered.resolve.bind(deffered));
-}, { defer: true });
-
-suite.on("cycle", (e) => {
-  console.log(e.target.toString());
-});
-
-suite.on("complete", () => {
-  console.log("Fastest is " + suite.filter("fastest").map("name"));
-});
-
-suite.run({ async: true });
+if (module.parent === null) {
+  module.exports(process.exit);
+}
