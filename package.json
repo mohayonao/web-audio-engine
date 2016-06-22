@@ -11,23 +11,23 @@
     "wav-encoder": "^1.1.0"
   },
   "devDependencies": {
-    "babel-cli": "^6.7.7",
-    "babel-plugin-transform-es2015-classes": "^6.7.7",
+    "babel-cli": "^6.10.1",
+    "babel-plugin-transform-es2015-classes": "^6.9.0",
     "babel-plugin-unassert": "^2.1.0",
-    "babel-preset-es2015": "^6.6.0",
+    "babel-preset-es2015": "^6.9.0",
     "babel-preset-power-assert": "^1.0.0",
-    "babel-register": "^6.7.2",
+    "babel-register": "^6.9.0",
     "babelify": "^7.3.0",
-    "browserify": "^13.0.0",
+    "browserify": "^13.0.1",
     "deep-equal": "^1.0.1",
-    "eslint": "^2.9.0",
-    "eslint-plugin-node": "^1.1.0",
-    "eslint-watch": "^2.1.10",
-    "mocha": "^2.4.5",
-    "npm-run-all": "^1.8.0",
-    "nyc": "^6.4.2",
-    "power-assert": "^1.3.1",
-    "sinon": "^1.17.3"
+    "eslint": "^2.13.1",
+    "eslint-plugin-node": "^1.5.0",
+    "eslint-watch": "^2.1.11",
+    "mocha": "^2.5.3",
+    "npm-run-all": "^2.2.0",
+    "nyc": "^6.6.1",
+    "power-assert": "^1.4.1",
+    "sinon": "^1.17.4"
   },
   "engines": {
     "node": ">= 4.0.0"
@@ -57,8 +57,8 @@
   },
   "scripts": {
     "build": "npm-run-all build:*",
-    "build:browser": "mkdir -p build && BABEL_ENV=production browserify src -s WebAudioEngine -o build/web-audio-engine.js -t [ babelify ]",
-    "build:to5": "mkdir -p lib && BABEL_ENV=production babel --out-dir=lib src",
+    "build:browser": "BABEL_ENV=production browserify src -s WebAudioEngine -o build/web-audio-engine.js -t [ babelify ]",
+    "build:to5": "BABEL_ENV=production babel --out-dir=lib src",
     "clean": "rm -rf lib coverage .nyc_output npm-debug.log",
     "cover": "BABEL_ENV=coverage nyc --reporter text --reporter html mocha --require babel-register",
     "gh-pages": "git checkout gh-pages && git merge master && git push origin gh-pages && git checkout master",
