@@ -163,6 +163,7 @@ Executes encoding.
 - `audioData: AudioData`
 
 ## Implemented API
+- `AnalyserNode`
 - `AudioBuffer`
 - `AudioBufferSourceNode`
 - `AudioContext`
