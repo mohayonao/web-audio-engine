@@ -100,80 +100,93 @@ describe("AudioNode", () => {
 
   describe("connection", () => {
     it("basic operation", () => {
-      const node1 = new AudioNode(context, { outputs: [ 1, 1 ] });
-      const node2 = new AudioNode(context, { inputs: [ 1, 1 ] });
+      const node1 = new AudioNode(context, { outputs: [ 1 ] });
+      const node2 = new AudioNode(context, { inputs: [ 1 ] });
 
+      node1.outputs[0].enable();
       node1.connect(node2);
 
-      assert(node2.isConnectedFrom(node1) === true);
+      assert(node1.outputs[0].isConnectedTo(node2) === true);
+      assert(node2.inputs[0].isConnectedFrom(node1) === true);
 
       node1.disconnect();
 
-      assert(node2.isConnectedFrom(node1) === false);
+      assert(node1.outputs[0].isConnectedTo(node2) === false);
+      assert(node2.inputs[0].isConnectedFrom(node1) === false);
     });
 
     it("with the channel", () => {
       const node1 = new AudioNode(context, { outputs: [ 1, 1 ] });
-      const node2 = new AudioNode(context, { inputs: [ 1, 1 ] });
+      const node2 = new AudioNode(context, { inputs: [ 1 ] });
 
+      node1.outputs[0].enable();
+      node1.outputs[1].enable();
       node1.connect(node2, 1);
 
-      assert(node2.isConnectedFrom(node1, 0) === false);
-      assert(node2.isConnectedFrom(node1, 1) === true);
+      assert(node1.outputs[0].isConnectedTo(node2) === false);
+      assert(node1.outputs[1].isConnectedTo(node2) === true);
+      assert(node2.inputs[0].isConnectedFrom(node1) === true);
 
       node1.disconnect(0);
 
-      assert(node2.isConnectedFrom(node1, 0) === false);
-      assert(node2.isConnectedFrom(node1, 1) === true);
+      assert(node1.outputs[0].isConnectedTo(node2) === false);
+      assert(node1.outputs[1].isConnectedTo(node2) === true);
+      assert(node2.inputs[0].isConnectedFrom(node1) === true);
 
       node1.disconnect(1);
 
-      assert(node2.isConnectedFrom(node1, 1) === false);
+      assert(node1.outputs[0].isConnectedTo(node2) === false);
+      assert(node1.outputs[1].isConnectedTo(node2) === false);
+      assert(node2.inputs[0].isConnectedFrom(node1) === false);
     });
 
     it("disconnect with the node", () => {
-      const node1 = new AudioNode(context, { outputs: [ 1, 1 ] });
-      const node2 = new AudioNode(context, { inputs: [ 1, 1 ] });
+      const node1 = new AudioNode(context, { outputs: [ 1 ] });
+      const node2 = new AudioNode(context, { inputs: [ 1 ] });
 
+      node1.outputs[0].enable();
       node1.connect(node2);
 
-      assert(node2.isConnectedFrom(node1) === true);
+      assert(node1.outputs[0].isConnectedTo(node2) === true);
+      assert(node2.inputs[0].isConnectedFrom(node1) === true);
 
       node1.disconnect(node1);
 
-      assert(node2.isConnectedFrom(node1) === true);
+      assert(node1.outputs[0].isConnectedTo(node2) === true);
+      assert(node2.inputs[0].isConnectedFrom(node1) === true);
 
       node1.disconnect(node2);
 
-      assert(node2.isConnectedFrom(node1) === false);
+      assert(node1.outputs[0].isConnectedTo(node2) === false);
+      assert(node2.inputs[0].isConnectedFrom(node1) === false);
     });
 
-    it("complex case", () => {
+    it("disconnect with the channels", () => {
       const node1 = new AudioNode(context, { outputs: [ 1, 1 ] });
       const node2 = new AudioNode(context, { inputs: [ 1, 1 ] });
 
-      node1.connect(node2, 0);
+      node1.outputs[0].enable();
+      node1.outputs[1].enable();
+      node1.connect(node2, 0, 1);
 
-      assert(node2.isConnectedFrom(node1, 0) === true);
-      assert(node2.isConnectedFrom(node1, 1) === false);
+      assert(node1.outputs[0].isConnectedTo(node2) === true);
+      assert(node1.outputs[1].isConnectedTo(node2) === false);
+      assert(node2.inputs[0].isConnectedFrom(node1) === false);
+      assert(node2.inputs[1].isConnectedFrom(node1) === true);
 
-      node1.disconnect(node1, 1);
+      node1.disconnect(node2, 1, 0);
 
-      assert(node2.isConnectedFrom(node1, 0) === true);
-      assert(node2.isConnectedFrom(node1, 1) === false);
+      assert(node1.outputs[0].isConnectedTo(node2) === true);
+      assert(node1.outputs[1].isConnectedTo(node2) === false);
+      assert(node2.inputs[0].isConnectedFrom(node1) === false);
+      assert(node2.inputs[1].isConnectedFrom(node1) === true);
 
-      node1.disconnect(node2, 0);
+      node1.disconnect(node2, 0, 1);
 
-      assert(node2.isConnectedFrom(node1, 0) === false);
-      assert(node2.isConnectedFrom(node1, 1) === false);
-    });
-
-    it("misc", () => {
-      const node1 = new AudioNode(context);
-      const node2 = new AudioNode(context);
-
-      assert(node1.isConnectedTo() === false);
-      assert(node2.isConnectedFrom() === false);
+      assert(node1.outputs[0].isConnectedTo(node2) === false);
+      assert(node1.outputs[1].isConnectedTo(node2) === false);
+      assert(node2.inputs[0].isConnectedFrom(node1) === false);
+      assert(node2.inputs[1].isConnectedFrom(node1) === false);
     });
   });
 

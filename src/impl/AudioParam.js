@@ -391,19 +391,6 @@ class AudioParam {
   disableOutputsIfNecessary() {}
 
   /**
-   * @return {boolean}
-   */
-  isConnectedFrom() {
-    const args = Array.from(arguments);
-
-    if (args[0] && args[0].isConnectedTo) {
-      return args[0].isConnectedTo.apply(args[0], [ this ].concat(args.slice(1)));
-    }
-
-    return false;
-  }
-
-  /**
    * @return {object[]}
    */
   getTimeline() {
