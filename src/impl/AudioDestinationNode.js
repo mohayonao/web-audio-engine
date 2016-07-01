@@ -42,7 +42,7 @@ class AudioDestinationNode extends AudioNode {
    * @param {number} value
    */
   setChannelCount(value) {
-    value = util.clip(value|0, 1, this.getMaxChannelCount());
+    value = util.clamp(value|0, 1, this.getMaxChannelCount());
     super.setChannelCount(value);
   }
 

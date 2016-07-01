@@ -23,10 +23,10 @@
     "browserify": "^13.0.1",
     "deep-equal": "^1.0.1",
     "eslint": "^2.13.1",
-    "eslint-plugin-node": "^1.5.0",
-    "eslint-watch": "^2.1.11",
+    "eslint-plugin-node": "^1.5.1",
+    "eslint-watch": "^2.1.12",
     "mocha": "^2.5.3",
-    "npm-run-all": "^2.2.0",
+    "npm-run-all": "^2.3.0",
     "nyc": "^6.6.1",
     "power-assert": "^1.4.1",
     "sinon": "^1.17.4"
