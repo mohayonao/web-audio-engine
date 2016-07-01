@@ -270,27 +270,18 @@ describe("AudioParam", () => {
   describe("connection", () => {
     it("basic operation", () => {
       const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
-      const node = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ]});
+      const node = new AudioNode(context, { outputs: [ 1 ] });
 
+      node.outputs[0].enable();
       node.connect(param);
 
-      assert(node.isConnectedTo(param) === true);
-      assert(param.isConnectedFrom(node) === true);
+      assert(node.outputs[0].isConnectedTo(param) === true);
+      assert(param.inputs[0].isConnectedFrom(node) === true);
 
       node.disconnect();
 
-      assert(node.isConnectedTo(param) === false);
-      assert(param.isConnectedFrom(node) === false);
-    });
-
-    it("misc", () => {
-      const node = new AudioNode(context, { inputs: [], outputs: [ 1 ] });
-      const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
-
-      assert(param.isConnectedFrom() === false);
-
-      node.connect(param);
-      assert(param.isConnectedFrom(node) === true);
+      assert(node.outputs[0].isConnectedTo(param) === false);
+      assert(param.inputs[0].isConnectedFrom(node) === false);
     });
   });
 

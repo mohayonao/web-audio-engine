@@ -24,7 +24,7 @@ class AudioNodeOutput {
     this.node = node;
     this.index = index|0;
     this.bus = new AudioBus(numberOfChannels, node.blockSize, node.sampleRate);
-    this._inputs = [];
+    this.inputs = [];
     this._enabled = !!enabled;
   }
 
@@ -45,17 +45,10 @@ class AudioNodeOutput {
 
       this.bus.setNumberOfChannels(numberOfChannels, channelInterpretation);
 
-      this._inputs.forEach((input) => {
+      this.inputs.forEach((input) => {
         input.updateNumberOfChannels();
       });
     }
-  }
-
-  /**
-   * @return {number}
-   */
-  getNumberOfConnections() {
-    return this._inputs.length;
   }
 
   /**
@@ -72,7 +65,7 @@ class AudioNodeOutput {
     /* istanbul ignore else */
     if (!this._enabled) {
       this._enabled = true;
-      this._inputs.forEach((input) => {
+      this.inputs.forEach((input) => {
         input.enableFrom(this);
       });
     }
@@ -85,7 +78,7 @@ class AudioNodeOutput {
     /* istanbul ignore else */
     if (this._enabled) {
       this._enabled = false;
-      this._inputs.forEach((input) => {
+      this.inputs.forEach((input) => {
         input.disableFrom(this);
       });
     }
@@ -105,8 +98,8 @@ class AudioNodeOutput {
   connect(destination, input) {
     const target = destination.inputs[input|0];
 
-    if (this._inputs.indexOf(target) === -1) {
-      this._inputs.push(target);
+    if (this.inputs.indexOf(target) === -1) {
+      this.inputs.push(target);
       target.connectFrom(this);
     }
   }
@@ -121,12 +114,12 @@ class AudioNodeOutput {
       args.length === 2 ? target => target.node === args[0] && target.index === args[1] :
       () => true;
 
-    for (let i = this._inputs.length - 1; i >= 0; i--) {
-      const target = this._inputs[i];
+    for (let i = this.inputs.length - 1; i >= 0; i--) {
+      const target = this.inputs[i];
 
       if (isTargetToDisconnect(target)) {
         target.disconnectFrom(this);
-        this._inputs.splice(i, 1);
+        this.inputs.splice(i, 1);
       }
     }
   }
@@ -134,17 +127,8 @@ class AudioNodeOutput {
   /**
    * @return {boolean}
    */
-  isConnectedTo() {
-    const args = Array.from(arguments);
-
-    if (args.length === 1) {
-      return this._inputs.some(target => target.node === args[0]);
-    }
-    if (args.length === 2) {
-      return this._inputs.some(target => target.node === args[0] && target.index === args[1]);
-    }
-
-    return false;
+  isConnectedTo(node) {
+    return this.inputs.some(target => target.node === node);
   }
 
   /**

@@ -30,10 +30,10 @@ class AudioNodeInput {
     this.bus = new AudioBus(numberOfChannels, node.blockSize, node.sampleRate);
 
     this.bus.setChannelInterpretation("speakers");
+    this.outputs = [];
+    this._disabledOutputs = new WeakSet();
     this._channelCount = channelCount|0;
     this._channelCountMode = channelCountMode;
-    this._outputs = [];
-    this._disabledOutputs = [];
   }
 
   /**
@@ -103,7 +103,7 @@ class AudioNodeInput {
       return this._channelCount;
     }
 
-    const maxChannels = this._outputs.reduce((maxChannels, output) => {
+    const maxChannels = this.outputs.reduce((maxChannels, output) => {
       return Math.max(maxChannels, output.getNumberOfChannels());
     }, 1);
 
@@ -128,24 +128,10 @@ class AudioNodeInput {
   }
 
   /**
-   * @return {number}
-   */
-  getNumberOfConnections() {
-    return this._outputs.length + this._disabledOutputs.length;
-  }
-
-  /**
-   * @return {number}
-   */
-  getNumberOfFanOuts() {
-    return this._outputs.length;
-  }
-
-  /**
    * @return {boolean}
    */
   isEnabled() {
-    return this._outputs.length !== 0;
+    return this.outputs.length !== 0;
   }
 
   /**
@@ -153,7 +139,7 @@ class AudioNodeInput {
    */
   enableFrom(output) {
     /* istanbul ignore else */
-    if (moveItem(output, this._disabledOutputs, this._outputs)) {
+    if (moveItem(output, this._disabledOutputs, this.outputs)) {
       this.inputDidUpdate();
     }
   }
@@ -163,7 +149,7 @@ class AudioNodeInput {
    */
   disableFrom(output) {
     /* istanbul ignore else */
-    if (moveItem(output, this._outputs, this._disabledOutputs)) {
+    if (moveItem(output, this.outputs, this._disabledOutputs)) {
       this.inputDidUpdate();
     }
   }
@@ -173,13 +159,13 @@ class AudioNodeInput {
    */
   connectFrom(output) {
     if (output.isEnabled()) {
-      assert(this._disabledOutputs.indexOf(output) === -1);
+      assert(!this._disabledOutputs.has(output));
       /* istanbul ignore else */
-      if (addItem(output, this._outputs)) {
+      if (addItem(output, this.outputs)) {
         this.inputDidUpdate();
       }
     } else {
-      assert(this._outputs.indexOf(output) === -1);
+      assert(this.outputs.indexOf(output) === -1);
       addItem(output, this._disabledOutputs);
     }
   }
@@ -189,13 +175,13 @@ class AudioNodeInput {
    */
   disconnectFrom(output) {
     if (output.isEnabled()) {
-      assert(this._disabledOutputs.indexOf(output) === -1);
+      assert(!this._disabledOutputs.has(output));
       /* istanbul ignore else */
-      if (removeItem(output, this._outputs)) {
+      if (removeItem(output, this.outputs)) {
         this.inputDidUpdate();
       }
     } else {
-      assert(this._outputs.indexOf(output) === -1);
+      assert(this.outputs.indexOf(output) === -1);
       removeItem(output, this._disabledOutputs);
     }
   }
@@ -205,7 +191,7 @@ class AudioNodeInput {
    */
   inputDidUpdate() {
     this.updateNumberOfChannels();
-    if (this._outputs.length === 0) {
+    if (this.outputs.length === 0) {
       this.node.disableOutputsIfNecessary();
     } else {
       this.node.enableOutputsIfNecessary();
@@ -215,21 +201,9 @@ class AudioNodeInput {
   /**
    * @return {boolean}
    */
-  isConnectedFrom() {
-    const args = Array.from(arguments);
-
-    if (args.length === 1) {
-      const hasTarget = target => target.node === args[0];
-
-      return this._outputs.some(hasTarget) || this._disabledOutputs.some(hasTarget);
-    }
-    if (args.length === 2) {
-      const hasTarget = target => target.node === args[0] && target.index === args[1];
-
-      return this._outputs.some(hasTarget) || this._disabledOutputs.some(hasTarget);
-    }
-
-    return false;
+  isConnectedFrom(node) {
+    return this.outputs.some(target => target.node === node) ||
+      !!(node && Array.isArray(node.outputs) && node.outputs.some(target => this._disabledOutputs.has(target)));
   }
 
   /**
@@ -237,7 +211,7 @@ class AudioNodeInput {
    */
   sumAllConnections() {
     const audioBus = this.bus;
-    const outputs = this._outputs;
+    const outputs = this.outputs;
 
     audioBus.zeros();
 
@@ -252,8 +226,8 @@ class AudioNodeInput {
    * @return {AudioBus}
    */
   pull() {
-    if (this._outputs.length === 1) {
-      const output = this._outputs[0];
+    if (this.outputs.length === 1) {
+      const output = this.outputs[0];
 
       /* istanbul ignore else */
       if (output.getNumberOfChannels() === this.getNumberOfChannels()) {
@@ -266,43 +240,45 @@ class AudioNodeInput {
 }
 
 function addItem(target, destination) {
-  const index = destination.indexOf(target);
+  if (destination instanceof WeakSet) {
+    /* istanbul ignore next */
+    if (destination.has(target)) {
+      return false;
+    }
+    destination.add(target);
+  } else {
+    const index = destination.indexOf(target);
 
-  /* istanbul ignore next */
-  if (index !== -1) {
-    return false;
+    /* istanbul ignore next */
+    if (index !== -1) {
+      return false;
+    }
+    destination.push(target);
   }
-
-  destination.push(target);
-
   return true;
 }
 
 function removeItem(target, source) {
-  const index = source.indexOf(target);
+  if (source instanceof WeakSet) {
+    /* istanbul ignore next */
+    if (!source.has(target)) {
+      return false;
+    }
+    source.delete(target);
+  } else {
+    const index = source.indexOf(target);
 
-  /* istanbul ignore next */
-  if (index === -1) {
-    return false;
+    /* istanbul ignore next */
+    if (index === -1) {
+      return false;
+    }
+    source.splice(index, 1);
   }
-
-  source.splice(index, 1);
-
   return true;
 }
 
 function moveItem(target, source, destination) {
-  const index = source.indexOf(target);
-
-  /* istanbul ignore next */
-  if (index === -1) {
-    return false;
-  }
-
-  source.splice(index, 1);
-  destination.push(target);
-
-  return true;
+  return removeItem(target, source) && addItem(target, destination);
 }
 
 function isValidChannelCountMode(value) {

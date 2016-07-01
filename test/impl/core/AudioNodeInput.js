@@ -90,82 +90,137 @@ describe("AudioNodeInput", () => {
 
   describe("connection", () => {
     it("connect", () => {
-      const node1 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const node2 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const input = node2.inputs[0];
+      const node1 = new AudioNode(context, { outputs: [ 1 ] });
+      const node2 = new AudioNode(context, { inputs: [ 1 ] });
 
-      assert(input.getNumberOfConnections() === 0);
+      node1.outputs[0].enable();
+      node1.connect(node2);
+
+      assert(node1.outputs[0].inputs.length === 1);
+      assert(node1.outputs[0].isConnectedTo(node2) === true);
+      assert(node2.inputs[0].outputs.length === 1);
+      assert(node2.inputs[0].isConnectedFrom(node1) === true);
 
       node1.connect(node2);
-      assert(input.isConnectedFrom(node1) === true);
-      assert(input.getNumberOfConnections() === 1);
 
-      node1.connect(node2);
-      assert(input.isConnectedFrom(node1) === true);
-      assert(input.getNumberOfConnections() === 1);
+      assert(node1.outputs[0].inputs.length === 1);
+      assert(node2.inputs[0].outputs.length === 1);
     });
 
     it("disconnect", () => {
-      const node1 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const node2 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const input = node2.inputs[0];
+      const node1 = new AudioNode(context, { outputs: [ 1 ] });
+      const node2 = new AudioNode(context, { inputs: [ 1 ] });
 
+      node1.outputs[0].enable();
       node1.connect(node2);
-      assert(input.isConnectedFrom(node1) === true);
-      assert(input.getNumberOfConnections() === 1);
+
+      assert(node1.outputs[0].inputs.length === 1);
+      assert(node1.outputs[0].isConnectedTo(node2) === true);
+      assert(node2.inputs[0].outputs.length === 1);
+      assert(node2.inputs[0].isConnectedFrom(node1) === true);
 
       node1.disconnect();
-      assert(input.isConnectedFrom(node1) === false);
-      assert(input.getNumberOfConnections() === 0);
+
+      assert(node1.outputs[0].inputs.length === 0);
+      assert(node1.outputs[0].isConnectedTo(node2) === false);
+      assert(node2.inputs[0].outputs.length === 0);
+      assert(node2.inputs[0].isConnectedFrom(node1) === false);
     });
 
     it("disconnect - destination", () => {
-      const node1 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const node2 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const node3 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const input = node2.inputs[0];
+      const node1 = new AudioNode(context, { outputs: [ 1 ] });
+      const node2 = new AudioNode(context, { inputs: [ 1 ] });
+      const node3 = new AudioNode(context, { inputs: [ 1 ] });
 
+      node1.outputs[0].enable();
       node1.connect(node2);
-      assert(input.isConnectedFrom(node1) === true);
-      assert(input.isConnectedFrom(node2) === false);
-      assert(input.getNumberOfConnections() === 1);
+
+      assert(node1.outputs[0].inputs.length === 1);
+      assert(node1.outputs[0].isConnectedTo(node2) === true);
+      assert(node1.outputs[0].isConnectedTo(node3) === false);
+      assert(node2.inputs[0].outputs.length === 1);
+      assert(node2.inputs[0].isConnectedFrom(node1) === true);
+      assert(node3.inputs[0].outputs.length === 0);
+      assert(node3.inputs[0].isConnectedFrom(node1) === false);
 
       node1.disconnect(node3);
-      assert(input.isConnectedFrom(node1) === true);
-      assert(input.isConnectedFrom(node2) === false);
-      assert(input.getNumberOfConnections() === 1);
+
+      assert(node1.outputs[0].inputs.length === 1);
+      assert(node1.outputs[0].isConnectedTo(node2) === true);
+      assert(node1.outputs[0].isConnectedTo(node3) === false);
+      assert(node2.inputs[0].outputs.length === 1);
+      assert(node2.inputs[0].isConnectedFrom(node1) === true);
+      assert(node3.inputs[0].outputs.length === 0);
+      assert(node3.inputs[0].isConnectedFrom(node1) === false);
 
       node1.disconnect(node2);
-      assert(input.isConnectedFrom(node1) === false);
-      assert(input.isConnectedFrom(node2) === false);
-      assert(input.getNumberOfConnections() === 0);
+
+      assert(node1.outputs[0].inputs.length === 0);
+      assert(node1.outputs[0].isConnectedTo(node2) === false);
+      assert(node1.outputs[0].isConnectedTo(node3) === false);
+      assert(node2.inputs[0].outputs.length === 0);
+      assert(node2.inputs[0].isConnectedFrom(node1) === false);
+      assert(node3.inputs[0].outputs.length === 0);
+      assert(node3.inputs[0].isConnectedFrom(node1) === false);
     });
 
     it("disconnect - destination / input", () => {
-      const node1 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const node2 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const node3 = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
-      const input = node2.inputs[0];
+      const node1 = new AudioNode(context, { outputs: [ 1, 1 ] });
+      const node2 = new AudioNode(context, { inputs: [ 1 ] });
+      const node3 = new AudioNode(context, { inputs: [ 1 ] });
 
+      node1.outputs[0].enable();
       node1.connect(node2);
-      assert(input.isConnectedFrom(node1, 0) === true);
-      assert(input.isConnectedFrom(node1, 1) === false);
-      assert(input.getNumberOfConnections() === 1);
+
+      assert(node1.outputs[0].inputs.length === 1);
+      assert(node1.outputs[0].isConnectedTo(node2) === true);
+      assert(node1.outputs[0].isConnectedTo(node3) === false);
+      assert(node1.outputs[1].inputs.length === 0);
+      assert(node1.outputs[1].isConnectedTo(node2) === false);
+      assert(node1.outputs[1].isConnectedTo(node3) === false);
+      assert(node2.inputs[0].outputs.length === 1);
+      assert(node2.inputs[0].isConnectedFrom(node1) === true);
+      assert(node3.inputs[0].outputs.length === 0);
+      assert(node3.inputs[0].isConnectedFrom(node1) === false);
 
       node1.disconnect(node3, 0);
-      assert(input.isConnectedFrom(node1, 0) === true);
-      assert(input.isConnectedFrom(node1, 1) === false);
-      assert(input.getNumberOfConnections() === 1);
+
+      assert(node1.outputs[0].inputs.length === 1);
+      assert(node1.outputs[0].isConnectedTo(node2) === true);
+      assert(node1.outputs[0].isConnectedTo(node3) === false);
+      assert(node1.outputs[1].inputs.length === 0);
+      assert(node1.outputs[1].isConnectedTo(node2) === false);
+      assert(node1.outputs[1].isConnectedTo(node3) === false);
+      assert(node2.inputs[0].outputs.length === 1);
+      assert(node2.inputs[0].isConnectedFrom(node1) === true);
+      assert(node3.inputs[0].outputs.length === 0);
+      assert(node3.inputs[0].isConnectedFrom(node1) === false);
 
       node1.disconnect(node2, 1);
-      assert(input.isConnectedFrom(node1, 0) === true);
-      assert(input.isConnectedFrom(node1, 1) === false);
-      assert(input.getNumberOfConnections() === 1);
+
+      assert(node1.outputs[0].inputs.length === 1);
+      assert(node1.outputs[0].isConnectedTo(node2) === true);
+      assert(node1.outputs[0].isConnectedTo(node3) === false);
+      assert(node1.outputs[1].inputs.length === 0);
+      assert(node1.outputs[1].isConnectedTo(node2) === false);
+      assert(node1.outputs[1].isConnectedTo(node3) === false);
+      assert(node2.inputs[0].outputs.length === 1);
+      assert(node2.inputs[0].isConnectedFrom(node1) === true);
+      assert(node3.inputs[0].outputs.length === 0);
+      assert(node3.inputs[0].isConnectedFrom(node1) === false);
 
       node1.disconnect(node2, 0);
-      assert(input.isConnectedFrom(node1, 0) === false);
-      assert(input.isConnectedFrom(node1, 1) === false);
-      assert(input.getNumberOfConnections() === 0);
+
+      assert(node1.outputs[0].inputs.length === 0);
+      assert(node1.outputs[0].isConnectedTo(node2) === false);
+      assert(node1.outputs[0].isConnectedTo(node3) === false);
+      assert(node1.outputs[1].inputs.length === 0);
+      assert(node1.outputs[1].isConnectedTo(node2) === false);
+      assert(node1.outputs[1].isConnectedTo(node3) === false);
+      assert(node2.inputs[0].outputs.length === 0);
+      assert(node2.inputs[0].isConnectedFrom(node1) === false);
+      assert(node3.inputs[0].outputs.length === 0);
+      assert(node3.inputs[0].isConnectedFrom(node1) === false);
     });
 
     it("fanout", () => {
@@ -186,39 +241,65 @@ describe("AudioNodeInput", () => {
       const node2 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
       const node3 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
       const node4 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
-      const input = node4.inputs[0];
 
       node1.connect(node2);
       node2.connect(node4);
       node3.connect(node4);
 
-      assert(input.getNumberOfConnections() === 2);
-      assert(input.getNumberOfFanOuts() === 0);
-      assert(input.isEnabled() === false);
+      assert(node2.outputs[0].inputs.length === 1);
+      assert(node2.outputs[0].isConnectedTo(node4) === true);
+      assert(node3.outputs[0].inputs.length === 1);
+      assert(node3.outputs[0].isConnectedTo(node4) === true);
+      assert(node4.inputs[0].outputs.length === 0);
+      assert(node4.inputs[0].isConnectedFrom(node2) === true);
+      assert(node4.inputs[0].isConnectedFrom(node3) === true);
+      assert(node4.inputs[0].isEnabled() === false);
 
       node1.outputs[0].enable();
-      assert(input.getNumberOfFanOuts() === 1);
-      assert(input.isEnabled() === true);
+
+      assert(node2.outputs[0].inputs.length === 1);
+      assert(node2.outputs[0].isConnectedTo(node4) === true);
+      assert(node3.outputs[0].inputs.length === 1);
+      assert(node3.outputs[0].isConnectedTo(node4) === true);
+      assert(node4.inputs[0].outputs.length === 1);
+      assert(node4.inputs[0].isConnectedFrom(node2) === true);
+      assert(node4.inputs[0].isConnectedFrom(node3) === true);
+      assert(node4.inputs[0].isEnabled() === true);
 
       node3.outputs[0].enable();
-      assert(input.getNumberOfFanOuts() === 2);
-      assert(input.isEnabled() === true);
+
+      assert(node2.outputs[0].inputs.length === 1);
+      assert(node2.outputs[0].isConnectedTo(node4) === true);
+      assert(node3.outputs[0].inputs.length === 1);
+      assert(node3.outputs[0].isConnectedTo(node4) === true);
+      assert(node4.inputs[0].outputs.length === 2);
+      assert(node4.inputs[0].isConnectedFrom(node2) === true);
+      assert(node4.inputs[0].isConnectedFrom(node3) === true);
+      assert(node4.inputs[0].isEnabled() === true);
 
       node1.disconnect();
-      assert(input.getNumberOfConnections() === 2);
-      assert(input.getNumberOfFanOuts() === 1);
-      assert(input.isEnabled() === true);
+
+      assert(node2.outputs[0].inputs.length === 1);
+      assert(node2.outputs[0].isConnectedTo(node4) === true);
+      assert(node2.outputs[0].isConnectedTo(node4));
+      assert(node3.outputs[0].isConnectedTo(node4) === true);
+      assert(node3.outputs[0].inputs.length === 1);
+      assert(node4.inputs[0].outputs.length === 1);
+      assert(node4.inputs[0].isConnectedFrom(node2) === true);
+      assert(node4.inputs[0].isConnectedFrom(node3) === true);
+      assert(node4.inputs[0].isEnabled() === true);
 
       node3.outputs[0].disable();
-      assert(input.getNumberOfConnections() === 2);
-      assert(input.getNumberOfFanOuts() === 0);
-      assert(input.isEnabled() === false);
 
-      node2.disconnect();
-      assert(input.getNumberOfConnections() === 1);
-
-      node3.disconnect();
-      assert(input.getNumberOfConnections() === 0);
+      assert(node2.outputs[0].inputs.length === 1);
+      assert(node2.outputs[0].isConnectedTo(node4) === true);
+      assert(node2.outputs[0].isConnectedTo(node4));
+      assert(node3.outputs[0].isConnectedTo(node4) === true);
+      assert(node3.outputs[0].inputs.length === 1);
+      assert(node4.inputs[0].outputs.length === 0);
+      assert(node4.inputs[0].isConnectedFrom(node2) === true);
+      assert(node4.inputs[0].isConnectedFrom(node3) === true);
+      assert(node4.inputs[0].isEnabled() === false);
     });
 
     it("misc", () => {

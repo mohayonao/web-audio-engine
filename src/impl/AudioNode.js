@@ -276,40 +276,6 @@ class AudioNode extends EventTarget {
   }
 
   /**
-   * @return {boolean}
-   */
-  isConnectedTo() {
-    const args = Array.from(arguments);
-
-    if (args.length === 1) {
-      return this.outputs.some((output) => {
-        return output.isConnectedTo(args[0]);
-      });
-    }
-
-    const output = args.splice(1, 1)[0]|0;
-
-    if (this.outputs[output]) {
-      return this.outputs[output].isConnectedTo.apply(this.outputs[output], args);
-    }
-
-    return false;
-  }
-
-  /**
-   * @return {boolean}
-   */
-  isConnectedFrom() {
-    const args = Array.from(arguments);
-
-    if (args[0] && args[0].isConnectedTo) {
-      return args[0].isConnectedTo.apply(args[0], [ this ].concat(args.slice(1)));
-    }
-
-    return false;
-  }
-
-  /**
    *
    */
   processIfNecessary() {
