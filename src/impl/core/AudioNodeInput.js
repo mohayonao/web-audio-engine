@@ -31,7 +31,7 @@ class AudioNodeInput {
 
     this.bus.setChannelInterpretation("speakers");
     this.outputs = [];
-    this._disabledOutputs = [];
+    this._disabledOutputs = new WeakSet();
     this._channelCount = channelCount|0;
     this._channelCountMode = channelCountMode;
   }
@@ -159,7 +159,7 @@ class AudioNodeInput {
    */
   connectFrom(output) {
     if (output.isEnabled()) {
-      assert(this._disabledOutputs.indexOf(output) === -1);
+      assert(!this._disabledOutputs.has(output));
       /* istanbul ignore else */
       if (addItem(output, this.outputs)) {
         this.inputDidUpdate();
@@ -175,7 +175,7 @@ class AudioNodeInput {
    */
   disconnectFrom(output) {
     if (output.isEnabled()) {
-      assert(this._disabledOutputs.indexOf(output) === -1);
+      assert(!this._disabledOutputs.has(output));
       /* istanbul ignore else */
       if (removeItem(output, this.outputs)) {
         this.inputDidUpdate();
@@ -203,7 +203,7 @@ class AudioNodeInput {
    */
   isConnectedFrom(node) {
     return this.outputs.some(target => target.node === node) ||
-      !!(node && Array.isArray(node.outputs) && node.outputs.some(target => this._disabledOutputs.indexOf(target) !== -1));
+      !!(node && Array.isArray(node.outputs) && node.outputs.some(target => this._disabledOutputs.has(target)));
   }
 
   /**
@@ -240,43 +240,45 @@ class AudioNodeInput {
 }
 
 function addItem(target, destination) {
-  const index = destination.indexOf(target);
+  if (destination instanceof WeakSet) {
+    /* istanbul ignore next */
+    if (destination.has(target)) {
+      return false;
+    }
+    destination.add(target);
+  } else {
+    const index = destination.indexOf(target);
 
-  /* istanbul ignore next */
-  if (index !== -1) {
-    return false;
+    /* istanbul ignore next */
+    if (index !== -1) {
+      return false;
+    }
+    destination.push(target);
   }
-
-  destination.push(target);
-
   return true;
 }
 
 function removeItem(target, source) {
-  const index = source.indexOf(target);
+  if (source instanceof WeakSet) {
+    /* istanbul ignore next */
+    if (!source.has(target)) {
+      return false;
+    }
+    source.delete(target);
+  } else {
+    const index = source.indexOf(target);
 
-  /* istanbul ignore next */
-  if (index === -1) {
-    return false;
+    /* istanbul ignore next */
+    if (index === -1) {
+      return false;
+    }
+    source.splice(index, 1);
   }
-
-  source.splice(index, 1);
-
   return true;
 }
 
 function moveItem(target, source, destination) {
-  const index = source.indexOf(target);
-
-  /* istanbul ignore next */
-  if (index === -1) {
-    return false;
-  }
-
-  source.splice(index, 1);
-  destination.push(target);
-
-  return true;
+  return removeItem(target, source) && addItem(target, destination);
 }
 
 function isValidChannelCountMode(value) {
