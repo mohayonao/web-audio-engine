@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports.clip = require("./clip");
+module.exports.clamp = require("./clamp");
 module.exports.defaults = require("./defaults");
 module.exports.defineProp = require("./defineProp");
 module.exports.fill = require("./fill");

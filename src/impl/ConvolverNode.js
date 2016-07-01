@@ -25,7 +25,7 @@ class ConvolverNode extends AudioNode {
    * @param {number} value
    */
   setChannelCount(value) {
-    value = util.clip(value|0, 1, 2);
+    value = util.clamp(value|0, 1, 2);
     super.setChannelCount(value);
   }
 

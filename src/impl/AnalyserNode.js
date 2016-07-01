@@ -37,7 +37,7 @@ class AnalyserNode extends AudioNode {
    * @param {number} value
    */
   setFftSize(value) {
-    value = util.clip(value|0, MinFFTSize, MaxFFTSize);
+    value = util.clamp(value|0, MinFFTSize, MaxFFTSize);
     value = util.toPowerOfTwo(value, Math.ceil);
     this._fftSize = value;
     this.dspUpdateSizes(this._fftSize);
@@ -98,7 +98,7 @@ class AnalyserNode extends AudioNode {
    * @param {number}
    */
   setSmoothingTimeConstant(value) {
-    value = util.clip(util.toNumber(value), 0, 1);
+    value = util.clamp(util.toNumber(value), 0, 1);
     this._smoothingTimeConstant = value;
   }
 

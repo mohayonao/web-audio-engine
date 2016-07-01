@@ -1,6 +1,6 @@
 "use strict";
 
-const clip = require("./clip");
+const clamp = require("./clamp");
 
 /**
  * normalize - returns a number between 0 - 1
@@ -10,7 +10,7 @@ const clip = require("./clip");
  */
 function normalize(value, minValue, maxValue) {
   const val = (value - minValue) / (maxValue - minValue);
-  return clip(val, 0, 1);
+  return clamp(val, 0, 1);
 }
 
 module.exports = normalize;

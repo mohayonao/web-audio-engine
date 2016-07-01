@@ -1,7 +1,7 @@
 "use strict";
 
 const toNumber = require("./toNumber");
-const clip = require("./clip");
+const clamp = require("./clamp");
 const MIN_SAMPLERATE = 3000;
 const MAX_SAMPLERATE = 192000;
 
@@ -10,7 +10,7 @@ const MAX_SAMPLERATE = 192000;
  * @return {number}
  */
 function toValidSampleRate(value) {
-  return clip(toNumber(value), MIN_SAMPLERATE, MAX_SAMPLERATE)|0;
+  return clamp(toNumber(value), MIN_SAMPLERATE, MAX_SAMPLERATE)|0;
 }
 
 module.exports = toValidSampleRate;
