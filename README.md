@@ -182,6 +182,7 @@ Executes encoding.
 - `StereoPannerNode`
 - `WaveShaperNode`
 - The other not implemented nodes will pass its input to its output without modification.
+- See: [Comparison Chart of implemented nodes](https://github.com/mohayonao/web-audio-engine/wiki/Compatibility-Comparison)
 
 ## Example
 
