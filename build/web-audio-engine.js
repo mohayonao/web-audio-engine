@@ -4894,46 +4894,6 @@ var AudioNode = function (_EventTarget) {
     }
 
     /**
-     * @return {boolean}
-     */
-
-  }, {
-    key: "isConnectedTo",
-    value: function isConnectedTo() {
-      var args = Array.from(arguments);
-
-      if (args.length === 1) {
-        return this.outputs.some(function (output) {
-          return output.isConnectedTo(args[0]);
-        });
-      }
-
-      var output = args.splice(1, 1)[0] | 0;
-
-      if (this.outputs[output]) {
-        return this.outputs[output].isConnectedTo.apply(this.outputs[output], args);
-      }
-
-      return false;
-    }
-
-    /**
-     * @return {boolean}
-     */
-
-  }, {
-    key: "isConnectedFrom",
-    value: function isConnectedFrom() {
-      var args = Array.from(arguments);
-
-      if (args[0] && args[0].isConnectedTo) {
-        return args[0].isConnectedTo.apply(args[0], [this].concat(args.slice(1)));
-      }
-
-      return false;
-    }
-
-    /**
      *
      */
 
@@ -5430,22 +5390,6 @@ var AudioParam = function () {
   }, {
     key: "disableOutputsIfNecessary",
     value: function disableOutputsIfNecessary() {}
-
-    /**
-     * @return {boolean}
-     */
-
-  }, {
-    key: "isConnectedFrom",
-    value: function isConnectedFrom() {
-      var args = Array.from(arguments);
-
-      if (args[0] && args[0].isConnectedTo) {
-        return args[0].isConnectedTo.apply(args[0], [this].concat(args.slice(1)));
-      }
-
-      return false;
-    }
 
     /**
      * @return {object[]}
@@ -8294,10 +8238,10 @@ var AudioNodeInput = function () {
     this.bus = new AudioBus(numberOfChannels, node.blockSize, node.sampleRate);
 
     this.bus.setChannelInterpretation("speakers");
+    this.outputs = [];
+    this._disabledOutputs = new WeakSet();
     this._channelCount = channelCount | 0;
     this._channelCountMode = channelCountMode;
-    this._outputs = [];
-    this._disabledOutputs = [];
   }
 
   /**
@@ -8392,7 +8336,7 @@ var AudioNodeInput = function () {
         return this._channelCount;
       }
 
-      var maxChannels = this._outputs.reduce(function (maxChannels, output) {
+      var maxChannels = this.outputs.reduce(function (maxChannels, output) {
         return Math.max(maxChannels, output.getNumberOfChannels());
       }, 1);
 
@@ -8420,33 +8364,13 @@ var AudioNodeInput = function () {
     }
 
     /**
-     * @return {number}
-     */
-
-  }, {
-    key: "getNumberOfConnections",
-    value: function getNumberOfConnections() {
-      return this._outputs.length + this._disabledOutputs.length;
-    }
-
-    /**
-     * @return {number}
-     */
-
-  }, {
-    key: "getNumberOfFanOuts",
-    value: function getNumberOfFanOuts() {
-      return this._outputs.length;
-    }
-
-    /**
      * @return {boolean}
      */
 
   }, {
     key: "isEnabled",
     value: function isEnabled() {
-      return this._outputs.length !== 0;
+      return this.outputs.length !== 0;
     }
 
     /**
@@ -8457,7 +8381,7 @@ var AudioNodeInput = function () {
     key: "enableFrom",
     value: function enableFrom(output) {
       /* istanbul ignore else */
-      if (moveItem(output, this._disabledOutputs, this._outputs)) {
+      if (moveItem(output, this._disabledOutputs, this.outputs)) {
         this.inputDidUpdate();
       }
     }
@@ -8470,7 +8394,7 @@ var AudioNodeInput = function () {
     key: "disableFrom",
     value: function disableFrom(output) {
       /* istanbul ignore else */
-      if (moveItem(output, this._outputs, this._disabledOutputs)) {
+      if (moveItem(output, this.outputs, this._disabledOutputs)) {
         this.inputDidUpdate();
       }
     }
@@ -8484,7 +8408,7 @@ var AudioNodeInput = function () {
     value: function connectFrom(output) {
       if (output.isEnabled()) {
         /* istanbul ignore else */
-        if (addItem(output, this._outputs)) {
+        if (addItem(output, this.outputs)) {
           this.inputDidUpdate();
         }
       } else {
@@ -8501,7 +8425,7 @@ var AudioNodeInput = function () {
     value: function disconnectFrom(output) {
       if (output.isEnabled()) {
         /* istanbul ignore else */
-        if (removeItem(output, this._outputs)) {
+        if (removeItem(output, this.outputs)) {
           this.inputDidUpdate();
         }
       } else {
@@ -8517,7 +8441,7 @@ var AudioNodeInput = function () {
     key: "inputDidUpdate",
     value: function inputDidUpdate() {
       this.updateNumberOfChannels();
-      if (this._outputs.length === 0) {
+      if (this.outputs.length === 0) {
         this.node.disableOutputsIfNecessary();
       } else {
         this.node.enableOutputsIfNecessary();
@@ -8530,25 +8454,14 @@ var AudioNodeInput = function () {
 
   }, {
     key: "isConnectedFrom",
-    value: function isConnectedFrom() {
-      var args = Array.from(arguments);
+    value: function isConnectedFrom(node) {
+      var _this = this;
 
-      if (args.length === 1) {
-        var hasTarget = function hasTarget(target) {
-          return target.node === args[0];
-        };
-
-        return this._outputs.some(hasTarget) || this._disabledOutputs.some(hasTarget);
-      }
-      if (args.length === 2) {
-        var _hasTarget = function _hasTarget(target) {
-          return target.node === args[0] && target.index === args[1];
-        };
-
-        return this._outputs.some(_hasTarget) || this._disabledOutputs.some(_hasTarget);
-      }
-
-      return false;
+      return this.outputs.some(function (target) {
+        return target.node === node;
+      }) || !!(node && Array.isArray(node.outputs) && node.outputs.some(function (target) {
+        return _this._disabledOutputs.has(target);
+      }));
     }
 
     /**
@@ -8559,7 +8472,7 @@ var AudioNodeInput = function () {
     key: "sumAllConnections",
     value: function sumAllConnections() {
       var audioBus = this.bus;
-      var outputs = this._outputs;
+      var outputs = this.outputs;
 
       audioBus.zeros();
 
@@ -8577,8 +8490,8 @@ var AudioNodeInput = function () {
   }, {
     key: "pull",
     value: function pull() {
-      if (this._outputs.length === 1) {
-        var output = this._outputs[0];
+      if (this.outputs.length === 1) {
+        var output = this.outputs[0];
 
         /* istanbul ignore else */
         if (output.getNumberOfChannels() === this.getNumberOfChannels()) {
@@ -8594,43 +8507,45 @@ var AudioNodeInput = function () {
 }();
 
 function addItem(target, destination) {
-  var index = destination.indexOf(target);
+  if (destination instanceof WeakSet) {
+    /* istanbul ignore next */
+    if (destination.has(target)) {
+      return false;
+    }
+    destination.add(target);
+  } else {
+    var index = destination.indexOf(target);
 
-  /* istanbul ignore next */
-  if (index !== -1) {
-    return false;
+    /* istanbul ignore next */
+    if (index !== -1) {
+      return false;
+    }
+    destination.push(target);
   }
-
-  destination.push(target);
-
   return true;
 }
 
 function removeItem(target, source) {
-  var index = source.indexOf(target);
+  if (source instanceof WeakSet) {
+    /* istanbul ignore next */
+    if (!source.has(target)) {
+      return false;
+    }
+    source.delete(target);
+  } else {
+    var index = source.indexOf(target);
 
-  /* istanbul ignore next */
-  if (index === -1) {
-    return false;
+    /* istanbul ignore next */
+    if (index === -1) {
+      return false;
+    }
+    source.splice(index, 1);
   }
-
-  source.splice(index, 1);
-
   return true;
 }
 
 function moveItem(target, source, destination) {
-  var index = source.indexOf(target);
-
-  /* istanbul ignore next */
-  if (index === -1) {
-    return false;
-  }
-
-  source.splice(index, 1);
-  destination.push(target);
-
-  return true;
+  return removeItem(target, source) && addItem(target, destination);
 }
 
 function isValidChannelCountMode(value) {
@@ -8674,7 +8589,7 @@ var AudioNodeOutput = function () {
     this.node = node;
     this.index = index | 0;
     this.bus = new AudioBus(numberOfChannels, node.blockSize, node.sampleRate);
-    this._inputs = [];
+    this.inputs = [];
     this._enabled = !!enabled;
   }
 
@@ -8702,20 +8617,10 @@ var AudioNodeOutput = function () {
 
         this.bus.setNumberOfChannels(numberOfChannels, channelInterpretation);
 
-        this._inputs.forEach(function (input) {
+        this.inputs.forEach(function (input) {
           input.updateNumberOfChannels();
         });
       }
-    }
-
-    /**
-     * @return {number}
-     */
-
-  }, {
-    key: "getNumberOfConnections",
-    value: function getNumberOfConnections() {
-      return this._inputs.length;
     }
 
     /**
@@ -8740,7 +8645,7 @@ var AudioNodeOutput = function () {
       /* istanbul ignore else */
       if (!this._enabled) {
         this._enabled = true;
-        this._inputs.forEach(function (input) {
+        this.inputs.forEach(function (input) {
           input.enableFrom(_this);
         });
       }
@@ -8758,7 +8663,7 @@ var AudioNodeOutput = function () {
       /* istanbul ignore else */
       if (this._enabled) {
         this._enabled = false;
-        this._inputs.forEach(function (input) {
+        this.inputs.forEach(function (input) {
           input.disableFrom(_this2);
         });
       }
@@ -8784,8 +8689,8 @@ var AudioNodeOutput = function () {
     value: function connect(destination, input) {
       var target = destination.inputs[input | 0];
 
-      if (this._inputs.indexOf(target) === -1) {
-        this._inputs.push(target);
+      if (this.inputs.indexOf(target) === -1) {
+        this.inputs.push(target);
         target.connectFrom(this);
       }
     }
@@ -8806,12 +8711,12 @@ var AudioNodeOutput = function () {
         return true;
       };
 
-      for (var i = this._inputs.length - 1; i >= 0; i--) {
-        var target = this._inputs[i];
+      for (var i = this.inputs.length - 1; i >= 0; i--) {
+        var target = this.inputs[i];
 
         if (isTargetToDisconnect(target)) {
           target.disconnectFrom(this);
-          this._inputs.splice(i, 1);
+          this.inputs.splice(i, 1);
         }
       }
     }
@@ -8822,21 +8727,10 @@ var AudioNodeOutput = function () {
 
   }, {
     key: "isConnectedTo",
-    value: function isConnectedTo() {
-      var args = Array.from(arguments);
-
-      if (args.length === 1) {
-        return this._inputs.some(function (target) {
-          return target.node === args[0];
-        });
-      }
-      if (args.length === 2) {
-        return this._inputs.some(function (target) {
-          return target.node === args[0] && target.index === args[1];
-        });
-      }
-
-      return false;
+    value: function isConnectedTo(node) {
+      return this.inputs.some(function (target) {
+        return target.node === node;
+      });
     }
 
     /**
