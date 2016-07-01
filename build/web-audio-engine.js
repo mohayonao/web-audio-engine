@@ -3599,7 +3599,7 @@ var AnalyserNode = function (_AudioNode) {
   }, {
     key: "setFftSize",
     value: function setFftSize(value) {
-      value = util.clip(value | 0, MinFFTSize, MaxFFTSize);
+      value = util.clamp(value | 0, MinFFTSize, MaxFFTSize);
       value = util.toPowerOfTwo(value, Math.ceil);
       this._fftSize = value;
       this.dspUpdateSizes(this._fftSize);
@@ -3680,7 +3680,7 @@ var AnalyserNode = function (_AudioNode) {
   }, {
     key: "setSmoothingTimeConstant",
     value: function setSmoothingTimeConstant(value) {
-      value = util.clip(util.toNumber(value), 0, 1);
+      value = util.clamp(util.toNumber(value), 0, 1);
       this._smoothingTimeConstant = value;
     }
 
@@ -4452,7 +4452,7 @@ var AudioDestinationNode = function (_AudioNode) {
   }, {
     key: "setChannelCount",
     value: function setChannelCount(value) {
-      value = util.clip(value | 0, 1, this.getMaxChannelCount());
+      value = util.clamp(value | 0, 1, this.getMaxChannelCount());
       _get(Object.getPrototypeOf(AudioDestinationNode.prototype), "setChannelCount", this).call(this, value);
     }
 
@@ -5918,7 +5918,7 @@ var BasePannerNode = function (_AudioNode) {
   _createClass(BasePannerNode, [{
     key: "setChannelCount",
     value: function setChannelCount(value) {
-      value = util.clip(value | 0, 1, 2);
+      value = util.clamp(value | 0, 1, 2);
       _get(Object.getPrototypeOf(BasePannerNode.prototype), "setChannelCount", this).call(this, value);
     }
 
@@ -6516,7 +6516,7 @@ var ConvolverNode = function (_AudioNode) {
   _createClass(ConvolverNode, [{
     key: "setChannelCount",
     value: function setChannelCount(value) {
-      value = util.clip(value | 0, 1, 2);
+      value = util.clamp(value | 0, 1, 2);
       _get(Object.getPrototypeOf(ConvolverNode.prototype), "setChannelCount", this).call(this, value);
     }
 
@@ -11291,11 +11291,11 @@ module.exports = { computeValueAtTime: computeValueAtTime, getLinearRampToValueA
  * @param {number} maxValue
  */
 
-function clip(value, minValue, maxValue) {
+function clamp(value, minValue, maxValue) {
   return Math.max(minValue, Math.min(value, maxValue));
 }
 
-module.exports = clip;
+module.exports = clamp;
 
 },{}],97:[function(require,module,exports){
 "use strict";
@@ -11427,7 +11427,7 @@ module.exports = fillRange;
 },{}],103:[function(require,module,exports){
 "use strict";
 
-module.exports.clip = require("./clip");
+module.exports.clamp = require("./clamp");
 module.exports.defaults = require("./defaults");
 module.exports.defineProp = require("./defineProp");
 module.exports.fill = require("./fill");
@@ -11445,10 +11445,10 @@ module.exports.toValidBlockSize = require("./toValidBlockSize");
 module.exports.toValidNumberOfChannels = require("./toValidNumberOfChannels");
 module.exports.toValidSampleRate = require("./toValidSampleRate");
 
-},{"./clip":96,"./defaults":98,"./defineProp":99,"./fill":101,"./fillRange":102,"./normalize":104,"./toArrayIfNeeded":107,"./toAudioTime":108,"./toDecibel":109,"./toGain":110,"./toImpl":111,"./toNumber":112,"./toPowerOfTwo":113,"./toValidBitDepth":114,"./toValidBlockSize":115,"./toValidNumberOfChannels":116,"./toValidSampleRate":117}],104:[function(require,module,exports){
+},{"./clamp":96,"./defaults":98,"./defineProp":99,"./fill":101,"./fillRange":102,"./normalize":104,"./toArrayIfNeeded":107,"./toAudioTime":108,"./toDecibel":109,"./toGain":110,"./toImpl":111,"./toNumber":112,"./toPowerOfTwo":113,"./toValidBitDepth":114,"./toValidBlockSize":115,"./toValidNumberOfChannels":116,"./toValidSampleRate":117}],104:[function(require,module,exports){
 "use strict";
 
-var clip = require("./clip");
+var clamp = require("./clamp");
 
 /**
  * normalize - returns a number between 0 - 1
@@ -11458,12 +11458,12 @@ var clip = require("./clip");
  */
 function normalize(value, minValue, maxValue) {
   var val = (value - minValue) / (maxValue - minValue);
-  return clip(val, 0, 1);
+  return clamp(val, 0, 1);
 }
 
 module.exports = normalize;
 
-},{"./clip":96}],105:[function(require,module,exports){
+},{"./clamp":96}],105:[function(require,module,exports){
 "use strict";
 
 /**
@@ -11647,7 +11647,7 @@ module.exports = toValidBitDepth;
 },{}],115:[function(require,module,exports){
 "use strict";
 
-var clip = require("./clip");
+var clamp = require("./clamp");
 var toPowerOfTwo = require("./toPowerOfTwo");
 var MIN_BLOCK_SIZE = 8;
 var MAX_BLOCK_SIZE = 1024;
@@ -11657,16 +11657,16 @@ var MAX_BLOCK_SIZE = 1024;
  * @return {number}
  */
 function toValidBlockSize(value) {
-  return clip(toPowerOfTwo(value), MIN_BLOCK_SIZE, MAX_BLOCK_SIZE);
+  return clamp(toPowerOfTwo(value), MIN_BLOCK_SIZE, MAX_BLOCK_SIZE);
 }
 
 module.exports = toValidBlockSize;
 
-},{"./clip":96,"./toPowerOfTwo":113}],116:[function(require,module,exports){
+},{"./clamp":96,"./toPowerOfTwo":113}],116:[function(require,module,exports){
 "use strict";
 
 var toNumber = require("./toNumber");
-var clip = require("./clip");
+var clamp = require("./clamp");
 var MAX_NUMBER_OF_CHANNELS = 32;
 
 /**
@@ -11674,16 +11674,16 @@ var MAX_NUMBER_OF_CHANNELS = 32;
  * @return {number}
  */
 function toValidNumberOfChannels(value) {
-  return clip(toNumber(value), 1, MAX_NUMBER_OF_CHANNELS) | 0;
+  return clamp(toNumber(value), 1, MAX_NUMBER_OF_CHANNELS) | 0;
 }
 
 module.exports = toValidNumberOfChannels;
 
-},{"./clip":96,"./toNumber":112}],117:[function(require,module,exports){
+},{"./clamp":96,"./toNumber":112}],117:[function(require,module,exports){
 "use strict";
 
 var toNumber = require("./toNumber");
-var clip = require("./clip");
+var clamp = require("./clamp");
 var MIN_SAMPLERATE = 3000;
 var MAX_SAMPLERATE = 192000;
 
@@ -11692,12 +11692,12 @@ var MAX_SAMPLERATE = 192000;
  * @return {number}
  */
 function toValidSampleRate(value) {
-  return clip(toNumber(value), MIN_SAMPLERATE, MAX_SAMPLERATE) | 0;
+  return clamp(toNumber(value), MIN_SAMPLERATE, MAX_SAMPLERATE) | 0;
 }
 
 module.exports = toValidSampleRate;
 
-},{"./clip":96,"./toNumber":112}],118:[function(require,module,exports){
+},{"./clamp":96,"./toNumber":112}],118:[function(require,module,exports){
 "use strict";
 
 var OfflineAudioContext = require("./context/OfflineAudioContext");
