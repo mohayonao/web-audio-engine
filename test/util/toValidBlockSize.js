@@ -3,7 +3,7 @@
 const assert = require("power-assert");
 const toValidBlockSize = require("../../src/util/toValidBlockSize");
 
-describe("util.toValidBitDepth()", () => {
+describe("util.toValidBlockSize()", () => {
   it("return valid block size", () => {
     assert(toValidBlockSize(0) === 8);
     assert(toValidBlockSize(8) === 8);
