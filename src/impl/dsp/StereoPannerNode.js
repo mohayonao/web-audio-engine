@@ -36,7 +36,7 @@ const StereoPannerNodeDSP = {
         outputs[1][i] = input[i] * gainR;
       }
     } else {
-      const inputs = inputBus.getChannelData()[0];
+      const inputs = inputBus.getChannelData();
 
       for (let i = 0; i < blockSize; i++) {
         const panValue = Math.max(-1, Math.min(panValues[i], +1));
@@ -72,7 +72,7 @@ const StereoPannerNodeDSP = {
         outputs[1][i] = input[i] * gainR;
       }
     } else {
-      const inputs = inputBus.getChannelData()[0];
+      const inputs = inputBus.getChannelData();
       const panRadian = (panValue <= 0 ? panValue + 1: panValue) * 0.5 * Math.PI
       const gainL = Math.cos(panRadian);
       const gainR = Math.sin(panRadian);
