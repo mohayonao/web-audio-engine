@@ -1,5 +1,7 @@
 "use strict";
 
+require("run-with-mocha");
+
 const assert = require("power-assert");
 const deepEqual = require("deep-equal");
 const fillRange = require("../../src/util/fillRange");

@@ -1,5 +1,7 @@
 "use strict";
 
+require("run-with-mocha");
+
 const assert = require("power-assert");
 const AudioContext = require("../../src/impl/AudioContext");
 const PannerNode = require("../../src/impl/PannerNode");

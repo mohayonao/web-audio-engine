@@ -1,5 +1,7 @@
 "use strict";
 
+require("run-with-mocha");
+
 const setImmediate = require("../../src/util/setImmediate");
 
 describe("util.setImmediate(fn)", () => {

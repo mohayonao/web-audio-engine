@@ -1,5 +1,7 @@
 "use strict";
 
+require("run-with-mocha");
+
 const assert = require("power-assert");
 const toValidNumberOfChannels = require("../../src/util/toValidNumberOfChannels");
 

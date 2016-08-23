@@ -1,5 +1,7 @@
 "use strict";
 
+require("run-with-mocha");
+
 const assert = require("power-assert");
 const OfflineAudioContext = require("../../src/context/OfflineAudioContext");
 const AudioBuffer = require("../../src/api/AudioBuffer");

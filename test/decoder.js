@@ -1,5 +1,7 @@
 "use strict";
 
+require("run-with-mocha");
+
 const assert = require("power-assert");
 const sinon = require("sinon");
 const decoder = require("../src/decoder");

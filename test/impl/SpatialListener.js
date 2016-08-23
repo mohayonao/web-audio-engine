@@ -1,5 +1,7 @@
 "use strict";
 
+require("run-with-mocha");
+
 const attrTester = require("../helpers/attrTester");
 const AudioContext = require("../../src/impl/AudioContext");
 const SpatialListener = require("../../src/impl/SpatialListener");

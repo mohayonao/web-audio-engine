@@ -1,5 +1,7 @@
 "use strict";
 
+require("run-with-mocha");
+
 const assert = require("power-assert");
 const toAudioTime = require("../../src/util/toAudioTime");
 

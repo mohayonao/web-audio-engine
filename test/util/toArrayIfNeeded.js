@@ -1,5 +1,7 @@
 "use strict";
 
+require("run-with-mocha");
+
 const assert = require("power-assert");
 const deepEqual = require("deep-equal");
 const toArrayIfNeeded = require("../../src/util/toArrayIfNeeded");

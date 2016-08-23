@@ -1,5 +1,7 @@
 "use strict";
 
+require("run-with-mocha");
+
 const assert = require("power-assert");
 const toPowerOfTwo = require("../../src/util/toPowerOfTwo");
 
