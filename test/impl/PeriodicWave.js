@@ -2,34 +2,38 @@
 
 require("run-with-mocha");
 
-const assert = require("power-assert");
-const attrTester = require("../helpers/attrTester");
+const assert = require("assert");
 const AudioContext = require("../../src/impl/AudioContext");
 const PeriodicWave = require("../../src/impl/PeriodicWave");
 
 const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
 const real = new Float32Array([ 0, 0 ]);
 const imag = new Float32Array([ 0, 1 ]);
-const testSpec = {};
 
-testSpec.constraints = {
-  testCase: [ { expected: false } ]
-};
+describe("impl/PeriodicWave", () => {
+  it("constructor", () => {
+    const node = new PeriodicWave(context, { real, imag });
 
-testSpec.real = {
-  testCase: [ { expected: real } ]
-};
+    assert(node instanceof PeriodicWave);
+  });
 
-testSpec.imag = {
-  testCase: [ { expected: imag } ]
-};
+  describe("attributes", () => {
+    it(".constraints", () => {
+      const node = new PeriodicWave(context, { real, imag });
 
-describe("PeriodicWave", () => {
-  describe("basic attributes", () => {
-    attrTester.makeTests(context, {
-      class: PeriodicWave,
-      create: context => new PeriodicWave(context, { real, imag }),
-      testSpec
+      assert(node.getConstraints() === false);
+    });
+
+    it(".real", () => {
+      const node = new PeriodicWave(context, { real, imag });
+
+      assert(node.getReal() === real);
+    });
+
+    it(".imag", () => {
+      const node = new PeriodicWave(context, { real, imag });
+
+      assert(node.getImag() === imag);
     });
   });
 
@@ -42,10 +46,7 @@ describe("PeriodicWave", () => {
       { type: "triangle", expected: "triangle" },
       { type: "square", expected: "square" },
       { type: "unknown", expected: "custom" }
-    ].forEach((opts) => {
-      let type = opts.type;
-      let expected = opts.expected;
-
+    ].forEach(({ type, expected }) => {
       it(type, () => {
         periodicWave.generateBasicWaveform(type);
         assert(periodicWave.getName() === expected);

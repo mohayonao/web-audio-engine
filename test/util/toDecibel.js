@@ -2,10 +2,10 @@
 
 require("run-with-mocha");
 
-const assert = require("power-assert");
+const assert = require("assert");
 const toDecibel = require("../../src/util/toDecibel");
 
-describe("util.toDecibel(gainValue)", () => {
+describe("util/toDecibel(gainValue)", () => {
   it("convert gainValue to decibel", () => {
     assert(Math.round(toDecibel(3.162)) === 10);
     assert(Math.round(toDecibel(1.995)) ===  6);

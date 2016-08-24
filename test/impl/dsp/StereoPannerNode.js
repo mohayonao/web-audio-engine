@@ -2,18 +2,19 @@
 
 require("run-with-mocha");
 
-const assert = require("power-assert");
+const assert = require("assert");
 const np = require("../../helpers/np");
 const AudioContext = require("../../../src/api/AudioContext");
 
-describe("StereoPannerNode", () => {
+const channelData = [ new Float32Array(16), new Float32Array(16) ];
+
+describe("impl/dsp/StereoPannerNode", () => {
   it("mono", () => {
     const audioContext = new AudioContext({ sampleRate: 8000, blockSize: 16 });
     const noise0 = np.random_sample(16);
     const buffer = audioContext.createBuffer(1, 16, 8000);
     const bufSrc = audioContext.createBufferSource();
     const panner = audioContext.createStereoPanner();
-    const channelData = [ new Float32Array(16), new Float32Array(16) ];
 
     audioContext.resume();
 

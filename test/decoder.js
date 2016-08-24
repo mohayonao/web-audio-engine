@@ -2,7 +2,7 @@
 
 require("run-with-mocha");
 
-const assert = require("power-assert");
+const assert = require("assert");
 const sinon = require("sinon");
 const decoder = require("../src/decoder");
 const decoderUtil = require("../src/util/decoderUtil");

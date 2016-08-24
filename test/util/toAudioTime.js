@@ -2,10 +2,10 @@
 
 require("run-with-mocha");
 
-const assert = require("power-assert");
+const assert = require("assert");
 const toAudioTime = require("../../src/util/toAudioTime");
 
-describe("util.toAudioTime()", () => {
+describe("util/toAudioTime()", () => {
   it("return the provided value when provide positive number", () => {
     assert(toAudioTime(10) === 10);
   });

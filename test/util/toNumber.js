@@ -2,10 +2,10 @@
 
 require("run-with-mocha");
 
-const assert = require("power-assert");
+const assert = require("assert");
 const toNumber = require("../../src/util/toNumber");
 
-describe("util.toNumber(value)", () => {
+describe("util/toNumber(value)", () => {
   it("convert to number", () => {
     assert(toNumber(1) === 1);
     assert(toNumber(Infinity) === Infinity);

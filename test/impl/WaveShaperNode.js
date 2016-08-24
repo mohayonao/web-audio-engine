@@ -2,58 +2,55 @@
 
 require("run-with-mocha");
 
-const assert = require("power-assert");
-const deepEqual = require("deep-equal");
-const np = require("../helpers/np");
-const attrTester = require("../helpers/attrTester");
+const assert = require("assert");
 const AudioContext = require("../../src/impl/AudioContext");
 const WaveShaperNode = require("../../src/impl/WaveShaperNode");
 const AudioNode = require("../../src/impl/AudioNode");
 
 const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
-const curve = new Float32Array(128);
-const testSpec = {};
 
-testSpec.numberOfInputs = {
-  testCase: [ { expected: 1 } ]
-};
+describe("impl/WaveShaperNode", () => {
+  it("constructor", () => {
+    const node = new WaveShaperNode(context);
 
-testSpec.numberOfOutputs = {
-  testCase: [ { expected: 1 } ]
-};
-
-testSpec.curve = {
-  defaultValue: null,
-  testCase: [
-    { value: curve, expected: curve },
-    { value: null, expected: null }
-  ]
-};
-
-testSpec.oversample = {
-  defaultValue: "none",
-  testCase: [
-    { value: "4x", expected: "4x" },
-    { value: "2x", expected: "2x" },
-    { value: "none", expected: "none" },
-    { value: "unknown", expected: "none" }
-  ]
-};
-
-describe("WaveShaperNode", () => {
-  describe("inherits", () => {
-    it("WaveShaperNode < AudioNode", () => {
-      const node = new WaveShaperNode(context);
-
-      assert(node instanceof WaveShaperNode);
-      assert(node instanceof AudioNode);
-    });
+    assert(node instanceof WaveShaperNode);
+    assert(node instanceof AudioNode);
   });
 
-  describe("basic attributes", () => {
-    attrTester.makeTests(context, {
-      class: WaveShaperNode,
-      testSpec
+  describe("attributes", () => {
+    it(".numberOfInputs", () => {
+      const node = new WaveShaperNode(context);
+
+      assert(node.getNumberOfInputs() === 1);
+    });
+
+    it(".numberOfOutputs", () => {
+      const node = new WaveShaperNode(context);
+
+      assert(node.getNumberOfOutputs() === 1);
+    });
+
+    it(".curve=", () => {
+      const node = new WaveShaperNode(context);
+      const curve = new Float32Array(128);
+
+      assert(node.getCurve() === null);
+
+      node.setCurve(curve);
+      assert(node.getCurve() === curve);
+    });
+
+    it(".oversample=", () => {
+      const node = new WaveShaperNode(context);
+
+      assert(node.getOversample() === "none");
+
+      [
+        "none", "2x", "4x"
+      ].forEach((oversample) => {
+        node.setOversample(oversample);
+        assert(node.getOversample() === oversample);
+      });
     });
   });
 
@@ -65,66 +62,36 @@ describe("WaveShaperNode", () => {
 
       node1.outputs[0].enable();
       node2.outputs[0].enable();
-      node2.connect(node3);
 
+      // +-------+
+      // | node1 |
+      // +--(4)--+
+      //
+      // +--(1)--+
+      // | node2 | WaveShaperNode
+      // +--(1)--+
+      //     |
+      // +--(1)--+
+      // | node3 |
+      // +-------+
+      node2.connect(node3);
       assert(node2.inputs[0].getNumberOfChannels() === 1);
       assert(node3.inputs[0].getNumberOfChannels() === 1);
 
+      // +-------+
+      // | node1 |
+      // +--(4)--+
+      //     |
+      // +--(4)--+
+      // | node2 | WaveShaperNode
+      // +--(4)--+
+      //     |
+      // +--(4)--+
+      // | node3 |
+      // +-------+
       node1.connect(node2);
-
       assert(node2.inputs[0].getNumberOfChannels() === 4);
       assert(node3.inputs[0].getNumberOfChannels() === 4);
-    });
-  });
-
-  describe("processing", () => {
-    const channelData = [ new Float32Array(16), new Float32Array(16) ];
-
-    it("works", () => {
-      const node1 = new AudioNode(context, { outputs: [ 2 ] });
-      const node2 = new WaveShaperNode(context);
-      const curve = new Float32Array([ 1, 0, 1 ]);
-      const noise1 = np.random_sample(16).map(x => (x - 0.5) * 2);
-      const noise2 = np.random_sample(16).map(x => (x - 0.5) * 2);
-
-      context.resume();
-      node1.connect(node2);
-      node2.connect(context.getDestination());
-      node1.enableOutputsIfNecessary();
-      node1.outputs[0].bus.getMutableData()[0].set(noise1);
-      node1.outputs[0].bus.getMutableData()[1].set(noise2);
-
-      node2.setCurve(curve);
-
-      context.process(channelData, 0);
-
-      const actual = node2.outputs[0].bus.getChannelData();
-      const expected = [ noise1.map(Math.abs), noise2.map(Math.abs) ];
-
-      assert(deepEqual(actual[0], expected[0]));
-      assert(deepEqual(actual[1], expected[1]));
-    });
-
-    it("works - without curve", () => {
-      const node1 = new AudioNode(context, { outputs: [ 2 ] });
-      const node2 = new WaveShaperNode(context);
-      const noise1 = np.random_sample(16).map(x => (x - 0.5) * 2);
-      const noise2 = np.random_sample(16).map(x => (x - 0.5) * 2);
-
-      context.resume();
-      node1.connect(node2);
-      node2.connect(context.getDestination());
-      node1.enableOutputsIfNecessary();
-      node1.outputs[0].bus.getMutableData()[0].set(noise1);
-      node1.outputs[0].bus.getMutableData()[1].set(noise2);
-
-      context.process(channelData, 0);
-
-      const actual = node2.outputs[0].bus.getChannelData();
-      const expected = [ noise1, noise2 ];
-
-      assert(deepEqual(actual[0], expected[0]));
-      assert(deepEqual(actual[1], expected[1]));
     });
   });
 });

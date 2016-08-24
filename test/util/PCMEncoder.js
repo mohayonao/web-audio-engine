@@ -2,11 +2,10 @@
 
 require("run-with-mocha");
 
-const assert = require("power-assert");
-const deepEqual = require("deep-equal");
+const assert = require("assert");
 const PCMEncoder = require("../../src/util/PCMEncoder");
 
-describe("util.PCMEncoder", () => {
+describe("util/PCMEncoder", () => {
   describe(".create()", () => {
     it("works", () => {
       const encoder = PCMEncoder.create(8, { channels: 1, bitDepth: 32, float: true });
@@ -28,9 +27,11 @@ describe("util.PCMEncoder", () => {
       const buf2 = encoder.encode(channelData2);
       const actual1 = new Float32Array(Uint8Array.from(buf1).buffer);
       const actual2 = new Float32Array(Uint8Array.from(buf2).buffer);
+      const expected1 = new Float32Array([ +0.0, +0.1, +0.2, +0.3, +0.4, +0.5, +0.6, +0.7 ]);
+      const expected2 = new Float32Array([ -0.0, -0.1, -0.2, -0.3, -0.4, -0.5, -0.6, -0.7 ]);
 
-      assert(deepEqual(actual1, new Float32Array([ +0.0, +0.1, +0.2, +0.3, +0.4, +0.5, +0.6, +0.7 ])));
-      assert(deepEqual(actual2, new Float32Array([ -0.0, -0.1, -0.2, -0.3, -0.4, -0.5, -0.6, -0.7 ])));
+      assert.deepEqual(actual1, expected1);
+      assert.deepEqual(actual2, expected2);
     });
   });
 
@@ -50,9 +51,11 @@ describe("util.PCMEncoder", () => {
       const buf2 = encoder.encode(channelData2);
       const actual1 = new Float32Array(Uint8Array.from(buf1).buffer);
       const actual2 = new Float32Array(Uint8Array.from(buf2).buffer);
+      const expected1 = new Float32Array([ +0.0, +0.4, +0.1, +0.5, +0.2, +0.6, +0.3, +0.7 ]);
+      const expected2 = new Float32Array([ -0.0, -0.4, -0.1, -0.5, -0.2, -0.6, -0.3, -0.7 ]);
 
-      assert(deepEqual(actual1, new Float32Array([ +0.0, +0.4, +0.1, +0.5, +0.2, +0.6, +0.3, +0.7 ])));
-      assert(deepEqual(actual2, new Float32Array([ -0.0, -0.4, -0.1, -0.5, -0.2, -0.6, -0.3, -0.7 ])));
+      assert.deepEqual(actual1, expected1);
+      assert.deepEqual(actual2, expected2);
     });
   });
 
@@ -76,9 +79,11 @@ describe("util.PCMEncoder", () => {
       const buf2 = encoder.encode(channelData2);
       const actual1 = new Float32Array(Uint8Array.from(buf1).buffer);
       const actual2 = new Float32Array(Uint8Array.from(buf2).buffer);
+      const expected1 = new Float32Array([ +0.0, +0.2, +0.4, +0.6, +0.1, +0.3, +0.5, +0.7 ]);
+      const expected2 = new Float32Array([ -0.0, -0.2, -0.4, -0.6, -0.1, -0.3, -0.5, -0.7 ]);
 
-      assert(deepEqual(actual1, new Float32Array([ +0.0, +0.2, +0.4, +0.6, +0.1, +0.3, +0.5, +0.7 ])));
-      assert(deepEqual(actual2, new Float32Array([ -0.0, -0.2, -0.4, -0.6, -0.1, -0.3, -0.5, -0.7 ])));
+      assert.deepEqual(actual1, expected1);
+      assert.deepEqual(actual2, expected2);
     });
   });
 });

@@ -1,6 +1,6 @@
 "use strict";
 
-const assert = require("power-assert");
+const assert = require("assert");
 const AudioParam = require("../../src/impl/AudioParam");
 
 function makeTests(context, expectedValues, sched1, sched2) {

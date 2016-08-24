@@ -2,73 +2,85 @@
 
 require("run-with-mocha");
 
-const assert = require("power-assert");
-const attrTester = require("../helpers/attrTester");
+const assert = require("assert");
 const AudioContext = require("../../src/impl/AudioContext");
 const ConvolverNode = require("../../src/impl/ConvolverNode");
 const AudioBuffer = require("../../src/impl/AudioBuffer");
 const AudioNode = require("../../src/impl/AudioNode");
 
 const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
-const buffer = new AudioBuffer(2, 32, context.sampleRate);
-const testSpec = {};
 
-testSpec.numberOfInputs = {
-  testCase: [ { expected: 1 } ]
-};
+describe("impl/ConvolverNode", () => {
+  it("constructor", () => {
+    const node = new ConvolverNode(context);
 
-testSpec.numberOfOutputs = {
-  testCase: [ { expected: 1 } ]
-};
-
-testSpec.channelCount = {
-  defaultValue: 2,
-  testCase: [
-    { value: 1, expected: 1 },
-    { value: 2, expected: 2 },
-    { value: 4, expected: 2 }
-  ]
-};
-
-testSpec.channelCountMode = {
-  defaultValue: "clamped-max",
-  testCase: [
-    { value: "max", expected: "clamped-max" },
-    { value: "clamped-max", expected: "clamped-max" },
-    { value: "explicit", expected: "explicit" },
-    { value: "unknown", expected: "explicit" }
-  ]
-};
-
-testSpec.buffer = {
-  defaultValue: null,
-  testCase: [
-    { value: buffer, expected: buffer }
-  ]
-};
-
-testSpec.normalize = {
-  defaultValue: true,
-  testCase: [
-    { value: true, expected: true },
-    { value: null, expected: false }
-  ]
-};
-
-describe("ConvolverNode", () => {
-  describe("inherits", () => {
-    it("ConvolverNode < AudioNode", () => {
-      const node = new ConvolverNode(context);
-
-      assert(node instanceof ConvolverNode);
-      assert(node instanceof AudioNode);
-    });
+    assert(node instanceof ConvolverNode);
+    assert(node instanceof AudioNode);
   });
 
-  describe("basic attributes", () => {
-    attrTester.makeTests(context, {
-      class: ConvolverNode,
-      testSpec
+  describe("attributes", () => {
+    it(".numberOfInputs", () => {
+      const node = new ConvolverNode(context);
+
+      assert(node.getNumberOfInputs() === 1);
+    });
+
+    it(".numberOfOutputs", () => {
+      const node = new ConvolverNode(context);
+
+      assert(node.getNumberOfOutputs() === 1);
+    });
+
+    it(".channelCount=", () => {
+      const node = new ConvolverNode(context);
+
+      assert(node.getChannelCount() === 2);
+
+      node.setChannelCount(1);
+      assert(node.getChannelCount() === 1);
+
+      node.setChannelCount(2);
+      assert(node.getChannelCount() === 2);
+
+      node.setChannelCount(4);
+      assert(node.getChannelCount() === 2);
+    });
+
+    it(".channelCountMode=", () => {
+      const node = new ConvolverNode(context);
+
+      assert(node.getChannelCountMode() === "clamped-max");
+
+      node.setChannelCountMode("max");
+      assert(node.getChannelCountMode() === "clamped-max");
+      assert(node.inputs[0].getChannelCountMode() === "clamped-max");
+
+      node.setChannelCountMode("explicit");
+      assert(node.getChannelCountMode() === "explicit");
+      assert(node.inputs[0].getChannelCountMode() === "explicit");
+
+      node.setChannelCountMode("clamped-max");
+      assert(node.getChannelCountMode() === "clamped-max");
+      assert(node.inputs[0].getChannelCountMode() === "clamped-max");
+    });
+
+    it(".buffer=", () => {
+      const node = new ConvolverNode(context);
+      const buffer = new AudioBuffer(2, 32, context.sampleRate);
+
+      assert(node.getBuffer() === null);
+
+      node.setBuffer(buffer);
+      assert(node.getBuffer() === buffer);
+    });
+
+    it(".normalize=", () => {
+      const node = new ConvolverNode(context);
+
+      assert(node.getNormalize() === true);
+
+      node.setNormalize(false);
+      assert(node.getNormalize() === false);
     });
   });
 
@@ -80,13 +92,34 @@ describe("ConvolverNode", () => {
 
       node1.outputs[0].enable();
       node2.outputs[0].enable();
-      node2.connect(node3);
 
+      // +-------+
+      // | node1 |
+      // +--(4)--+
+      //
+      // +--(1)--+
+      // | node2 | ConvolverNode
+      // +--(1)--+
+      //     |
+      // +--(1)--+
+      // | node3 |
+      // +-------+
+      node2.connect(node3);
       assert(node2.inputs[0].getNumberOfChannels() === 1);
       assert(node3.inputs[0].getNumberOfChannels() === 1);
 
+      // +-------+
+      // | node1 |
+      // +--(4)--+
+      //     |
+      // +--(2)--+
+      // | node2 | ConvolverNode
+      // +--(2)--+
+      //     |
+      // +--(2)--+
+      // | node3 |
+      // +-------+
       node1.connect(node2);
-
       assert(node2.inputs[0].getNumberOfChannels() === 2);
       assert(node3.inputs[0].getNumberOfChannels() === 2);
     });

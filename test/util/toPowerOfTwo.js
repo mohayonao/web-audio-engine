@@ -2,10 +2,10 @@
 
 require("run-with-mocha");
 
-const assert = require("power-assert");
+const assert = require("assert");
 const toPowerOfTwo = require("../../src/util/toPowerOfTwo");
 
-describe("util.toPowerOfTwo(value)", () => {
+describe("util/toPowerOfTwo(value)", () => {
   it("convert to 2^n", () => {
     assert(toPowerOfTwo(1) === 1);
     assert(toPowerOfTwo(2) === 2);

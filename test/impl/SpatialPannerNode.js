@@ -2,54 +2,63 @@
 
 require("run-with-mocha");
 
-const assert = require("power-assert");
-const attrTester = require("../helpers/attrTester");
+const assert = require("assert");
 const AudioContext = require("../../src/impl/AudioContext");
 const SpatialPannerNode = require("../../src/impl/SpatialPannerNode");
 const BasePannerNode = require("../../src/impl/BasePannerNode");
 const AudioParam = require("../../src/impl/AudioParam");
 
 const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
-const testSpec = {};
 
-testSpec.positionX = {
-  testCase: [ { expected: value => value instanceof AudioParam } ]
-};
+describe("impl/SpatialPannerNode", () => {
+  it("constructor", () => {
+    const node = new SpatialPannerNode(context);
 
-testSpec.positionY = {
-  testCase: [ { expected: value => value instanceof AudioParam } ]
-};
-
-testSpec.positionZ = {
-  testCase: [ { expected: value => value instanceof AudioParam } ]
-};
-
-testSpec.orientationX = {
-  testCase: [ { expected: value => value instanceof AudioParam } ]
-};
-
-testSpec.orientationY = {
-  testCase: [ { expected: value => value instanceof AudioParam } ]
-};
-
-testSpec.orientationZ = {
-  testCase: [ { expected: value => value instanceof AudioParam } ]
-};
-
-describe("SpatialPannerNode", () => {
-  describe("inherits", () => {
-    it("SpatialPannerNode < BasePannerNode", () => {
-      const node = new SpatialPannerNode(context);
-
-      assert(node instanceof SpatialPannerNode);
-      assert(node instanceof BasePannerNode);
-    });
+    assert(node instanceof SpatialPannerNode);
+    assert(node instanceof BasePannerNode);
   });
 
-  describe("basic attributes", () => {
-    attrTester.makeTests(context, {
-      class: SpatialPannerNode,
-      testSpec
+  describe("attributes", () => {
+    it(".positionX", () => {
+      const node = new SpatialPannerNode(context);
+
+      assert(node.getPositionX() instanceof AudioParam);
+      assert(node.getPositionX().getValue() === 0);
+    });
+
+    it(".positionY", () => {
+      const node = new SpatialPannerNode(context);
+
+      assert(node.getPositionY() instanceof AudioParam);
+      assert(node.getPositionY().getValue() === 0);
+    });
+
+    it(".positionZ", () => {
+      const node = new SpatialPannerNode(context);
+
+      assert(node.getPositionZ() instanceof AudioParam);
+      assert(node.getPositionZ().getValue() === 0);
+    });
+
+    it(".orientationX", () => {
+      const node = new SpatialPannerNode(context);
+
+      assert(node.getOrientationX() instanceof AudioParam);
+      assert(node.getOrientationX().getValue() === 0);
+    });
+
+    it(".orientationY", () => {
+      const node = new SpatialPannerNode(context);
+
+      assert(node.getOrientationY() instanceof AudioParam);
+      assert(node.getOrientationY().getValue() === 0);
+    });
+
+    it(".orientationZ", () => {
+      const node = new SpatialPannerNode(context);
+
+      assert(node.getOrientationZ() instanceof AudioParam);
+      assert(node.getOrientationZ().getValue() === 0);
     });
   });
 });
