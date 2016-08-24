@@ -20,7 +20,6 @@
     "babel-preset-power-assert": "^1.0.0",
     "babelify": "^7.3.0",
     "browserify": "^13.1.0",
-    "deep-equal": "^1.0.1",
     "eslint": "^3.3.1",
     "mocha": "^3.0.2",
     "npm-run-all": "^3.0.0",
