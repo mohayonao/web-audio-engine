@@ -1,9 +1,11 @@
 "use strict";
 
-const assert = require("power-assert");
+require("run-with-mocha");
+
+const assert = require("assert");
 const clamp = require("../../src/util/clamp");
 
-describe("util.clamp(value, minValue, maxValue)", () => {
+describe("util/clamp(value, minValue, maxValue)", () => {
   it("return clamped value in the range [minValue, maxValue]", () => {
     assert(clamp(0, 2, 4) === 2);
     assert(clamp(1, 2, 4) === 2);

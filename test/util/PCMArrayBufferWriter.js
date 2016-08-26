@@ -1,10 +1,11 @@
 "use strict";
 
-const assert = require("power-assert");
-const deepEqual = require("deep-equal");
+require("run-with-mocha");
+
+const assert = require("assert");
 const PCMArrayBufferWriter = require("../../src/util/PCMArrayBufferWriter");
 
-describe("PCMArrayBufferWriter", () => {
+describe("util/PCMArrayBufferWriter", () => {
   describe("constructor", () => {
     it("works", () => {
       const buffer = new Uint8Array(16).buffer;
@@ -26,7 +27,7 @@ describe("PCMArrayBufferWriter", () => {
       const actual = new Uint8Array(buffer);
       const expected = new Uint8Array([ 0, 8, 16, 24, 32, 40, 48, 56, 64, 72, 80, 88, 96, 104, 112, 120 ]);
 
-      assert(deepEqual(actual, expected));
+      assert.deepEqual(actual, expected);
     });
   });
 
@@ -42,7 +43,7 @@ describe("PCMArrayBufferWriter", () => {
       const actual = new Uint16Array(buffer);
       const expected = new Uint16Array([ 32768, 40960, 49152, 57344, 0, 8191, 16383, 24575 ]);
 
-      assert(deepEqual(actual, expected));
+      assert.deepEqual(actual, expected);
     });
   });
 
@@ -58,7 +59,7 @@ describe("PCMArrayBufferWriter", () => {
       const actual = new Uint32Array(buffer);
       const expected = new Uint32Array([ 2147483648, 3221225472, 0, 1073741823 ]);
 
-      assert(deepEqual(actual, expected));
+      assert.deepEqual(actual, expected);
     });
   });
 
@@ -74,7 +75,7 @@ describe("PCMArrayBufferWriter", () => {
       const actual = new Float32Array(buffer);
       const expected = new Float32Array([ -1, -0.5, 0, 0.5 ]);
 
-      assert(deepEqual(actual, expected));
+      assert.deepEqual(actual, expected);
     });
   });
 });

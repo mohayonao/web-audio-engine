@@ -1,9 +1,11 @@
 "use strict";
 
-const assert = require("power-assert");
+require("run-with-mocha");
+
+const assert = require("assert");
 const toValidBitDepth = require("../../src/util/toValidBitDepth");
 
-describe("util.toValidBitDepth()", () => {
+describe("util/toValidBitDepth()", () => {
   it("return valid bit depth", () => {
     assert(toValidBitDepth(8) === 8);
     assert(toValidBitDepth(16) === 16);

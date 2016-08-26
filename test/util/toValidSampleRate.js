@@ -1,9 +1,11 @@
 "use strict";
 
-const assert = require("power-assert");
+require("run-with-mocha");
+
+const assert = require("assert");
 const toValidSampleRate = require("../../src/util/toValidSampleRate");
 
-describe("util.toValidSampleRate()", () => {
+describe("util/toValidSampleRate()", () => {
   it("return valid sampleRate", () => {
     assert(toValidSampleRate(0) === 3000);
     assert(toValidSampleRate(5512.5) === 5512);

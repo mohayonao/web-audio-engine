@@ -1,54 +1,80 @@
 "use strict";
 
-const attrTester = require("../helpers/attrTester");
+require("run-with-mocha");
+
+const assert = require("assert");
 const AudioContext = require("../../src/impl/AudioContext");
 const SpatialListener = require("../../src/impl/SpatialListener");
 const AudioParam = require("../../src/impl/AudioParam");
 
 const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
-const testSpec = {};
 
-testSpec.positionX = {
-  testCase: [ { expected: value => value instanceof AudioParam } ]
-};
+describe("impl/SpatialListener", () => {
+  it("constructor", () => {
+    const node = new SpatialListener(context);
 
-testSpec.positionY = {
-  testCase: [ { expected: value => value instanceof AudioParam } ]
-};
+    assert(node instanceof SpatialListener);
+  });
 
-testSpec.positionZ = {
-  testCase: [ { expected: value => value instanceof AudioParam } ]
-};
+  describe("attributes", () => {
+    it(".positionX", () => {
+      const node = new SpatialListener(context);
 
-testSpec.forwardX = {
-  testCase: [ { expected: value => value instanceof AudioParam } ]
-};
+      assert(node.getPositionX() instanceof AudioParam);
+      assert(node.getPositionX().getValue() === 0);
+    });
 
-testSpec.forwardY = {
-  testCase: [ { expected: value => value instanceof AudioParam } ]
-};
+    it(".positionY", () => {
+      const node = new SpatialListener(context);
 
-testSpec.forwardZ = {
-  testCase: [ { expected: value => value instanceof AudioParam } ]
-};
+      assert(node.getPositionY() instanceof AudioParam);
+      assert(node.getPositionY().getValue() === 0);
+    });
 
-testSpec.upX = {
-  testCase: [ { expected: value => value instanceof AudioParam } ]
-};
+    it(".positionZ", () => {
+      const node = new SpatialListener(context);
 
-testSpec.upY = {
-  testCase: [ { expected: value => value instanceof AudioParam } ]
-};
+      assert(node.getPositionZ() instanceof AudioParam);
+      assert(node.getPositionZ().getValue() === 0);
+    });
 
-testSpec.upZ = {
-  testCase: [ { expected: value => value instanceof AudioParam } ]
-};
+    it(".forwardX", () => {
+      const node = new SpatialListener(context);
 
-describe("SpatialListener", () => {
-  describe("basic attributes", () => {
-    attrTester.makeTests(context, {
-      class: SpatialListener,
-      testSpec
+      assert(node.getForwardX() instanceof AudioParam);
+      assert(node.getForwardX().getValue() === 0);
+    });
+
+    it(".forwardY", () => {
+      const node = new SpatialListener(context);
+
+      assert(node.getForwardY() instanceof AudioParam);
+      assert(node.getForwardY().getValue() === 0);
+    });
+
+    it(".forwardZ", () => {
+      const node = new SpatialListener(context);
+
+      assert(node.getForwardZ() instanceof AudioParam);
+      assert(node.getForwardZ().getValue() === 0);
+    });
+
+    it(".upX", () => {
+      const node = new SpatialListener(context);
+
+      assert(node.getUpX() instanceof AudioParam);
+    });
+
+    it(".upY", () => {
+      const node = new SpatialListener(context);
+
+      assert(node.getUpY() instanceof AudioParam);
+    });
+
+    it(".upZ", () => {
+      const node = new SpatialListener(context);
+
+      assert(node.getUpZ() instanceof AudioParam);
     });
   });
 });

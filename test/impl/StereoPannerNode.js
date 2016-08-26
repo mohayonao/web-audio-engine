@@ -1,33 +1,41 @@
 "use strict";
 
-const assert = require("power-assert");
-const attrTester = require("../helpers/attrTester");
+require("run-with-mocha");
+
+const assert = require("assert");
 const AudioContext = require("../../src/impl/AudioContext");
 const StereoPannerNode = require("../../src/impl/StereoPannerNode");
 const BasePannerNode = require("../../src/impl/BasePannerNode");
 const AudioParam = require("../../src/impl/AudioParam");
 
 const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
-const testSpec = {};
 
-testSpec.pan = {
-  testCase: [ { expected: value => value instanceof AudioParam } ]
-};
+describe("impl/StereoPannerNode", () => {
+  it("constructor", () => {
+    const node = new StereoPannerNode(context);
 
-describe("StereoPannerNode", () => {
-  describe("inherits", () => {
-    it("StereoPannerNode < AudioNode", () => {
-      const node = new StereoPannerNode(context);
-
-      assert(node instanceof StereoPannerNode);
-      assert(node instanceof BasePannerNode);
-    });
+    assert(node instanceof StereoPannerNode);
+    assert(node instanceof BasePannerNode);
   });
 
-  describe("basic attributes", () => {
-    attrTester.makeTests(context, {
-      class: StereoPannerNode,
-      testSpec
+  describe("attributes", () => {
+    it(".numberOfInputs", () => {
+      const node = new StereoPannerNode(context);
+
+      assert(node.getNumberOfInputs() === 1);
+    });
+
+    it(".numberOfOutputs", () => {
+      const node = new StereoPannerNode(context);
+
+      assert(node.getNumberOfOutputs() === 1);
+    });
+
+    it(".pan", () => {
+      const node = new StereoPannerNode(context);
+
+      assert(node.getPan() instanceof AudioParam);
+      assert(node.getPan().getValue() === 0);
     });
   });
 });

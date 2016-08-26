@@ -1,6 +1,8 @@
 "use strict";
 
-const assert = require("power-assert");
+require("run-with-mocha");
+
+const assert = require("assert");
 const sinon = require("sinon");
 const encoder = require("../src/encoder");
 const encoderUtil = require("../src/util/encoderUtil");

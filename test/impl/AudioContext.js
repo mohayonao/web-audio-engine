@@ -1,41 +1,66 @@
 "use strict";
 
-const assert = require("power-assert");
+require("run-with-mocha");
+
+const assert = require("assert");
 const sinon = require("sinon");
-const attrTester = require("../helpers/attrTester");
 const AudioContext = require("../../src/impl/AudioContext");
 const AudioDestinationNode = require("../../src/impl/AudioDestinationNode");
 const AudioListener = require("../../src/impl/AudioListener");
 
 const contextOpts = { sampleRate: 8000, blockSize: 16 };
-const testSpec = {};
 
-testSpec.destination = {
-  testCase: [ { expected: value => value instanceof AudioDestinationNode } ]
-};
+describe("impl/AudioContext", () => {
+  it("constructor", () => {
+    const context = new AudioContext(contextOpts);
 
-testSpec.sampleRate = {
-  testCase: [ { expected: 8000 } ]
-};
+    assert(context instanceof AudioContext);
+  });
 
-testSpec.currentTime = {
-  testCase: [ { expected: 0 } ]
-};
+  describe("attributes", () => {
+    it(".destination", () => {
+      const context = new AudioContext(contextOpts);
 
-testSpec.listener = {
-  testCase: [ { expected: value => value instanceof AudioListener } ]
-};
+      assert(context.getDestination() instanceof AudioDestinationNode);
+    });
 
-describe("AudioContext", () => {
-  describe("basic attributes", () => {
-    attrTester.makeTests(null, {
-      class: AudioContext,
-      create: () => new AudioContext(contextOpts),
-      testSpec
+    it(".sampleRate", () => {
+      const context = new AudioContext(contextOpts);
+
+      assert(context.getSampleRate() === contextOpts.sampleRate);
+    });
+
+    it(".currentTime", () => {
+      const context = new AudioContext(contextOpts);
+
+      assert(context.getCurrentTime() === 0);
+    });
+
+    it(".listener", () => {
+      const context = new AudioContext(contextOpts);
+
+      assert(context.getListener() instanceof AudioListener);
     });
   });
 
-  describe("state", () => {
+  describe("methods", () => {
+    it(".reset()", () => {
+      const context = new AudioContext(contextOpts);
+      const channelData = [ new Float32Array(16), new Float32Array(16) ];
+
+      context.resume();
+      context.process(channelData, 0);
+
+      assert(context.getState() === "running");
+      assert(context.currentTime !== 0);
+
+      context.reset();
+      assert(context.getState() === "suspended");
+      assert(context.currentTime === 0);
+    });
+  });
+
+  describe("state change", () => {
     let context, stateChangeSpy;
 
     before(() => {
@@ -86,65 +111,6 @@ describe("AudioContext", () => {
       context.close();
       assert(context.getState() === "closed");
       assert(stateChangeSpy.callCount === 1);
-    });
-  });
-
-  describe("processing", () => {
-    let context, destination;
-
-    before(() => {
-      context = new AudioContext(contextOpts);
-      destination = context.getDestination();
-
-      context.resume();
-    });
-
-    it("1: time advances", () => {
-      const channelData = [new Float32Array(16), new Float32Array(16) ];
-
-      assert(context.getCurrentTime() === 0);
-      destination.process = sinon.spy();
-
-      context.process(channelData, 0);
-
-      assert(destination.process.callCount === 1);
-      assert(destination.process.calledWith(channelData, 0));
-      assert(context.getCurrentTime() === 16 / 8000);
-    });
-
-    it("2: do post process and reserve pre process (for next process)", () => {
-      const channelData = [ new Float32Array(16), new Float32Array(16) ];
-      const immediateSpy = sinon.spy();
-
-      assert(context.getCurrentTime() === 16 / 8000);
-      destination.process = sinon.spy(() => {
-        context.addPostProcess(immediateSpy);
-      });
-
-      context.process(channelData, 0);
-
-      assert(destination.process.callCount === 1);
-      assert(destination.process.calledWith(channelData, 0));
-      assert(context.getCurrentTime() === 32 / 8000);
-      assert(immediateSpy.callCount === 1);
-      assert(immediateSpy.calledAfter(destination.process));
-    });
-  });
-
-  describe("reset", () => {
-    it("works", () => {
-      const context = new AudioContext(contextOpts);
-      const channelData = [ new Float32Array(16), new Float32Array(16) ];
-
-      context.resume();
-      context.process(channelData, 0);
-
-      assert(context.getState() === "running");
-      assert(context.currentTime !== 0);
-
-      context.reset();
-      assert(context.getState() === "suspended");
-      assert(context.currentTime === 0);
     });
   });
 });

@@ -1,115 +1,131 @@
 "use strict";
 
-const assert = require("power-assert");
-const attrTester = require("../helpers/attrTester");
+require("run-with-mocha");
+
+const assert = require("assert");
 const AudioContext = require("../../src/impl/AudioContext");
 const BasePannerNode = require("../../src/impl/BasePannerNode");
 const AudioNode = require("../../src/impl/AudioNode");
 
 const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
-const testSpec = {};
 
-testSpec.numberOfInputs = {
-  testCase: [ { expected: 1 } ]
-};
+describe("impl/BasePannerNode", () => {
+  it("constructor", () => {
+    const node = new BasePannerNode(context);
 
-testSpec.numberOfOutputs = {
-  testCase: [ { expected: 1 } ]
-};
-
-testSpec.channelCount = {
-  defaultValue: 2,
-  testCase: [
-    { value: 1, expected: 1 },
-    { value: 2, expected: 2 },
-    { value: 4, expected: 2 }
-  ]
-};
-
-testSpec.channelCountMode = {
-  defaultValue: "clamped-max",
-  testCase: [
-    { value: "max", expected: "clamped-max" },
-    { value: "clamped-max", expected: "clamped-max" },
-    { value: "explicit", expected: "explicit" }
-  ]
-};
-
-testSpec.panningModel = {
-  defaultValue: "equalpower",
-  testCase: [
-    { value: "HRTF", expected: "HRTF" },
-    { value: "equalpower", expected: "equalpower" },
-    { value: "unknown", expected: "equalpower" }
-  ]
-};
-
-testSpec.distanceModel = {
-  defaultValue: "inverse",
-  testCase: [
-    { value: "linear", expected: "linear" },
-    { value: "exponential", expected: "exponential" },
-    { value: "inverse", expected: "inverse" },
-    { value: "unknwon", expected: "inverse" }
-  ]
-};
-
-testSpec.refDistance = {
-  defaultValue: 1,
-  testCase: [
-    { value: 2, expected: 2 }
-  ]
-};
-
-testSpec.maxDistance = {
-  defaultValue: 10000,
-  testCase: [
-    { value: 11000, expected: 11000 }
-  ]
-};
-
-testSpec.rolloffFactor = {
-  defaultValue: 1,
-  testCase: [
-    { value: 0.8, expected: 0.8 }
-  ]
-};
-
-testSpec.coneInnerAngle = {
-  defaultValue: 360,
-  testCase: [
-    { value: 180, expected: 180 }
-  ]
-};
-
-testSpec.coneOuterAngle = {
-  defaultValue: 360,
-  testCase: [
-    { value: 180, expected: 180 }
-  ]
-};
-
-testSpec.coneOuterGain = {
-  defaultValue: 0,
-  testCase: [
-    { value: 0.2, expected: 0.2 }
-  ]
-};
-
-describe("BasePannerNode", () => {
-  describe("inherits", () => {
-    it("BasePannerNode < AudioNode", () => {
-      const node = new BasePannerNode(context);
-
-      assert(node instanceof BasePannerNode);
-      assert(node instanceof AudioNode);
-    });
+    assert(node instanceof BasePannerNode);
+    assert(node instanceof AudioNode);
   });
 
-  describe("basic attributes", () => {
-    attrTester.makeTests(context, {
-      class: BasePannerNode,
-      testSpec
+  describe("attributes", () => {
+    it(".numberOfInputs", () => {
+      const node = new BasePannerNode(context);
+
+      assert(node.getNumberOfInputs() === 1);
+    });
+
+    it(".numberOfOutputs", () => {
+      const node = new BasePannerNode(context);
+
+      assert(node.getNumberOfOutputs() === 1);
+    });
+
+    it(".channelCount=", () => {
+      const node = new BasePannerNode(context);
+
+      assert(node.getChannelCount() === 2);
+
+      node.setChannelCount(1);
+      assert(node.getChannelCount() === 1);
+    });
+
+    it(".channelCountMode=", () => {
+      const node = new BasePannerNode(context);
+
+      assert(node.getChannelCountMode() === "clamped-max");
+
+      node.setChannelCountMode("explicit");
+      assert(node.getChannelCountMode() === "explicit");
+    });
+
+    it(".panningModel=", () => {
+      const node = new BasePannerNode(context);
+
+      assert(node.getPanningModel() === "equalpower");
+
+      [
+        "equalpower", "HRTF"
+      ].forEach((panningModel) => {
+        node.setPanningModel(panningModel);
+        assert(node.getPanningModel() === panningModel);
+      });
+  });
+
+    it(".distanceModel=", () => {
+      const node = new BasePannerNode(context);
+
+      assert(node.getDistanceModel() === "inverse");
+
+      [
+        "inverse", "linear", "exponential"
+      ].forEach((distanceModel) => {
+        node.setDistanceModel(distanceModel);
+        assert(node.getDistanceModel() === distanceModel);
+      });
+    });
+
+    it(".refDistance=", () => {
+      const node = new BasePannerNode(context);
+
+      assert(node.getRefDistance() === 1);
+
+      node.setRefDistance(2);
+      assert(node.getRefDistance() === 2);
+    });
+
+    it(".maxDistance=", () => {
+      const node = new BasePannerNode(context);
+
+      assert(node.getMaxDistance() === 10000);
+
+      node.setMaxDistance(20000);
+      assert(node.getMaxDistance() === 20000);
+    });
+
+    it(".rolloffFactor=", () => {
+      const node = new BasePannerNode(context);
+
+      assert(node.getRolloffFactor() === 1);
+
+      node.setRolloffFactor(0.8);
+      assert(node.getRolloffFactor() === 0.8);
+    });
+
+    it(".coneInnerAngle=", () => {
+      const node = new BasePannerNode(context);
+
+      assert(node.getConeInnerAngle() === 360);
+
+      node.setConeInnerAngle(270);
+      assert(node.getConeInnerAngle() === 270);
+    });
+
+    it(".coneOuterAngle=", () => {
+      const node = new BasePannerNode(context);
+
+      assert(node.getConeOuterAngle() === 360);
+
+      node.setConeOuterAngle(270);
+      assert(node.getConeOuterAngle() === 270);
+    });
+
+    it(".coneOuterGain=", () => {
+      const node = new BasePannerNode(context);
+
+      assert(node.getConeOuterGain() === 0);
+
+      node.setConeOuterGain(0.1);
+      assert(node.getConeOuterGain() === 0.1);
     });
   });
 
@@ -121,13 +137,34 @@ describe("BasePannerNode", () => {
 
       node1.outputs[0].enable();
       node2.outputs[0].enable();
-      node2.connect(node3);
 
+      // +-------+
+      // | node1 |
+      // +--(4)--+
+      //
+      // +--(1)--+
+      // | node2 | BasePannerNode
+      // +--(2)--+
+      //     |
+      // +--(2)--+
+      // | node3 |
+      // +-------+
+      node2.connect(node3);
       assert(node2.inputs[0].getNumberOfChannels() === 1);
       assert(node3.inputs[0].getNumberOfChannels() === 2);
 
+      // +-------+
+      // | node1 |
+      // +--(4)--+
+      //     |
+      // +--(2)--+
+      // | node2 | BasePannerNode
+      // +--(2)--+
+      //     |
+      // +--(2)--+
+      // | node3 |
+      // +-------+
       node1.connect(node2);
-
       assert(node2.inputs[0].getNumberOfChannels() === 2);
       assert(node3.inputs[0].getNumberOfChannels() === 2);
     });

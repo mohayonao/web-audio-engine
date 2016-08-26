@@ -1,18 +1,20 @@
 "use strict";
 
-const assert = require("power-assert");
-const deepEqual = require("deep-equal");
+require("run-with-mocha");
+
+const assert = require("assert");
 const fill = require("../../src/util/fill");
 
-describe("util.fill(list, value)", () => {
+describe("util/fill(list, value)", () => {
   it("fill value", () => {
     const list = new Float32Array(8);
     const actual = fill(list, 1);
     const expected = new Float32Array([ 1, 1, 1, 1, 1, 1, 1, 1 ]);
 
-    assert(deepEqual(actual, expected));
-    assert(deepEqual(list, expected));
+    assert.deepEqual(actual, expected);
+    assert.deepEqual(list, expected);
   });
+
   it("fill value - polyfill ver", () => {
     const list = new Float32Array(8);
 
@@ -22,7 +24,7 @@ describe("util.fill(list, value)", () => {
     const actual = fill(list, 1);
     const expected = new Float32Array([ 1, 1, 1, 1, 1, 1, 1, 1 ]);
 
-    assert(deepEqual(actual, expected));
-    assert(deepEqual(list, expected));
+    assert.deepEqual(actual, expected);
+    assert.deepEqual(list, expected);
   });
 });

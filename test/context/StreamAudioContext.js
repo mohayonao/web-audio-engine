@@ -1,9 +1,10 @@
 "use strict";
 
-const assert = require("power-assert");
+require("run-with-mocha");
+
+const assert = require("assert");
 const sinon = require("sinon");
 const events = require("events");
-const deepEqual = require("deep-equal");
 const StreamAudioContext = require("../../src/context/StreamAudioContext");
 
 describe("StreamAudioContext", () => {
@@ -20,7 +21,7 @@ describe("StreamAudioContext", () => {
 
       assert(context.numberOfChannels === 1);
       assert(context.blockSize === 16);
-      assert(deepEqual(context.format, { sampleRate: 8000, channels: 1, bitDepth: 8, float: false }));
+      assert.deepEqual(context.format, { sampleRate: 8000, channels: 1, bitDepth: 8, float: false });
     });
   });
 

@@ -1,9 +1,11 @@
 "use strict";
 
-const assert = require("power-assert");
+require("run-with-mocha");
+
+const assert = require("assert");
 const toImpl = require("../../src/util/toImpl");
 
-describe("util.toImpl(value)", () => {
+describe("util/toImpl(value)", () => {
   it("convert to impl", () => {
     const impl = {};
     const value = { _impl: impl };
@@ -12,6 +14,7 @@ describe("util.toImpl(value)", () => {
 
     assert(actual === expected);
   });
+
   it("nothing to do", () => {
     const impl = {};
     const actual = toImpl(impl);
