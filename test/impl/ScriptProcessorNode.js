@@ -7,10 +7,15 @@ const AudioContext = require("../../src/impl/AudioContext");
 const ScriptProcessorNode = require("../../src/impl/ScriptProcessorNode");
 const AudioNode = require("../../src/impl/AudioNode");
 
-const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
 const bufferSize = 256, numberOfInputChannels = 1, numberOfOutputChannels = 2;
 
 describe("impl/ScriptProcessorNode", () => {
+  let context;
+
+  beforeEach(() => {
+    context = new AudioContext({ sampleRate: 8000, blockSize: 32 });
+  });
+
   it("constructor", () => {
     const node = new ScriptProcessorNode(context, { bufferSize, numberOfInputChannels, numberOfOutputChannels });
 

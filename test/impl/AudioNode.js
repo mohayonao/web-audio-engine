@@ -10,9 +10,13 @@ const EventTarget = require("../../src/impl/EventTarget");
 const AudioNodeInput = require("../../src/impl/core/AudioNodeInput");
 const AudioNodeOutput = require("../../src/impl/core/AudioNodeOutput");
 
-const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
-
 describe("impl/AudioNode", () => {
+  let context;
+
+  beforeEach(() => {
+    context = new AudioContext({ sampleRate: 8000, blockSize: 32 });
+  });
+
   it("constructor", () => {
     const node = new AudioNode(context);
 

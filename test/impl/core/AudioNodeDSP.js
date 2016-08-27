@@ -7,9 +7,13 @@ const np = require("../../helpers/np");
 const AudioContext = require("../../../src/impl/AudioContext");
 const AudioNode = require("../../../src/impl/AudioNode");
 
-const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
-
 describe("impl/core/AudioNode - DSP", () => {
+  let context;
+
+  beforeEach(() => {
+    context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
+  });
+
   it("pull from the single connection", () => {
     const node1 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
     const node2 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });

@@ -8,9 +8,13 @@ const DynamicsCompressorNode = require("../../src/impl/DynamicsCompressorNode");
 const AudioParam = require("../../src/impl/AudioParam");
 const AudioNode = require("../../src/impl/AudioNode");
 
-const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
-
 describe("impl/DynamicsCompressorNode", () => {
+  let context;
+
+  beforeEach(() => {
+    context = new AudioContext({ sampleRate: 8000, blockSize: 32 });
+  });
+
   it("constructor", () => {
     const node = new DynamicsCompressorNode(context);
 

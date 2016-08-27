@@ -6,9 +6,13 @@ const assert = require("assert");
 const AudioContext = require("../../../src/impl/AudioContext");
 const AudioNode = require("../../../src/impl/AudioNode");
 
-const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
-
 describe("impl/core/AudioNode - Connection", () => {
+  let context;
+
+  beforeEach(() => {
+    context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
+  });
+
   it("connect()", () => {
     const node1 = new AudioNode(context, { outputs: [ 1 ] });
     const node2 = new AudioNode(context, { inputs: [ 1 ] });

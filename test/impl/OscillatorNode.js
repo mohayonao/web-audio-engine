@@ -10,9 +10,13 @@ const AudioSourceNode = require("../../src/impl/AudioSourceNode");
 const PeriodicWave = require("../../src/impl/PeriodicWave");
 const AudioParam = require("../../src/impl/AudioParam");
 
-const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
-
 describe("impl/OscillatorNode", () => {
+  let context;
+
+  beforeEach(() => {
+    context = new AudioContext({ sampleRate: 8000, blockSize: 32 });
+  });
+
   it("constructor", () => {
     const node = new OscillatorNode(context);
 

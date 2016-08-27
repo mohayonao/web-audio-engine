@@ -7,9 +7,13 @@ const AudioContext = require("../../../src/impl/AudioContext");
 const AudioNode = require("../../../src/impl/AudioNode");
 const GainNode = require("../../../src/impl/GainNode");
 
-const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
-
 describe("impl/core/AudioNode - ChannelPropagation", () => {
+  let context;
+
+  beforeEach(() => {
+    context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
+  });
+
   it("numberOfChannels", () => {
     const node1 = new GainNode(context);
     const node2 = new GainNode(context);

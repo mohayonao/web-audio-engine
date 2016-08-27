@@ -7,11 +7,16 @@ const AudioContext = require("../../src/impl/AudioContext");
 const IIRFilterNode = require("../../src/impl/IIRFilterNode");
 const AudioNode = require("../../src/impl/AudioNode");
 
-const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
 const feedforward = new Float32Array(8);
 const feedback = new Float32Array(8);
 
 describe("impl/IIRFilterNode", () => {
+  let context;
+
+  beforeEach(() => {
+    context = new AudioContext({ sampleRate: 8000, blockSize: 32 });
+  });
+
   it("constructor", () => {
     const node = new IIRFilterNode(context, { feedforward, feedback });
 

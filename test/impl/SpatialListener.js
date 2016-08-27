@@ -7,9 +7,13 @@ const AudioContext = require("../../src/impl/AudioContext");
 const SpatialListener = require("../../src/impl/SpatialListener");
 const AudioParam = require("../../src/impl/AudioParam");
 
-const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
-
 describe("impl/SpatialListener", () => {
+  let context;
+
+  beforeEach(() => {
+    context = new AudioContext({ sampleRate: 8000, blockSize: 32 });
+  });
+
   it("constructor", () => {
     const node = new SpatialListener(context);
 

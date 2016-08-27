@@ -10,9 +10,13 @@ const AudioSourceNode = require("../../src/impl/AudioSourceNode");
 const AudioBuffer = require("../../src/impl/AudioBuffer");
 const AudioParam = require("../../src/impl/AudioParam");
 
-const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
-
 describe("impl/AudioBufferSourceNode", () => {
+  let context;
+
+  beforeEach(() => {
+    context = new AudioContext({ sampleRate: 8000, blockSize: 32 });
+  });
+
   it("constructor", () => {
     const node = new AudioBufferSourceNode(context);
 

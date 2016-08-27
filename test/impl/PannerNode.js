@@ -7,9 +7,13 @@ const AudioContext = require("../../src/impl/AudioContext");
 const PannerNode = require("../../src/impl/PannerNode");
 const BasePannerNode = require("../../src/impl/BasePannerNode");
 
-const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
-
 describe("impl/PannerNode", () => {
+  let context;
+
+  beforeEach(() => {
+    context = new AudioContext({ sampleRate: 8000, blockSize: 32 });
+  });
+
   it("constructor", () => {
     const node = new PannerNode(context);
 

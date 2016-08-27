@@ -7,9 +7,13 @@ const AudioContext = require("../../src/impl/AudioContext");
 const ChannelSplitterNode = require("../../src/impl/ChannelSplitterNode");
 const AudioNode = require("../../src/impl/AudioNode");
 
-const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
-
 describe("impl/ChannelSplitterNode", () => {
+  let context;
+
+  beforeEach(() => {
+    context = new AudioContext({ sampleRate: 8000, blockSize: 32 });
+  });
+
   it("constructor", () => {
     const node = new ChannelSplitterNode(context, { numberOfOutputs: 6 });
 

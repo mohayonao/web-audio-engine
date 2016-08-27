@@ -8,9 +8,13 @@ const SpatialPannerNode = require("../../src/impl/SpatialPannerNode");
 const BasePannerNode = require("../../src/impl/BasePannerNode");
 const AudioParam = require("../../src/impl/AudioParam");
 
-const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
-
 describe("impl/SpatialPannerNode", () => {
+  let context;
+
+  beforeEach(() => {
+    context = new AudioContext({ sampleRate: 8000, blockSize: 32 });
+  });
+
   it("constructor", () => {
     const node = new SpatialPannerNode(context);
 
