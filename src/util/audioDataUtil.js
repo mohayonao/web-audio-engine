@@ -1,5 +1,7 @@
 "use strict";
 
+const nmap = require("nmap");
+
 /**
  * @param {*} data
  * @return {boolean}
@@ -36,7 +38,7 @@ function toAudioData(data) {
   if (isAudioBuffer(data)) {
     const numberOfChannels = data.numberOfChannels;
     const sampleRate = data.sampleRate;
-    const channelData = Array.from({ length: numberOfChannels }, (_, ch) => data.getChannelData(ch));
+    const channelData = nmap(numberOfChannels, (_, ch) => data.getChannelData(ch));
     const length = numberOfChannels ? channelData[0].length : 0;
 
     return { numberOfChannels, length, sampleRate, channelData };

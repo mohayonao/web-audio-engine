@@ -125,9 +125,7 @@ class AudioNode extends EventTarget {
   /**
    *
    */
-  disconnect() {
-    const args = Array.from(arguments);
-
+  disconnect(...args) {
     if (args.length === 0) {
       return this.disconnectAll();
     }

@@ -107,8 +107,7 @@ class AudioNodeOutput {
   /**
    *
    */
-  disconnect() {
-    const args = Array.from(arguments);
+  disconnect(...args) {
     const isTargetToDisconnect =
       args.length === 1 ? target => target.node === args[0] :
       args.length === 2 ? target => target.node === args[0] && target.index === args[1] :

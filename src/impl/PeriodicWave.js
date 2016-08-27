@@ -1,5 +1,6 @@
 "use strict";
 
+const nmap = require("nmap");
 const PeriodicWaveDSP = require("./dsp/PeriodicWave");
 
 class PeriodicWave {
@@ -75,7 +76,7 @@ class PeriodicWave {
       break;
     case "sawtooth":
       this._real = new Float32Array(length);
-      this._imag = new Float32Array(Array.from({ length }, (_, n) => {
+      this._imag = new Float32Array(nmap(length, (_, n) => {
         return n === 0 ? 0 : Math.pow(-1, n + 1) * (2 / (n * Math.PI));
       }));
       this._name = "sawtooth";
@@ -83,7 +84,7 @@ class PeriodicWave {
       break;
     case "triangle":
       this._real = new Float32Array(length);
-      this._imag = new Float32Array(Array.from({ length }, (_, n) => {
+      this._imag = new Float32Array(nmap(length, (_, n) => {
         return n === 0 ? 0 : (8 * Math.sin(n * Math.PI / 2)) / Math.pow(n * Math.PI,  2);
       }));
       this._name = "triangle";
@@ -91,7 +92,7 @@ class PeriodicWave {
       break;
     case "square":
       this._real = new Float32Array(length);
-      this._imag = new Float32Array(Array.from({ length }, (_, n) => {
+      this._imag = new Float32Array(nmap(length, (_, n) => {
         return n === 0 ? 0 : (2 / (n * Math.PI)) * (1 - Math.pow(-1, n));
       }));
       this._name = "square";

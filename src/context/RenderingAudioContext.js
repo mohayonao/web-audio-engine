@@ -1,5 +1,6 @@
 "use strict";
 
+const nmap = require("nmap");
 const util = require("../util");
 const config = require("../config");
 const AudioContext = require("../api/AudioContext");
@@ -74,7 +75,7 @@ class RenderingAudioContext extends AudioContext {
     const iterations = Math.ceil(duration * this.sampleRate / blockSize);
     const bufferLength = blockSize * iterations;
     const numberOfChannels = this._format.channels;
-    const buffers = Array.from({ length: numberOfChannels }, () => new Float32Array(bufferLength));
+    const buffers = nmap(numberOfChannels, () => new Float32Array(bufferLength));
 
     impl.changeState("running");
 
@@ -94,7 +95,7 @@ class RenderingAudioContext extends AudioContext {
     const numberOfChannels = this._format.channels;
     const length = this._rendered.reduce((length, buffers) => length + buffers[0].length, 0);
     const sampleRate = this._format.sampleRate;
-    const channelData = Array.from({ length: numberOfChannels }, () => new Float32Array(length));
+    const channelData = nmap(numberOfChannels, () => new Float32Array(length));
     const audioData = { numberOfChannels, length, sampleRate, channelData };
 
     let offset = 0;
