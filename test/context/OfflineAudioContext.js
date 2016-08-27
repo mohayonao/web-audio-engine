@@ -11,6 +11,8 @@ describe("OfflineAudioContext", () => {
     const context = new OfflineAudioContext(2, 128, 44100);
 
     assert(context instanceof OfflineAudioContext);
+    assert(context.length === 128);
+    assert(context.sampleRate === 44100);
   });
 
   it("should emit a 'complete' event with AudioBuffer after rendering", (done) => {

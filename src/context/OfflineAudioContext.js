@@ -35,6 +35,13 @@ class OfflineAudioContext extends AudioContext {
   }
 
   /**
+   * @return {number}
+   */
+  get length() {
+    return this._length;
+  }
+
+  /**
    * @return {function}
    */
   get oncomplete() {
