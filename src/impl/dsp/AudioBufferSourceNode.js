@@ -6,13 +6,19 @@ const AudioBufferSourceNodeDSP = {
   },
 
   dspStart() {
-    const bufferSampleRate = this._audioData.sampleRate;
-    const bufferDuration = this._audioData.length / bufferSampleRate;
+    if (this._audioData) {
+      const bufferSampleRate = this._audioData.sampleRate;
+      const bufferDuration = this._audioData.length / bufferSampleRate;
 
-    this._phase = Math.max(0, Math.min(this._offset, bufferDuration)) * bufferSampleRate;
+      this._phase = Math.max(0, Math.min(this._offset, bufferDuration)) * bufferSampleRate;
+    }
   },
 
   dspProcess() {
+    if (this._audioData === null) {
+      return this.dspEmitEnded();
+    }
+
     const blockSize = this.blockSize;
     const quantumStartFrame = this.context.currentSampleFrame;
     const quantumEndFrame = quantumStartFrame + blockSize;
@@ -42,11 +48,7 @@ const AudioBufferSourceNodeDSP = {
         writeIndex += 1;
       }
 
-      this.context.addPostProcess(() => {
-        this.outputs[0].bus.zeros();
-        this.outputs[0].disable();
-        this.dispatchEvent({ type: "ended" });
-      });
+      this.dspEmitEnded();
     }
   },
 
@@ -79,12 +81,13 @@ const AudioBufferSourceNodeDSP = {
       const phaseTime = phase / bufferSampleRate;
       const bufferDuration = bufferLength / bufferSampleRate;
 
-      if (this._loop) {
-        if (bufferDuration <= phaseTime || (0 < this._loopEnd && this._loopEnd <= phaseTime)) {
-          phase = Math.max(0, Math.min(this._loopStart, bufferDuration)) * bufferSampleRate;
-        }
-      } else {
-        if (bufferDuration <= phaseTime) {
+      if (bufferDuration <= phaseTime) {
+        if (this._loop) {
+          if (0 < this._loopEnd && this._loopEnd <= phaseTime) {
+            phase = Math.max(0, Math.min(this._loopStart, bufferDuration)) * bufferSampleRate;
+          }
+        } else {
+          this.dspEmitEnded();
           break;
         }
       }
@@ -93,6 +96,15 @@ const AudioBufferSourceNodeDSP = {
     this._phase = phase;
 
     return writeIndex;
+  },
+
+  dspEmitEnded() {
+    this._done = true;
+    this.context.addPostProcess(() => {
+      this.outputs[0].bus.zeros();
+      this.outputs[0].disable();
+      this.dispatchEvent({ type: "ended" });
+    });
   }
 };
 

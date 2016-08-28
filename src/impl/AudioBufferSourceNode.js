@@ -19,6 +19,7 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
     this._loopStart = 0;
     this._loopEnd = 0;
     this._offset = 0;
+    this._done = false;
   }
 
   /**
@@ -40,6 +41,16 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
       this._audioData = this._buffer.audioData;
       this.outputs[0].setNumberOfChannels(this._audioData.numberOfChannels);
     }
+  }
+
+  /**
+   * @return {string}
+   */
+  getPlaybackState() {
+    if (this._done) {
+      return "finished";
+    }
+    return super.getPlaybackState();
   }
 
   /**
@@ -126,10 +137,9 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
     }
 
     this.context.sched(when, () => {
+      this.dspStart();
       this.outputs[0].enable();
     });
-
-    this.dspStart();
   }
 }
 

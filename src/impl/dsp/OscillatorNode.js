@@ -35,6 +35,7 @@ const OscillatorNodeDSP = {
       }
 
       this.context.addPostProcess(() => {
+        this._playbackState = "finished";
         this.outputs[0].bus.zeros();
         this.outputs[0].disable();
         this.dispatchEvent({ type: "ended" });

@@ -17,6 +17,40 @@ class AudioScheduledSourceNode extends AudioSourceNode {
   }
 
   /**
+   * @return {number}
+   */
+  getStartTime() {
+    if (this._startTime !== Infinity) {
+      return this._startTime;
+    }
+  }
+
+  /**
+   * @return {number}
+   */
+  getStopTime() {
+    if (this._stopTime !== Infinity) {
+      return this._stopTime;
+    }
+  }
+
+  /**
+   * @return {string}
+   */
+  getPlaybackState() {
+    if (this._startTime === Infinity) {
+      return "unscheduled";
+    }
+    if (this.context.currentTime < this._startTime) {
+      return "scheduled";
+    }
+    if (this._stopTime <= this.context.currentTime) {
+      return "finished";
+    }
+    return "playing";
+  }
+
+  /**
    * @param {number} when
    */
   start(when) {
@@ -40,7 +74,7 @@ class AudioScheduledSourceNode extends AudioSourceNode {
    */
   stop(when) {
     /* istanbul ignore next */
-    if (this._startTime === Infinity && this._stopTime !== Infinity) {
+    if (this._stopTime !== Infinity) {
       return;
     }
 
