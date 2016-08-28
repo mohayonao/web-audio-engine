@@ -7,9 +7,13 @@ const AudioContext = require("../../src/impl/AudioContext");
 const AnalyserNode = require("../../src/impl/AnalyserNode");
 const AudioNode = require("../../src/impl/AudioNode");
 
-const context = new AudioContext({ sampleRate: 8000, blockSize: 32 });
-
 describe("impl/AnalyserNode", () => {
+  let context;
+
+  beforeEach(() => {
+    context = new AudioContext({ sampleRate: 8000, blockSize: 32 });
+  });
+
   it("constructor", () => {
     const node = new AnalyserNode(context);
 

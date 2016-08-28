@@ -9,9 +9,13 @@ const AudioBus = require("../../../src/impl/core/AudioBus");
 const AudioContext = require("../../../src/impl/AudioContext");
 const AudioNode = require("../../../src/impl/AudioNode");
 
-const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
-
 describe("impl/core/AudioNodeOutput", () => {
+  let context;
+
+  beforeEach(() => {
+    context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
+  });
+
   it("AudioNode().outputs[0]", () => {
     const node = new AudioNode(context, { outputs: [ 1 ] });
 

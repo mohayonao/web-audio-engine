@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "fourier-transform": "^1.0.2",
+    "nmap": "^0.9.0",
     "scijs-window-functions": "^2.0.2",
     "wav-decoder": "^1.1.0",
     "wav-encoder": "^1.1.0"

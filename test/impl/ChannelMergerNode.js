@@ -7,9 +7,13 @@ const AudioContext = require("../../src/impl/AudioContext");
 const ChannelMergerNode = require("../../src/impl/ChannelMergerNode");
 const AudioNode = require("../../src/impl/AudioNode");
 
-const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
-
 describe("impl/ChannelMergerNode", () => {
+  let context;
+
+  beforeEach(() => {
+    context = new AudioContext({ sampleRate: 8000, blockSize: 32 });
+  });
+
   it("constructor", () => {
     const node = new ChannelMergerNode(context, { numberOfInputs: 6 });
 

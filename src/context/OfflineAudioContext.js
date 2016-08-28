@@ -1,5 +1,6 @@
 "use strict";
 
+const nmap = require("nmap");
 const util = require("../util");
 const audioDataUtil = require("../util/audioDataUtil");
 const AudioContext = require("../api/AudioContext");
@@ -31,6 +32,13 @@ class OfflineAudioContext extends AudioContext {
     util.defineProp(this, "_renderingIterations", 128);
     util.defineProp(this, "_audioData", null);
     util.defineProp(this, "_writeIndex", 0);
+  }
+
+  /**
+   * @return {number}
+   */
+  get length() {
+    return this._length;
   }
 
   /**
@@ -131,7 +139,7 @@ class OfflineAudioContext extends AudioContext {
 function createRenderingAudioData(numberOfChannels, length, sampleRate, blockSize) {
   length = Math.ceil(length / blockSize) * blockSize;
 
-  const channelData = Array.from({ length: numberOfChannels }, () => new Float32Array(length));
+  const channelData = nmap(numberOfChannels, () => new Float32Array(length));
 
   return { numberOfChannels, length, sampleRate, channelData };
 }

@@ -6,11 +6,16 @@ const assert = require("assert");
 const AudioContext = require("../../src/impl/AudioContext");
 const PeriodicWave = require("../../src/impl/PeriodicWave");
 
-const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
 const real = new Float32Array([ 0, 0 ]);
 const imag = new Float32Array([ 0, 1 ]);
 
 describe("impl/PeriodicWave", () => {
+  let context;
+
+  beforeEach(() => {
+    context = new AudioContext({ sampleRate: 8000, blockSize: 32 });
+  });
+
   it("constructor", () => {
     const node = new PeriodicWave(context, { real, imag });
 

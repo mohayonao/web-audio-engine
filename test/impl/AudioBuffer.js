@@ -8,10 +8,15 @@ const AudioContext = require("../../src/impl/AudioContext");
 const AudioBuffer = require("../../src/impl/AudioBuffer");
 const AudioData = require("../../src/impl/core/AudioData");
 
-const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
 const numberOfChannels = 2, length = 32, sampleRate = 8000;
 
 describe("impl/AudioBuffer", () => {
+  let context;
+
+  beforeEach(() => {
+    context = new AudioContext({ sampleRate: 8000, blockSize: 32 });
+  });
+
   it("constructor", () => {
     const node = new AudioBuffer(context, { numberOfChannels, length, sampleRate });
 

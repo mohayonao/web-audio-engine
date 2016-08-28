@@ -1,5 +1,6 @@
 "use strict";
 
+const nmap = require("nmap");
 const util = require("../util");
 const config = require("../config");
 const AudioContext = require("../api/AudioContext");
@@ -114,7 +115,7 @@ class StreamAudioContext extends AudioContext {
     const encoder = this._encoder;
     const impl = this._impl;
     const aheadTime = 0.1;
-    const channelData = Array.from({ length: this._numberOfChannels }, () => new Float32Array(this._blockSize));
+    const channelData = nmap(this._numberOfChannels, () => new Float32Array(this._blockSize));
 
     const renderingProcess = () => {
       if (this._isPlaying) {
