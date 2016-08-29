@@ -83,7 +83,9 @@ context.processTo("00:01:30.000");
 context.processTo("00:02:00.000");
 // context.currentTime -> 120.00072562358277
 
-context.encodeAudioData(context.exportAsAudioData()).then((arrayBuffer) => {
+const audioData = context.exportAsAudioData();
+
+context.encodeAudioData(audioData).then((arrayBuffer) => {
   fs.writeFile("output.wav", new Buffer(arrayBuffer));
 });
 ```
@@ -135,12 +137,12 @@ interface AudioData {
 ```
 
 ### decoder
-The default decoder of `web-audio-engine` supports "wav" format only. If you need to support other audio format, you are necessary to prepare a custom decoder yourself.
+The default decoder of `web-audio-engine` supports "wav" format only. If you need to support other audio format, you are necessary to prepare a decoder yourself.
 
-##### decoder.get(): function
+##### decoder.get(type: string): function
 Returns the function for decoding currently set.
 
-##### decoder.set(decodeFn: function)
+##### decoder.set(type: string, decodeFn: function)
 Sets the function for decoding.
 - `decodeFn: (audioData: ArrayBuffer, opts?: object) => Promise< AudioData >` The decoding to use.
 
@@ -148,19 +150,56 @@ Sets the function for decoding.
 Executes decoding.
 - `audioData: ArrayBuffer`
 
-### encoder
-The default encoder of `web-audio-engine` supports "wav" format only. If you need to support other audio format, you are necessary to prepare a custom encoder yourself.
+###### mp3 decoder example
 
-##### encoder.get(): function
+```js
+const wae = reuiqre("web-audio-engine");
+const mp3decoder = reuiqre("/path/to/mp3decoder");
+
+wae.decoder.set("mp3", mp3decoder);
+
+const fs = requrie("fs");
+const AudioContext = require("web-audio-engine").RenderingAudioContxt;
+const context = new AudioContext();
+const audioData = fs.readFileSync("amen.mp3");
+
+context.decodeAudioData(audioData).then((audioBuffer) => {
+  console.log(audioBuffer);
+});
+```
+
+### encoder
+The default encoder of `web-audio-engine` supports "wav" format only. If you need to support other audio format, you are necessary to prepare an encoder yourself.
+
+##### encoder.get(type: string): function
 Returns the function for encoding currently set.
 
-##### encoder.set(encodeFn: function)
+##### encoder.set(type: string, encodeFn: function)
 Sets the function for encoding.
 - `encodeFn: (audioData: AudioData, opts?: object) => Promise< ArrayBuffer >` The encoding to use.
 
 ##### encoder.encode(audioData: AudioData, opts?: object): Promise< ArrayBuffer >
 Executes encoding.
 - `audioData: AudioData`
+- `opts.type: string` audio format type - _default: "wav"_
+
+###### mp3 encoder example
+
+```js
+const wae = reuiqre("web-audio-engine");
+const mp3encoder = reuiqre("/path/to/mp3encoder");
+
+wae.encoder.set("mp3", mp3encoder);
+
+const fs = requrie("fs");
+const AudioContext = require("web-audio-engine").RenderingAudioContxt;
+const context = new AudioContext();
+const audioData = context.exportAsAudioData();
+
+context.encodeAudioData(audioData, { type: "mp3" }).then((arrayBuffer) => {
+  fs.writeFile("output.mp3", new Buffer(arrayBuffer));
+});
+```
 
 ## Implemented API
 - `AnalyserNode`
