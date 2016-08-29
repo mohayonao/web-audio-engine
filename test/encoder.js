@@ -8,49 +8,64 @@ const encoder = require("../src/encoder");
 const encoderUtil = require("../src/util/encoderUtil");
 
 describe("encoder", () => {
-  let defaultEncoder, encoderUtil$encode;
+  let defaultWavEncoder, encoderUtil$encode;
 
   before(() => {
-    defaultEncoder = encoder.get();
+    defaultWavEncoder = encoder.get("wav");
     encoderUtil$encode = encoderUtil.encode;
     encoderUtil.encode = sinon.spy(encoderUtil.encode);
   });
   afterEach(() => {
-    encoder.set(defaultEncoder);
+    encoder.set("wav", defaultWavEncoder);
     encoderUtil.encode.reset();
   });
   after(() => {
     encoderUtil.encode = encoderUtil$encode;
   });
 
-  describe("set/get", () => {
-    it("works", () => {
-      const encodeFn = sinon.spy();
+  it(".get(type: string): function", () => {
+    const encodeFn1 = encoder.get("wav");
+    const encodeFn2 = encoder.get("unknown");
 
-      encoder.set(encodeFn);
+    assert(typeof encodeFn1 === "function");
+    assert(typeof encodeFn2 !== "function");
+  });
 
-      assert(encoder.get() === encodeFn);
+
+  it(".set(type: string, fn: function)", () => {
+    const encodeFn1 = sinon.spy();
+
+    encoder.set("spy", encodeFn1);
+
+    assert(encoder.get("spy") === encodeFn1);
+  });
+
+  it(".encode(audioData: object, opts?: object): Promise<ArrayBuffer>", () => {
+    const channelData = [ new Float32Array(16), new Float32Array(16) ];
+    const audioData = { sampleRate: 44100, channelData: channelData };
+    const encodeFn = sinon.spy(() => {
+      return Promise.resolve(new Uint8Array(64).buffer);
+    });
+    const opts = {};
+
+    encoder.set("wav", encodeFn);
+
+    return encoder.encode(audioData, opts).then((arrayBuffer) => {
+      assert(encodeFn.callCount === 1);
+      assert(encodeFn.calledWith(audioData, opts));
+      assert(encoderUtil.encode.callCount === 1);
+      assert(encoderUtil.encode.calledWith(encodeFn, audioData, opts));
+      assert(arrayBuffer instanceof ArrayBuffer);
     });
   });
 
-  describe(".encode(audioData: object, opts?: object): Promise<ArrayBuffer>", () => {
-    it("works", () => {
-      const channelData = [ new Float32Array(16), new Float32Array(16) ];
-      const audioData = { sampleRate: 44100, channelData: channelData };
-      const encodeFn = sinon.spy(() => {
-        return Promise.resolve(new Uint8Array(64).buffer);
-      });
-      const opts = {};
+  it(".encode(audioData: object, opts?: object): Promise<ArrayBuffer> - failed", () => {
+    const channelData = [ new Float32Array(16), new Float32Array(16) ];
+    const audioData = { sampleRate: 44100, channelData: channelData };
+    const opts = { type: "mid" };
 
-      encoder.set(encodeFn);
-
-      return encoder.encode(audioData, opts).then((arrayBuffer) => {
-        assert(encodeFn.callCount === 1);
-        assert(encodeFn.calledWith(audioData, opts));
-        assert(encoderUtil.encode.callCount === 1);
-        assert(encoderUtil.encode.calledWith(encodeFn, audioData, opts));
-        assert(arrayBuffer instanceof ArrayBuffer);
-      });
+    return encoder.encode(audioData, opts).catch((err) => {
+      assert(err instanceof TypeError);
     });
   });
 });

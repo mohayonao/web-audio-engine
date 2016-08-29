@@ -7,6 +7,7 @@
     "url": "https://github.com/mohayonao/web-audio-engine/issues"
   },
   "dependencies": {
+    "audio-type": "^1.0.2",
     "fourier-transform": "^1.0.2",
     "nmap": "^0.9.0",
     "scijs-window-functions": "^2.0.2",

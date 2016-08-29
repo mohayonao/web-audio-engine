@@ -9,54 +9,70 @@ const decoderUtil = require("../src/util/decoderUtil");
 const AudioBuffer = require("../src/api/AudioBuffer");
 
 describe("decoder", () => {
-  let defaultDecoder, decoderUtil$decode;
+  let defaultWavDecoder, decoderUtil$decode;
 
   before(() => {
-    defaultDecoder = decoder.get();
+    defaultWavDecoder = decoder.get("wav");
     decoderUtil$decode = decoderUtil.decode;
     decoderUtil.decode = sinon.spy(decoderUtil.decode);
   });
   afterEach(() => {
-    decoder.set(defaultDecoder);
+    decoder.set("wav", defaultWavDecoder);
     decoderUtil.decode.reset();
   });
   after(() => {
     decoderUtil.decode = decoderUtil$decode;
   });
 
-  describe("set/get", () => {
-    it("works", () => {
-      const decodeFn = sinon.spy();
+  it(".get(type: string): function", () => {
+    const decodeFn1 = decoder.get("wav");
+    const decodeFn2 = decoder.get("unknown");
 
-      decoder.set(decodeFn);
+    assert(typeof decodeFn1 === "function");
+    assert(typeof decodeFn2 !== "function");
+  });
 
-      assert(decoder.get() === decodeFn);
+  it(".set(type: string, fn: function)", () => {
+    const decodeFn1 = sinon.spy();
+
+    decoder.set("spy", decodeFn1);
+
+    assert(decoder.get("spy") === decodeFn1);
+  });
+
+  it(".decode(audioData: ArrayBuffer, opts?:object): Promise<AudioBuffer>", () => {
+    const channelData = [ new Float32Array(16), new Float32Array(16) ];
+    const decodeFn = sinon.spy(() => {
+      return Promise.resolve({ sampleRate: 44100, channelData: channelData });
+    });
+    const audioData = new Uint32Array([
+      0x46464952, 0x0000002c, 0x45564157, 0x20746d66,
+      0x00000010, 0x00020001, 0x0000ac44, 0x0002b110,
+      0x00100004, 0x61746164, 0x00000008, 0x8000c000, 0x3fff7fff
+    ]).buffer;
+    const opts = {};
+
+    decoder.set("wav", decodeFn);
+
+    return decoder.decode(audioData, opts).then((audioBuffer) => {
+      assert(decodeFn.callCount === 1);
+      assert(decodeFn.calledWith(audioData, opts));
+      assert(decoderUtil.decode.callCount === 1);
+      assert(decoderUtil.decode.calledWith(decodeFn, audioData, opts));
+      assert(audioBuffer instanceof AudioBuffer);
+      assert(audioBuffer.numberOfChannels === 2);
+      assert(audioBuffer.length === 16);
+      assert(audioBuffer.sampleRate === 44100);
+      assert(audioBuffer.getChannelData(0) === channelData[0]);
+      assert(audioBuffer.getChannelData(1) === channelData[1]);
     });
   });
 
-  describe(".decode(audioData: ArrayBuffer, opts?:object): Promise<AudioBuffer>", () => {
-    it("works", () => {
-      const channelData = [ new Float32Array(16), new Float32Array(16) ];
-      const decodeFn = sinon.spy(() => {
-        return Promise.resolve({ sampleRate: 44100, channelData: channelData });
-      });
-      const audioData = new Uint8Array(64).buffer;
-      const opts = {};
+  it(".decode(audioData: ArrayBuffer, opts?:object): Promise<AudioBuffer> - not supported", () => {
+    const audioData = new Uint8Array(16).buffer;
 
-      decoder.set(decodeFn);
-
-      return decoder.decode(audioData, opts).then((audioBuffer) => {
-        assert(decodeFn.callCount === 1);
-        assert(decodeFn.calledWith(audioData, opts));
-        assert(decoderUtil.decode.callCount === 1);
-        assert(decoderUtil.decode.calledWith(decodeFn, audioData, opts));
-        assert(audioBuffer instanceof AudioBuffer);
-        assert(audioBuffer.numberOfChannels === 2);
-        assert(audioBuffer.length === 16);
-        assert(audioBuffer.sampleRate === 44100);
-        assert(audioBuffer.getChannelData(0) === channelData[0]);
-        assert(audioBuffer.getChannelData(1) === channelData[1]);
-      });
+    return decoder.decode(audioData).catch((err) => {
+      assert(err instanceof TypeError);
     });
   });
 });
