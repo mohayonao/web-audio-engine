@@ -129,6 +129,9 @@ describe("impl/AudioBufferSourceNode", () => {
       node.setLoop(true);
       node.connect(context.getDestination());
 
+      // 0....1....2....3....4....5....
+      // |
+      // currentTime
       assert(node.getStartTime() === undefined);
       assert(node.getPlaybackState() === "unscheduled");
 
@@ -140,6 +143,8 @@ describe("impl/AudioBufferSourceNode", () => {
       // currentTime
       node.start(1);
       assert(node.getStartTime() === 1);
+      assert(node.getStartOffset() === 0);
+      assert(node.getStartDuration() === undefined);
       assert(node.getPlaybackState() === "scheduled");
 
       //      start
@@ -163,6 +168,69 @@ describe("impl/AudioBufferSourceNode", () => {
       assert(node.getPlaybackState() === "playing");
     });
 
+    it(".start(when, offset, duration)", () => {
+      const node = new AudioBufferSourceNode(context);
+      const buffer = new AudioBuffer(context, { numberOfChannels: 2, length: 8000, sampleRate: 8000 });
+      const onended = sinon.spy();
+
+      node.setBuffer(buffer);
+      node.setLoop(true);
+      node.connect(context.getDestination());
+      node.addEventListener("ended", onended);
+
+      // 0....1....2....3....4....5....
+      // |
+      // currentTime
+      assert(node.getStopTime() === undefined);
+      assert(node.getPlaybackState() === "unscheduled");
+
+      //           start     stop
+      //           |--->|    |
+      // 0....1....2....3....4....5....
+      //      |    ==================..  buffer
+      //      |
+      //      currentTime
+      node.start(2, 0.5, 1);
+      node.stop(4);
+      processTo(context, 1);
+      assert(node.getStartTime() === 2);
+      assert(node.getStartOffset() === 0.5);
+      assert(node.getStartDuration() === 1);
+      assert(node.getStopTime() === 4);
+      assert(node.getPlaybackState() === "scheduled");
+
+      //           start     stop
+      //           |--->|    |
+      // 0....1....2....3....4....5....
+      //           |=================..  buffer
+      //           |
+      //           currentTime
+      node.stop(5);
+      processTo(context, 2);
+      assert(node.getStopTime() === 4);
+      assert(node.getPlaybackState() === "playing");
+
+      //           start     stop
+      //           |--->|    |
+      // 0....1....2....3....4....5....
+      //           =====|============..  buffer
+      //                |
+      //                currentTime
+      processTo(context, 3);
+      assert(node.getPlaybackState() === "playing");
+      assert(onended.callCount === 0);
+
+      //           start     stop
+      //           |--->|    |
+      // 0....1....2....3....4....5....
+      //           ==========|=======..  buffer
+      //                     |
+      //                     currentTime
+      processTo(context, 4);
+      assert(node.getPlaybackState() === "finished");
+      assert(onended.callCount === 1);
+    });
+
     it(".start(when) without buffer", () => {
       const node = new AudioBufferSourceNode(context);
       const onended = sinon.spy();
@@ -170,21 +238,26 @@ describe("impl/AudioBufferSourceNode", () => {
       node.connect(context.getDestination());
       node.addEventListener("ended", onended);
 
+      // 0....1....2....3....4....5....
+      // |
+      // currentTime
       assert(node.getStartTime() === undefined);
       assert(node.getPlaybackState() === "unscheduled");
 
-      //      start
-      //      |
+      //      start     stop
+      //      |         |
       // 0....1....2....3....4....5....
       // |
       // currentTime
       node.start(1);
+      node.stop(3);
       assert(node.getStartTime() === 1);
+      assert(node.getStopTime() === 3);
       assert(node.getPlaybackState() === "scheduled");
       assert(onended.callCount === 0);
 
-      //      start
-      //      |
+      //      start     stop
+      //      |         |
       // 0....1....2....3....4....5....
       //      |
       //      currentTime
@@ -192,12 +265,150 @@ describe("impl/AudioBufferSourceNode", () => {
       assert(node.getPlaybackState() === "playing");
       assert(onended.callCount === 0);
 
-      //      start
-      //      |
+      //      start     stop
+      //      |         |
       // 0....1....2....3....4....5....
       //           |
       //           currentTime
       processTo(context, 2);
+      assert(node.getPlaybackState() === "finished");
+      assert(onended.callCount === 1);
+
+      //      start     stop
+      //      |         |
+      // 0....1....2....3....4....5....
+      //                |
+      //                currentTime
+      processTo(context, 3);
+      assert(node.getPlaybackState() === "finished");
+      assert(onended.callCount === 1);
+    });
+
+    it(".start(when) auto stop by buffer duration", () => {
+      const node = new AudioBufferSourceNode(context);
+      const buffer = new AudioBuffer(context, { numberOfChannels: 2, length: 8000, sampleRate: 8000 });
+      const onended = sinon.spy();
+
+      node.setBuffer(buffer);
+      node.connect(context.getDestination());
+      node.addEventListener("ended", onended);
+
+      // 0....1....2....3....4....5....
+      // |
+      // currentTime
+      assert(node.getStopTime() === undefined);
+      assert(node.getPlaybackState() === "unscheduled");
+
+      // 0....1....2....3....4....5....
+      // |
+      // currentTime
+      node.stop(0);
+      assert(node.getStopTime() === undefined);
+      assert(node.getPlaybackState() === "unscheduled");
+
+      //           start     stop
+      //           |         |
+      // 0....1....2....3....4....5....
+      //      |    =====                 buffer
+      //      |
+      //      currentTime
+      node.start(2);
+      node.stop(4);
+      processTo(context, 1);
+      assert(node.getStartTime() === 2);
+      assert(node.getStopTime() === 4);
+      assert(node.getPlaybackState() === "scheduled");
+
+      //           start     stop
+      //           |         |
+      // 0....1....2....3....4....5....
+      //           |====                 buffer
+      //           |
+      //           currentTime
+      node.stop(5);
+      processTo(context, 2);
+      assert(node.getStopTime() === 4);
+      assert(node.getPlaybackState() === "playing");
+
+      //           start     stop
+      //           |         |
+      // 0....1....2....3....4....5....
+      //           =====|                buffer
+      //                |
+      //                currentTime
+      processTo(context, 3);
+      assert(node.getPlaybackState() === "finished");
+      assert(onended.callCount === 1);
+
+      //           start     stop
+      //           |         |
+      // 0....1....2....3....4....5....
+      //           =====     |           buffer
+      //                     |
+      //                     currentTime
+      processTo(context, 4);
+      assert(node.getPlaybackState() === "finished");
+      assert(onended.callCount === 1);
+    });
+
+    it(".start(when, offset, duration) auto stop by buffer duration", () => {
+      const node = new AudioBufferSourceNode(context);
+      const buffer = new AudioBuffer(context, { numberOfChannels: 2, length: 8000, sampleRate: 8000 });
+      const onended = sinon.spy();
+
+      node.setBuffer(buffer);
+      node.connect(context.getDestination());
+      node.addEventListener("ended", onended);
+
+      // 0....1....2....3....4....5....
+      // |
+      // currentTime
+      assert(node.getStopTime() === undefined);
+      assert(node.getPlaybackState() === "unscheduled");
+
+      //           start     stop
+      //           |--->|    |
+      // 0....1....2....3....4....5....
+      //      |    ==================..  buffer
+      //      |
+      //      currentTime
+      node.start(2, 0.5, 1);
+      node.stop(4);
+      processTo(context, 1);
+      assert(node.getStartTime() === 2);
+      assert(node.getStartOffset() === 0.5);
+      assert(node.getStartDuration() === 1);
+      assert(node.getStopTime() === 4);
+      assert(node.getPlaybackState() === "scheduled");
+
+      //           start     stop
+      //           |--->|    |
+      // 0....1....2....3....4....5....
+      //           |=================..  buffer
+      //           |
+      //           currentTime
+      node.stop(5);
+      processTo(context, 2);
+      assert(node.getStopTime() === 4);
+      assert(node.getPlaybackState() === "playing");
+
+      //           start     stop
+      //           |--->|    |
+      // 0....1....2....3....4....5....
+      //           =====|============..  buffer
+      //                |
+      //                currentTime
+      processTo(context, 3);
+      assert(node.getPlaybackState() === "finished");
+      assert(onended.callCount === 1);
+
+      //           start     stop
+      //           |--->|    |
+      // 0....1....2....3....4....5....
+      //           ==========|=======..  buffer
+      //                     |
+      //                     currentTime
+      processTo(context, 4);
       assert(node.getPlaybackState() === "finished");
       assert(onended.callCount === 1);
     });
@@ -212,6 +423,9 @@ describe("impl/AudioBufferSourceNode", () => {
       node.connect(context.getDestination());
       node.addEventListener("ended", onended);
 
+      // 0....1....2....3....4....5....
+      // |
+      // currentTime
       assert(node.getStopTime() === undefined);
       assert(node.getPlaybackState() === "unscheduled");
 
@@ -231,6 +445,7 @@ describe("impl/AudioBufferSourceNode", () => {
       node.start(2);
       node.stop(4);
       processTo(context, 1);
+      assert(node.getStartTime() === 2);
       assert(node.getStopTime() === 4);
       assert(node.getPlaybackState() === "scheduled");
 
@@ -259,69 +474,6 @@ describe("impl/AudioBufferSourceNode", () => {
       //           |         |
       // 0....1....2....3....4....5....
       //      ===============|=======.. buffer
-      //                     |
-      //                     currentTime
-      processTo(context, 4);
-      assert(node.getPlaybackState() === "finished");
-      assert(onended.callCount === 1);
-    });
-
-    it(".stop(when, offset, duration)", () => {
-      const node = new AudioBufferSourceNode(context);
-      const buffer = new AudioBuffer(context, { numberOfChannels: 2, length: 8000, sampleRate: 8000 });
-      const onended = sinon.spy();
-
-      node.setBuffer(buffer);
-      node.connect(context.getDestination());
-      node.addEventListener("ended", onended);
-
-      assert(node.getStopTime() === undefined);
-      assert(node.getPlaybackState() === "unscheduled");
-
-      // 0....1....2....3....4....5....
-      // |
-      // currentTime
-      node.stop(0);
-      assert(node.getStopTime() === undefined);
-      assert(node.getPlaybackState() === "unscheduled");
-
-      //           start     stop
-      //           |         |
-      // 0....1....2....3....4....5....
-      //      |    =====                 buffer
-      //      |
-      //      currentTime
-      node.start(2);
-      node.stop(4);
-      processTo(context, 1);
-      assert(node.getStopTime() === 4);
-      assert(node.getPlaybackState() === "scheduled");
-
-      //      start          stop
-      //      |              |
-      // 0....1....2....3....4....5....
-      //           |====                 buffer
-      //           |
-      //           currentTime
-      node.stop(5);
-      processTo(context, 2);
-      assert(node.getStopTime() === 4);
-      assert(node.getPlaybackState() === "playing");
-
-      //      start          stop
-      //      |              |
-      // 0....1....2....3....4....5....
-      //           =====|                buffer
-      //                |
-      //                currentTime
-      processTo(context, 3);
-      assert(node.getPlaybackState() === "finished");
-      assert(onended.callCount === 1);
-
-      //      start          stop
-      //      |              |
-      // 0....1....2....3....4....5....
-      //           =====     |           buffer
       //                     |
       //                     currentTime
       processTo(context, 4);

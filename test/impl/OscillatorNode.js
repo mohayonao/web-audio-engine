@@ -112,6 +112,9 @@ describe("impl/OscillatorNode", () => {
 
       node.connect(context.getDestination());
 
+      // 0....1....2....3....4....5....
+      // |
+      // currentTime
       assert(node.getStartTime() === undefined);
       assert(node.getPlaybackState() === "unscheduled");
 
@@ -151,6 +154,9 @@ describe("impl/OscillatorNode", () => {
       node.connect(context.getDestination());
       node.addEventListener("ended", onended);
 
+      // 0....1....2....3....4....5....
+      // |
+      // currentTime
       assert(node.getStopTime() === undefined);
       assert(node.getPlaybackState() === "unscheduled");
 
@@ -169,6 +175,7 @@ describe("impl/OscillatorNode", () => {
       node.start(2);
       node.stop(4);
       processTo(context, 1);
+      assert(node.getStartTime() === 2);
       assert(node.getStopTime() === 4);
       assert(node.getPlaybackState() === "scheduled");
 
