@@ -1061,7 +1061,7 @@ var AnalyserNode = function (_AudioNode) {
   function AnalyserNode(context, opts) {
     _classCallCheck(this, AnalyserNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AnalyserNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (AnalyserNode.__proto__ || Object.getPrototypeOf(AnalyserNode)).call(this, context));
 
     _this._impl = new impl.AnalyserNode(context._impl, opts);
     return _this;
@@ -1211,7 +1211,7 @@ var AudioBufferSourceNode = function (_AudioNode) {
   function AudioBufferSourceNode(context, opts) {
     _classCallCheck(this, AudioBufferSourceNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AudioBufferSourceNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (AudioBufferSourceNode.__proto__ || Object.getPrototypeOf(AudioBufferSourceNode)).call(this, context));
 
     _this._impl = new impl.AudioBufferSourceNode(context._impl, opts);
     _this._impl.$playbackRate = new AudioParam(context, _this._impl.getPlaybackRate());
@@ -1332,7 +1332,7 @@ var AudioContext = function (_EventTarget) {
   function AudioContext(opts) {
     _classCallCheck(this, AudioContext);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AudioContext).call(this));
+    var _this = _possibleConstructorReturn(this, (AudioContext.__proto__ || Object.getPrototypeOf(AudioContext)).call(this));
 
     util.defineProp(_this, "_impl", new impl.AudioContext(opts));
 
@@ -1548,7 +1548,7 @@ var AudioDestinationNode = function (_AudioNode) {
   function AudioDestinationNode(context, impl) {
     _classCallCheck(this, AudioDestinationNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AudioDestinationNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (AudioDestinationNode.__proto__ || Object.getPrototypeOf(AudioDestinationNode)).call(this, context));
 
     _this._impl = impl;
     return _this;
@@ -1619,7 +1619,7 @@ var AudioNode = function (_EventTarget) {
   function AudioNode(context) {
     _classCallCheck(this, AudioNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AudioNode).call(this));
+    var _this = _possibleConstructorReturn(this, (AudioNode.__proto__ || Object.getPrototypeOf(AudioNode)).call(this));
 
     util.defineProp(_this, "_context", context);
     util.defineProp(_this, "_impl", null);
@@ -1780,7 +1780,7 @@ var AudioWorkerNode = function (_AudioNode) {
   function AudioWorkerNode(context, opts) {
     _classCallCheck(this, AudioWorkerNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AudioWorkerNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (AudioWorkerNode.__proto__ || Object.getPrototypeOf(AudioWorkerNode)).call(this, context));
 
     _this._impl = new impl.AudioWorkerNode(context._impl, opts);
     _this._impl.$onmessage = null;
@@ -1829,7 +1829,7 @@ var BiquadFilterNode = function (_AudioNode) {
   function BiquadFilterNode(context, opts) {
     _classCallCheck(this, BiquadFilterNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(BiquadFilterNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (BiquadFilterNode.__proto__ || Object.getPrototypeOf(BiquadFilterNode)).call(this, context));
 
     _this._impl = new impl.BiquadFilterNode(context._impl, opts);
     _this._impl.$frequency = new AudioParam(context, _this._impl.getFrequency());
@@ -1897,7 +1897,7 @@ var ChannelMergerNode = function (_AudioNode) {
   function ChannelMergerNode(context, opts) {
     _classCallCheck(this, ChannelMergerNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ChannelMergerNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (ChannelMergerNode.__proto__ || Object.getPrototypeOf(ChannelMergerNode)).call(this, context));
 
     _this._impl = new impl.ChannelMergerNode(context._impl, opts);
     return _this;
@@ -1926,7 +1926,7 @@ var ChannelSplitterNode = function (_AudioNode) {
   function ChannelSplitterNode(context, opts) {
     _classCallCheck(this, ChannelSplitterNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ChannelSplitterNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (ChannelSplitterNode.__proto__ || Object.getPrototypeOf(ChannelSplitterNode)).call(this, context));
 
     _this._impl = new impl.ChannelSplitterNode(context._impl, opts);
     return _this;
@@ -1957,7 +1957,7 @@ var ConvolverNode = function (_AudioNode) {
   function ConvolverNode(context, opts) {
     _classCallCheck(this, ConvolverNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ConvolverNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (ConvolverNode.__proto__ || Object.getPrototypeOf(ConvolverNode)).call(this, context));
 
     _this._impl = new impl.ConvolverNode(context._impl, opts);
     _this._impl.$buffer = null;
@@ -2009,7 +2009,7 @@ var DelayNode = function (_AudioNode) {
   function DelayNode(context, opts) {
     _classCallCheck(this, DelayNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(DelayNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (DelayNode.__proto__ || Object.getPrototypeOf(DelayNode)).call(this, context));
 
     _this._impl = new impl.DelayNode(context._impl, opts);
     _this._impl.$delayTime = new AudioParam(context, _this._impl.getDelayTime());
@@ -2049,7 +2049,7 @@ var DynamicsCompressorNode = function (_AudioNode) {
   function DynamicsCompressorNode(context, opts) {
     _classCallCheck(this, DynamicsCompressorNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(DynamicsCompressorNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (DynamicsCompressorNode.__proto__ || Object.getPrototypeOf(DynamicsCompressorNode)).call(this, context));
 
     _this._impl = new impl.DynamicsCompressorNode(context._impl, opts);
     _this._impl.$threshold = new AudioParam(context, _this._impl.getThreshold());
@@ -2147,7 +2147,7 @@ var GainNode = function (_AudioNode) {
   function GainNode(context, opts) {
     _classCallCheck(this, GainNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(GainNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (GainNode.__proto__ || Object.getPrototypeOf(GainNode)).call(this, context));
 
     _this._impl = new impl.GainNode(context._impl, opts);
     _this._impl.$gain = new AudioParam(context, _this._impl.getGain());
@@ -2186,7 +2186,7 @@ var IIRFilterNode = function (_AudioNode) {
   function IIRFilterNode(context, opts) {
     _classCallCheck(this, IIRFilterNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(IIRFilterNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (IIRFilterNode.__proto__ || Object.getPrototypeOf(IIRFilterNode)).call(this, context));
 
     _this._impl = new impl.IIRFilterNode(context._impl, opts);
     return _this;
@@ -2225,7 +2225,7 @@ var OscillatorNode = function (_AudioNode) {
   function OscillatorNode(context) {
     _classCallCheck(this, OscillatorNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(OscillatorNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (OscillatorNode.__proto__ || Object.getPrototypeOf(OscillatorNode)).call(this, context));
 
     _this._impl = new impl.OscillatorNode(context._impl);
     _this._impl.$frequency = new AudioParam(context, _this._impl.getFrequency());
@@ -2303,7 +2303,7 @@ var PannerNode = function (_AudioNode) {
   function PannerNode(context) {
     _classCallCheck(this, PannerNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(PannerNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (PannerNode.__proto__ || Object.getPrototypeOf(PannerNode)).call(this, context));
 
     _this._impl = new impl.PannerNode(context._impl);
     return _this;
@@ -2432,7 +2432,7 @@ var ScriptProcessorNode = function (_AudioNode) {
   function ScriptProcessorNode(context, opts) {
     _classCallCheck(this, ScriptProcessorNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ScriptProcessorNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (ScriptProcessorNode.__proto__ || Object.getPrototypeOf(ScriptProcessorNode)).call(this, context));
 
     _this._impl = new impl.ScriptProcessorNode(context._impl, opts);
     _this._impl.$onaudioprocess = null;
@@ -2567,7 +2567,7 @@ var SpatialPannerNode = function (_AudioNode) {
   function SpatialPannerNode(context) {
     _classCallCheck(this, SpatialPannerNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(SpatialPannerNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (SpatialPannerNode.__proto__ || Object.getPrototypeOf(SpatialPannerNode)).call(this, context));
 
     _this._impl = new impl.SpatialPannerNode(context._impl);
     _this._impl.$positionX = new AudioParam(context, _this._impl.getPositionX());
@@ -2701,7 +2701,7 @@ var StereoPannerNode = function (_AudioNode) {
   function StereoPannerNode(context) {
     _classCallCheck(this, StereoPannerNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(StereoPannerNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (StereoPannerNode.__proto__ || Object.getPrototypeOf(StereoPannerNode)).call(this, context));
 
     _this._impl = new impl.StereoPannerNode(context._impl);
     _this._impl.$pan = new AudioParam(context, _this._impl.getPan());
@@ -2740,7 +2740,7 @@ var WaveShaperNode = function (_AudioNode) {
   function WaveShaperNode(context) {
     _classCallCheck(this, WaveShaperNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(WaveShaperNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (WaveShaperNode.__proto__ || Object.getPrototypeOf(WaveShaperNode)).call(this, context));
 
     _this._impl = new impl.WaveShaperNode(context._impl);
     return _this;
@@ -2837,6 +2837,7 @@ var OfflineAudioContext = function (_AudioContext) {
    * @param {number} length
    * @param {number} sampleRate
    */
+
   function OfflineAudioContext(numberOfChannels, length, sampleRate) {
     _classCallCheck(this, OfflineAudioContext);
 
@@ -2844,7 +2845,7 @@ var OfflineAudioContext = function (_AudioContext) {
     length = Math.max(0, length | 0);
     sampleRate = util.toValidSampleRate(sampleRate);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(OfflineAudioContext).call(this, { sampleRate: sampleRate, numberOfChannels: numberOfChannels }));
+    var _this = _possibleConstructorReturn(this, (OfflineAudioContext.__proto__ || Object.getPrototypeOf(OfflineAudioContext)).call(this, { sampleRate: sampleRate, numberOfChannels: numberOfChannels }));
 
     _this._impl.$oncomplete = null;
 
@@ -3092,6 +3093,7 @@ var RenderingAudioContext = function (_AudioContext) {
    * @param {number}  opts.bitDepth
    * @param {boolean} opts.floatingPoint
    */
+
   function RenderingAudioContext(opts) {
     _classCallCheck(this, RenderingAudioContext);
 
@@ -3109,7 +3111,7 @@ var RenderingAudioContext = function (_AudioContext) {
     bitDepth = util.toValidBitDepth(bitDepth);
     floatingPoint = !!floatingPoint;
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(RenderingAudioContext).call(this, { sampleRate: sampleRate, blockSize: blockSize, numberOfChannels: numberOfChannels }));
+    var _this = _possibleConstructorReturn(this, (RenderingAudioContext.__proto__ || Object.getPrototypeOf(RenderingAudioContext)).call(this, { sampleRate: sampleRate, blockSize: blockSize, numberOfChannels: numberOfChannels }));
 
     util.defineProp(_this, "_format", { sampleRate: sampleRate, channels: numberOfChannels, bitDepth: bitDepth, float: floatingPoint });
     util.defineProp(_this, "_rendered", []);
@@ -3264,6 +3266,7 @@ var StreamAudioContext = function (_AudioContext) {
    * @param {number}  opts.bitDepth
    * @param {boolean} opts.floatingPoint
    */
+
   function StreamAudioContext(opts) {
     _classCallCheck(this, StreamAudioContext);
 
@@ -3281,7 +3284,7 @@ var StreamAudioContext = function (_AudioContext) {
     bitDepth = util.toValidBitDepth(bitDepth);
     floatingPoint = !!floatingPoint;
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(StreamAudioContext).call(this, { sampleRate: sampleRate, blockSize: blockSize, numberOfChannels: numberOfChannels }));
+    var _this = _possibleConstructorReturn(this, (StreamAudioContext.__proto__ || Object.getPrototypeOf(StreamAudioContext)).call(this, { sampleRate: sampleRate, blockSize: blockSize, numberOfChannels: numberOfChannels }));
 
     var format = { sampleRate: sampleRate, channels: numberOfChannels, bitDepth: bitDepth, float: floatingPoint };
     var encoder = PCMEncoder.create(blockSize, format);
@@ -3324,7 +3327,7 @@ var StreamAudioContext = function (_AudioContext) {
       if (this.state === "suspended") {
         this._resume();
       }
-      return _get(Object.getPrototypeOf(StreamAudioContext.prototype), "resume", this).call(this);
+      return _get(StreamAudioContext.prototype.__proto__ || Object.getPrototypeOf(StreamAudioContext.prototype), "resume", this).call(this);
     }
 
     /**
@@ -3338,7 +3341,7 @@ var StreamAudioContext = function (_AudioContext) {
       if (this.state === "running") {
         this._suspend();
       }
-      return _get(Object.getPrototypeOf(StreamAudioContext.prototype), "suspend", this).call(this);
+      return _get(StreamAudioContext.prototype.__proto__ || Object.getPrototypeOf(StreamAudioContext.prototype), "suspend", this).call(this);
     }
 
     /**
@@ -3352,7 +3355,7 @@ var StreamAudioContext = function (_AudioContext) {
       if (this.state !== "closed") {
         this._close();
       }
-      return _get(Object.getPrototypeOf(StreamAudioContext.prototype), "close", this).call(this);
+      return _get(StreamAudioContext.prototype.__proto__ || Object.getPrototypeOf(StreamAudioContext.prototype), "close", this).call(this);
     }
   }, {
     key: "_resume",
@@ -3465,6 +3468,7 @@ var WebAudioContext = function (_AudioContext) {
    * @param {number}       opts.numberOfChannels
    * @param {number}       opts.bufferSize
    */
+
   function WebAudioContext(opts) {
     _classCallCheck(this, WebAudioContext);
 
@@ -3482,7 +3486,7 @@ var WebAudioContext = function (_AudioContext) {
     bufferSize = util.toPowerOfTwo(bufferSize);
     bufferSize = Math.max(256, Math.min(bufferSize, 16384));
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(WebAudioContext).call(this, { sampleRate: sampleRate, blockSize: blockSize, numberOfChannels: numberOfChannels }));
+    var _this = _possibleConstructorReturn(this, (WebAudioContext.__proto__ || Object.getPrototypeOf(WebAudioContext)).call(this, { sampleRate: sampleRate, blockSize: blockSize, numberOfChannels: numberOfChannels }));
 
     var processor = context.createScriptProcessor(bufferSize, 0, numberOfChannels);
     var dspProcess = DSPAlgorithm[numberOfChannels] || DSPAlgorithm[0];
@@ -3506,7 +3510,7 @@ var WebAudioContext = function (_AudioContext) {
       if (this._processor) {
         this._processor.connect(this._destination);
       }
-      return _get(Object.getPrototypeOf(WebAudioContext.prototype), "resume", this).call(this);
+      return _get(WebAudioContext.prototype.__proto__ || Object.getPrototypeOf(WebAudioContext.prototype), "resume", this).call(this);
     }
 
     /**
@@ -3519,7 +3523,7 @@ var WebAudioContext = function (_AudioContext) {
       if (this._processor) {
         this._processor.disconnect();
       }
-      return _get(Object.getPrototypeOf(WebAudioContext.prototype), "suspend", this).call(this);
+      return _get(WebAudioContext.prototype.__proto__ || Object.getPrototypeOf(WebAudioContext.prototype), "suspend", this).call(this);
     }
 
     /**
@@ -3533,7 +3537,7 @@ var WebAudioContext = function (_AudioContext) {
         this._processor.disconnect();
         this._processor = null;
       }
-      return _get(Object.getPrototypeOf(WebAudioContext.prototype), "close", this).call(this);
+      return _get(WebAudioContext.prototype.__proto__ || Object.getPrototypeOf(WebAudioContext.prototype), "close", this).call(this);
     }
   }, {
     key: "originalContext",
@@ -3724,10 +3728,11 @@ var AnalyserNode = function (_AudioNode) {
   /**
    * @param {AudioContext} context
    */
+
   function AnalyserNode(context) {
     _classCallCheck(this, AnalyserNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AnalyserNode).call(this, context, {
+    var _this = _possibleConstructorReturn(this, (AnalyserNode.__proto__ || Object.getPrototypeOf(AnalyserNode)).call(this, context, {
       inputs: [1],
       outputs: [1],
       channelCount: 1,
@@ -3962,6 +3967,7 @@ var AudioBuffer = function () {
    * @param {number}       opts.length
    * @param {number}       opts.sampleRate
    */
+
   function AudioBuffer(context, opts) {
     _classCallCheck(this, AudioBuffer);
 
@@ -4091,10 +4097,11 @@ var AudioBufferSourceNode = function (_AudioScheduledSource) {
   /**
    * @param {AudioContext} context
    */
+
   function AudioBufferSourceNode(context) {
     _classCallCheck(this, AudioBufferSourceNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AudioBufferSourceNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (AudioBufferSourceNode.__proto__ || Object.getPrototypeOf(AudioBufferSourceNode)).call(this, context));
 
     _this._buffer = null;
     _this._audioData = null;
@@ -4104,6 +4111,7 @@ var AudioBufferSourceNode = function (_AudioScheduledSource) {
     _this._loopStart = 0;
     _this._loopEnd = 0;
     _this._offset = 0;
+    _this._duration = Infinity;
     _this._done = false;
     return _this;
   }
@@ -4137,6 +4145,28 @@ var AudioBufferSourceNode = function (_AudioScheduledSource) {
     }
 
     /**
+     * @return {number}
+     */
+
+  }, {
+    key: "getStartOffset",
+    value: function getStartOffset() {
+      return this._offset;
+    }
+
+    /**
+     * @return {number}
+     */
+
+  }, {
+    key: "getStartDuration",
+    value: function getStartDuration() {
+      if (this._duration !== Infinity) {
+        return this._duration;
+      }
+    }
+
+    /**
      * @return {string}
      */
 
@@ -4146,7 +4176,7 @@ var AudioBufferSourceNode = function (_AudioScheduledSource) {
       if (this._done) {
         return "finished";
       }
-      return _get(Object.getPrototypeOf(AudioBufferSourceNode.prototype), "getPlaybackState", this).call(this);
+      return _get(AudioBufferSourceNode.prototype.__proto__ || Object.getPrototypeOf(AudioBufferSourceNode.prototype), "getPlaybackState", this).call(this);
     }
 
     /**
@@ -4247,10 +4277,11 @@ var AudioBufferSourceNode = function (_AudioScheduledSource) {
         return;
       }
 
+      offset = util.defaults(offset, 0);
       duration = util.defaults(duration, Infinity);
 
       when = Math.max(this.context.currentTime, util.toNumber(when));
-      offset = Math.max(0, offset | 0);
+      offset = Math.max(0, offset);
       duration = Math.max(0, util.toNumber(duration));
 
       this._startTime = when;
@@ -4258,6 +4289,7 @@ var AudioBufferSourceNode = function (_AudioScheduledSource) {
       this._offset = offset;
 
       if (duration !== Infinity) {
+        this._duration = duration;
         this._stopFrame = Math.round((this._startTime + duration) * this.sampleRate);
       }
 
@@ -4309,12 +4341,13 @@ var AudioContext = function (_EventTarget) {
    * @param {number} opts.blockSize
    * @param {number} opts.numberOfChannels
    */
+
   function AudioContext(opts) {
     _classCallCheck(this, AudioContext);
 
     opts = opts || /* istanbul ignore next */{};
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AudioContext).call(this));
+    var _this = _possibleConstructorReturn(this, (AudioContext.__proto__ || Object.getPrototypeOf(AudioContext)).call(this));
 
     var sampleRate = util.defaults(opts.sampleRate, config.sampleRate);
     var blockSize = util.defaults(opts.blockSize, config.blockSize);
@@ -4585,6 +4618,7 @@ var AudioDestinationNode = function (_AudioNode) {
    * @param {object}       opts
    * @param {number}       opts.numberOfChannels
    */
+
   function AudioDestinationNode(context, opts) {
     _classCallCheck(this, AudioDestinationNode);
 
@@ -4594,7 +4628,7 @@ var AudioDestinationNode = function (_AudioNode) {
 
     numberOfChannels = util.toValidNumberOfChannels(numberOfChannels);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AudioDestinationNode).call(this, context, {
+    var _this = _possibleConstructorReturn(this, (AudioDestinationNode.__proto__ || Object.getPrototypeOf(AudioDestinationNode)).call(this, context, {
       inputs: [numberOfChannels],
       outputs: [],
       channelCount: numberOfChannels,
@@ -4625,7 +4659,7 @@ var AudioDestinationNode = function (_AudioNode) {
     key: "setChannelCount",
     value: function setChannelCount(value) {
       value = util.clamp(value | 0, 1, this.getMaxChannelCount());
-      _get(Object.getPrototypeOf(AudioDestinationNode.prototype), "setChannelCount", this).call(this, value);
+      _get(AudioDestinationNode.prototype.__proto__ || Object.getPrototypeOf(AudioDestinationNode.prototype), "setChannelCount", this).call(this, value);
     }
 
     /**
@@ -4666,6 +4700,7 @@ var AudioListener = function () {
   /**
    * @param {AudioContext} context
    */
+
   function AudioListener(context) {
     _classCallCheck(this, AudioListener);
 
@@ -4743,6 +4778,7 @@ var AudioNode = function (_EventTarget) {
    * @param {number}       opts.channelCount
    * @param {string}       opts.channelCountMode
    */
+
   function AudioNode(context, opts) {
     _classCallCheck(this, AudioNode);
 
@@ -4753,7 +4789,7 @@ var AudioNode = function (_EventTarget) {
     var channelCount = util.defaults(opts.channelCount, 1);
     var channelCountMode = util.defaults(opts.channelCountMode, "max");
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AudioNode).call(this));
+    var _this = _possibleConstructorReturn(this, (AudioNode.__proto__ || Object.getPrototypeOf(AudioNode)).call(this));
 
     _this.context = context;
     _this.blockSize = context.blockSize;
@@ -5142,6 +5178,7 @@ var AudioParam = function () {
    * @param {string}       opts.rate - [ "audio", "control "]
    * @param {number}       opts.defaultValue
    */
+
   function AudioParam(context, opts) {
     _classCallCheck(this, AudioParam);
 
@@ -5700,10 +5737,11 @@ var AudioScheduledSourceNode = function (_AudioSourceNode) {
   /**
    * @param {AudioContext} context
    */
+
   function AudioScheduledSourceNode(context) {
     _classCallCheck(this, AudioScheduledSourceNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AudioScheduledSourceNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (AudioScheduledSourceNode.__proto__ || Object.getPrototypeOf(AudioScheduledSourceNode)).call(this, context));
 
     _this._startTime = Infinity;
     _this._stopTime = Infinity;
@@ -5825,10 +5863,11 @@ var AudioSourceNode = function (_AudioNode) {
   /**
    * @param {AudioContext} context
    */
+
   function AudioSourceNode(context) {
     _classCallCheck(this, AudioSourceNode);
 
-    return _possibleConstructorReturn(this, Object.getPrototypeOf(AudioSourceNode).call(this, context, {
+    return _possibleConstructorReturn(this, (AudioSourceNode.__proto__ || Object.getPrototypeOf(AudioSourceNode)).call(this, context, {
       inputs: [],
       outputs: [1]
     }));
@@ -5894,6 +5933,7 @@ var AudioWorkerNode = function (_AudioNode) {
    * @param {number}       opts.numberOfInputs
    * @param {number}       opts.numberOfOutputs
    */
+
   function AudioWorkerNode(context, opts) {
     _classCallCheck(this, AudioWorkerNode);
 
@@ -5906,7 +5946,7 @@ var AudioWorkerNode = function (_AudioNode) {
     var inputs = util.toArrayIfNeeded(numberOfInputs).map(util.toValidNumberOfChannels);
     var outputs = util.toArrayIfNeeded(numberOfOutputs).map(util.toValidNumberOfChannels);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(AudioWorkerNode).call(this, context, {
+    var _this = _possibleConstructorReturn(this, (AudioWorkerNode.__proto__ || Object.getPrototypeOf(AudioWorkerNode)).call(this, context, {
       inputs: inputs,
       outputs: outputs,
       channelCount: 0,
@@ -6039,10 +6079,11 @@ var BasePannerNode = function (_AudioNode) {
   /**
    * @param {AudioContext} context
    */
+
   function BasePannerNode(context) {
     _classCallCheck(this, BasePannerNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(BasePannerNode).call(this, context, {
+    var _this = _possibleConstructorReturn(this, (BasePannerNode.__proto__ || Object.getPrototypeOf(BasePannerNode)).call(this, context, {
       inputs: [1],
       outputs: [2],
       channelCount: 2,
@@ -6069,7 +6110,7 @@ var BasePannerNode = function (_AudioNode) {
     key: "setChannelCount",
     value: function setChannelCount(value) {
       value = util.clamp(value | 0, 1, 2);
-      _get(Object.getPrototypeOf(BasePannerNode.prototype), "setChannelCount", this).call(this, value);
+      _get(BasePannerNode.prototype.__proto__ || Object.getPrototypeOf(BasePannerNode.prototype), "setChannelCount", this).call(this, value);
     }
 
     /**
@@ -6081,7 +6122,7 @@ var BasePannerNode = function (_AudioNode) {
     value: function setChannelCountMode(value) {
       /* istanbul ignore else */
       if (value === "clamped-max" || value === "explicit") {
-        _get(Object.getPrototypeOf(BasePannerNode.prototype), "setChannelCountMode", this).call(this, value);
+        _get(BasePannerNode.prototype.__proto__ || Object.getPrototypeOf(BasePannerNode.prototype), "setChannelCountMode", this).call(this, value);
       }
     }
 
@@ -6277,10 +6318,11 @@ var BiquadFilterNode = function (_AudioNode) {
   /**
    * @param {AudioContext} context
    */
+
   function BiquadFilterNode(context) {
     _classCallCheck(this, BiquadFilterNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(BiquadFilterNode).call(this, context, {
+    var _this = _possibleConstructorReturn(this, (BiquadFilterNode.__proto__ || Object.getPrototypeOf(BiquadFilterNode)).call(this, context, {
       inputs: [1],
       outputs: [1],
       channelCount: 2,
@@ -6488,6 +6530,7 @@ var ChannelMergerNode = function (_AudioNode) {
    * @param {object}       opts
    * @param {number}       opts.numberOfInputs
    */
+
   function ChannelMergerNode(context, opts) {
     _classCallCheck(this, ChannelMergerNode);
 
@@ -6497,7 +6540,7 @@ var ChannelMergerNode = function (_AudioNode) {
 
     numberOfInputs = util.toValidNumberOfChannels(numberOfInputs);
 
-    return _possibleConstructorReturn(this, Object.getPrototypeOf(ChannelMergerNode).call(this, context, {
+    return _possibleConstructorReturn(this, (ChannelMergerNode.__proto__ || Object.getPrototypeOf(ChannelMergerNode)).call(this, context, {
       inputs: new Array(numberOfInputs).fill(1),
       outputs: [numberOfInputs],
       channelCount: 1,
@@ -6557,7 +6600,7 @@ var ChannelMergerNode = function (_AudioNode) {
           }
         }
 
-        _get(Object.getPrototypeOf(ChannelMergerNode.prototype), "disableOutputsIfNecessary", this).call(this);
+        _get(ChannelMergerNode.prototype.__proto__ || Object.getPrototypeOf(ChannelMergerNode.prototype), "disableOutputsIfNecessary", this).call(this);
       }
     }
   }]);
@@ -6590,6 +6633,7 @@ var ChannelSplitterNode = function (_AudioNode) {
    * @param {object}       opts
    * @param {number}       opts.numberOfOutputs
    */
+
   function ChannelSplitterNode(context, opts) {
     _classCallCheck(this, ChannelSplitterNode);
 
@@ -6599,7 +6643,7 @@ var ChannelSplitterNode = function (_AudioNode) {
 
     numberOfOutputs = util.toValidNumberOfChannels(numberOfOutputs);
 
-    return _possibleConstructorReturn(this, Object.getPrototypeOf(ChannelSplitterNode).call(this, context, {
+    return _possibleConstructorReturn(this, (ChannelSplitterNode.__proto__ || Object.getPrototypeOf(ChannelSplitterNode)).call(this, context, {
       inputs: [1],
       outputs: new Array(numberOfOutputs).fill(1),
       channelCount: 2,
@@ -6638,10 +6682,11 @@ var ConvolverNode = function (_AudioNode) {
   /**
    * @param {AudioContext} context
    */
+
   function ConvolverNode(context) {
     _classCallCheck(this, ConvolverNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ConvolverNode).call(this, context, {
+    var _this = _possibleConstructorReturn(this, (ConvolverNode.__proto__ || Object.getPrototypeOf(ConvolverNode)).call(this, context, {
       inputs: [1],
       outputs: [1],
       channelCount: 2,
@@ -6663,7 +6708,7 @@ var ConvolverNode = function (_AudioNode) {
     key: "setChannelCount",
     value: function setChannelCount(value) {
       value = util.clamp(value | 0, 1, 2);
-      _get(Object.getPrototypeOf(ConvolverNode.prototype), "setChannelCount", this).call(this, value);
+      _get(ConvolverNode.prototype.__proto__ || Object.getPrototypeOf(ConvolverNode.prototype), "setChannelCount", this).call(this, value);
     }
 
     /**
@@ -6675,7 +6720,7 @@ var ConvolverNode = function (_AudioNode) {
     value: function setChannelCountMode(value) {
       /* istanbul ignore else */
       if (value === "clamped-max" || value === "explicit") {
-        _get(Object.getPrototypeOf(ConvolverNode.prototype), "setChannelCountMode", this).call(this, value);
+        _get(ConvolverNode.prototype.__proto__ || Object.getPrototypeOf(ConvolverNode.prototype), "setChannelCountMode", this).call(this, value);
       }
     }
 
@@ -6768,6 +6813,7 @@ var DelayNode = function (_AudioNode) {
    * @param {object}       opts
    * @param {number}       opts.maxDelayTime
    */
+
   function DelayNode(context, opts) {
     _classCallCheck(this, DelayNode);
 
@@ -6775,7 +6821,7 @@ var DelayNode = function (_AudioNode) {
 
     var maxDelayTime = util.defaults(opts.maxDelayTime, 1);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(DelayNode).call(this, context, {
+    var _this = _possibleConstructorReturn(this, (DelayNode.__proto__ || Object.getPrototypeOf(DelayNode)).call(this, context, {
       inputs: [1],
       outputs: [1],
       channelCount: 2,
@@ -6860,10 +6906,11 @@ var DynamicsCompressorNode = function (_AudioNode) {
   /**
    * @param {AudioContext} context
    */
+
   function DynamicsCompressorNode(context) {
     _classCallCheck(this, DynamicsCompressorNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(DynamicsCompressorNode).call(this, context, {
+    var _this = _possibleConstructorReturn(this, (DynamicsCompressorNode.__proto__ || Object.getPrototypeOf(DynamicsCompressorNode)).call(this, context, {
       inputs: [1],
       outputs: [2],
       channelCount: 2,
@@ -7043,10 +7090,11 @@ var GainNode = function (_AudioNode) {
   /**
    * @param {AudioContext} context
    */
+
   function GainNode(context) {
     _classCallCheck(this, GainNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(GainNode).call(this, context, {
+    var _this = _possibleConstructorReturn(this, (GainNode.__proto__ || Object.getPrototypeOf(GainNode)).call(this, context, {
       inputs: [1],
       outputs: [1],
       channelCount: 2,
@@ -7110,6 +7158,7 @@ var IIRFilterNode = function (_AudioNode) {
    * @param {Float32Array} opts.feedforward
    * @param {Float32Array} opts.feedback
    */
+
   function IIRFilterNode(context, opts) {
     _classCallCheck(this, IIRFilterNode);
 
@@ -7118,7 +7167,7 @@ var IIRFilterNode = function (_AudioNode) {
     var feedforward = util.defaults(opts.feedforward, [0]);
     var feedback = util.defaults(opts.feedback, [1]);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(IIRFilterNode).call(this, context, {
+    var _this = _possibleConstructorReturn(this, (IIRFilterNode.__proto__ || Object.getPrototypeOf(IIRFilterNode)).call(this, context, {
       inputs: [1],
       outputs: [1],
       channelCount: 2,
@@ -7211,10 +7260,11 @@ var OscillatorNode = function (_AudioScheduledSource) {
   /**
    * @param {AudioContext} context
    */
+
   function OscillatorNode(context) {
     _classCallCheck(this, OscillatorNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(OscillatorNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (OscillatorNode.__proto__ || Object.getPrototypeOf(OscillatorNode)).call(this, context));
 
     _this._frequency = _this.addParam("audio", 440);
     _this._detune = _this.addParam("audio", 0);
@@ -7349,10 +7399,11 @@ var PannerNode = function (_BasePannerNode) {
   /**
    * @param {AudioContext} context
    */
+
   function PannerNode(context) {
     _classCallCheck(this, PannerNode);
 
-    return _possibleConstructorReturn(this, Object.getPrototypeOf(PannerNode).call(this, context));
+    return _possibleConstructorReturn(this, (PannerNode.__proto__ || Object.getPrototypeOf(PannerNode)).call(this, context));
   }
 
   /**
@@ -7421,6 +7472,7 @@ var PeriodicWave = function () {
    * @param {Float32Array} opts.imag
    * @param {boolean}      opts.constraints
    */
+
   function PeriodicWave(context, opts) {
     _classCallCheck(this, PeriodicWave);
 
@@ -7571,6 +7623,7 @@ var ScriptProcessorNode = function (_AudioNode) {
    * @param {number}       opts.numberOfInputChannels
    * @param {number}       opts.numberOfOutputChannels
    */
+
   function ScriptProcessorNode(context, opts) {
     _classCallCheck(this, ScriptProcessorNode);
 
@@ -7585,7 +7638,7 @@ var ScriptProcessorNode = function (_AudioNode) {
     numberOfInputChannels = util.toValidNumberOfChannels(numberOfInputChannels);
     numberOfOutputChannels = util.toValidNumberOfChannels(numberOfOutputChannels);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(ScriptProcessorNode).call(this, context, {
+    var _this = _possibleConstructorReturn(this, (ScriptProcessorNode.__proto__ || Object.getPrototypeOf(ScriptProcessorNode)).call(this, context, {
       inputs: [numberOfInputChannels],
       outputs: [numberOfOutputChannels],
       channelCount: numberOfInputChannels,
@@ -7667,10 +7720,11 @@ var SpatialPannerNode = function (_BasePannerNode) {
   /**
    * @param {AudioContext}
    */
+
   function SpatialPannerNode(context) {
     _classCallCheck(this, SpatialPannerNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(SpatialPannerNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (SpatialPannerNode.__proto__ || Object.getPrototypeOf(SpatialPannerNode)).call(this, context));
 
     _this._positionX = _this.addParam("audio", 0);
     _this._positionY = _this.addParam("audio", 0);
@@ -7770,10 +7824,11 @@ var StereoPannerNode = function (_BasePannerNode) {
   /**
    * @param {AudioContext} context
    */
+
   function StereoPannerNode(context) {
     _classCallCheck(this, StereoPannerNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(StereoPannerNode).call(this, context));
+    var _this = _possibleConstructorReturn(this, (StereoPannerNode.__proto__ || Object.getPrototypeOf(StereoPannerNode)).call(this, context));
 
     _this._pan = _this.addParam("audio", 0);
     return _this;
@@ -7820,10 +7875,11 @@ var WaveShaperNode = function (_AudioNode) {
   /**
    * @param {AudioContext}
    */
+
   function WaveShaperNode(context) {
     _classCallCheck(this, WaveShaperNode);
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(WaveShaperNode).call(this, context, {
+    var _this = _possibleConstructorReturn(this, (WaveShaperNode.__proto__ || Object.getPrototypeOf(WaveShaperNode)).call(this, context, {
       inputs: [1],
       outputs: [1],
       channelCount: 2,
@@ -7927,6 +7983,7 @@ var AudioBus = function () {
    * @param {number} length
    * @param {number} sampleRate
    */
+
   function AudioBus(numberOfChannels, length, sampleRate) {
     _classCallCheck(this, AudioBus);
 
@@ -8416,6 +8473,7 @@ var AudioNodeInput = function () {
    * @param {number}    opts.channelCount
    * @param {string}    opts.channelCountMode
    */
+
   function AudioNodeInput(opts) {
     _classCallCheck(this, AudioNodeInput);
 
@@ -8769,6 +8827,7 @@ var AudioNodeOutput = function () {
    * @param {number}    opts.numberOfChannels
    * @param {boolean}   opts.enabled
    */
+
   function AudioNodeOutput(opts) {
     _classCallCheck(this, AudioNodeOutput);
 
