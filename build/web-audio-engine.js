@@ -2837,7 +2837,6 @@ var OfflineAudioContext = function (_AudioContext) {
    * @param {number} length
    * @param {number} sampleRate
    */
-
   function OfflineAudioContext(numberOfChannels, length, sampleRate) {
     _classCallCheck(this, OfflineAudioContext);
 
@@ -3093,7 +3092,6 @@ var RenderingAudioContext = function (_AudioContext) {
    * @param {number}  opts.bitDepth
    * @param {boolean} opts.floatingPoint
    */
-
   function RenderingAudioContext(opts) {
     _classCallCheck(this, RenderingAudioContext);
 
@@ -3266,7 +3264,6 @@ var StreamAudioContext = function (_AudioContext) {
    * @param {number}  opts.bitDepth
    * @param {boolean} opts.floatingPoint
    */
-
   function StreamAudioContext(opts) {
     _classCallCheck(this, StreamAudioContext);
 
@@ -3468,7 +3465,6 @@ var WebAudioContext = function (_AudioContext) {
    * @param {number}       opts.numberOfChannels
    * @param {number}       opts.bufferSize
    */
-
   function WebAudioContext(opts) {
     _classCallCheck(this, WebAudioContext);
 
@@ -3728,7 +3724,6 @@ var AnalyserNode = function (_AudioNode) {
   /**
    * @param {AudioContext} context
    */
-
   function AnalyserNode(context) {
     _classCallCheck(this, AnalyserNode);
 
@@ -3967,7 +3962,6 @@ var AudioBuffer = function () {
    * @param {number}       opts.length
    * @param {number}       opts.sampleRate
    */
-
   function AudioBuffer(context, opts) {
     _classCallCheck(this, AudioBuffer);
 
@@ -4097,7 +4091,6 @@ var AudioBufferSourceNode = function (_AudioScheduledSource) {
   /**
    * @param {AudioContext} context
    */
-
   function AudioBufferSourceNode(context) {
     _classCallCheck(this, AudioBufferSourceNode);
 
@@ -4341,7 +4334,6 @@ var AudioContext = function (_EventTarget) {
    * @param {number} opts.blockSize
    * @param {number} opts.numberOfChannels
    */
-
   function AudioContext(opts) {
     _classCallCheck(this, AudioContext);
 
@@ -4618,7 +4610,6 @@ var AudioDestinationNode = function (_AudioNode) {
    * @param {object}       opts
    * @param {number}       opts.numberOfChannels
    */
-
   function AudioDestinationNode(context, opts) {
     _classCallCheck(this, AudioDestinationNode);
 
@@ -4700,7 +4691,6 @@ var AudioListener = function () {
   /**
    * @param {AudioContext} context
    */
-
   function AudioListener(context) {
     _classCallCheck(this, AudioListener);
 
@@ -4778,7 +4768,6 @@ var AudioNode = function (_EventTarget) {
    * @param {number}       opts.channelCount
    * @param {string}       opts.channelCountMode
    */
-
   function AudioNode(context, opts) {
     _classCallCheck(this, AudioNode);
 
@@ -5178,7 +5167,6 @@ var AudioParam = function () {
    * @param {string}       opts.rate - [ "audio", "control "]
    * @param {number}       opts.defaultValue
    */
-
   function AudioParam(context, opts) {
     _classCallCheck(this, AudioParam);
 
@@ -5737,7 +5725,6 @@ var AudioScheduledSourceNode = function (_AudioSourceNode) {
   /**
    * @param {AudioContext} context
    */
-
   function AudioScheduledSourceNode(context) {
     _classCallCheck(this, AudioScheduledSourceNode);
 
@@ -5863,7 +5850,6 @@ var AudioSourceNode = function (_AudioNode) {
   /**
    * @param {AudioContext} context
    */
-
   function AudioSourceNode(context) {
     _classCallCheck(this, AudioSourceNode);
 
@@ -5933,7 +5919,6 @@ var AudioWorkerNode = function (_AudioNode) {
    * @param {number}       opts.numberOfInputs
    * @param {number}       opts.numberOfOutputs
    */
-
   function AudioWorkerNode(context, opts) {
     _classCallCheck(this, AudioWorkerNode);
 
@@ -6079,7 +6064,6 @@ var BasePannerNode = function (_AudioNode) {
   /**
    * @param {AudioContext} context
    */
-
   function BasePannerNode(context) {
     _classCallCheck(this, BasePannerNode);
 
@@ -6318,7 +6302,6 @@ var BiquadFilterNode = function (_AudioNode) {
   /**
    * @param {AudioContext} context
    */
-
   function BiquadFilterNode(context) {
     _classCallCheck(this, BiquadFilterNode);
 
@@ -6530,7 +6513,6 @@ var ChannelMergerNode = function (_AudioNode) {
    * @param {object}       opts
    * @param {number}       opts.numberOfInputs
    */
-
   function ChannelMergerNode(context, opts) {
     _classCallCheck(this, ChannelMergerNode);
 
@@ -6633,7 +6615,6 @@ var ChannelSplitterNode = function (_AudioNode) {
    * @param {object}       opts
    * @param {number}       opts.numberOfOutputs
    */
-
   function ChannelSplitterNode(context, opts) {
     _classCallCheck(this, ChannelSplitterNode);
 
@@ -6682,7 +6663,6 @@ var ConvolverNode = function (_AudioNode) {
   /**
    * @param {AudioContext} context
    */
-
   function ConvolverNode(context) {
     _classCallCheck(this, ConvolverNode);
 
@@ -6813,7 +6793,6 @@ var DelayNode = function (_AudioNode) {
    * @param {object}       opts
    * @param {number}       opts.maxDelayTime
    */
-
   function DelayNode(context, opts) {
     _classCallCheck(this, DelayNode);
 
@@ -6906,7 +6885,6 @@ var DynamicsCompressorNode = function (_AudioNode) {
   /**
    * @param {AudioContext} context
    */
-
   function DynamicsCompressorNode(context) {
     _classCallCheck(this, DynamicsCompressorNode);
 
@@ -7090,7 +7068,6 @@ var GainNode = function (_AudioNode) {
   /**
    * @param {AudioContext} context
    */
-
   function GainNode(context) {
     _classCallCheck(this, GainNode);
 
@@ -7158,7 +7135,6 @@ var IIRFilterNode = function (_AudioNode) {
    * @param {Float32Array} opts.feedforward
    * @param {Float32Array} opts.feedback
    */
-
   function IIRFilterNode(context, opts) {
     _classCallCheck(this, IIRFilterNode);
 
@@ -7260,7 +7236,6 @@ var OscillatorNode = function (_AudioScheduledSource) {
   /**
    * @param {AudioContext} context
    */
-
   function OscillatorNode(context) {
     _classCallCheck(this, OscillatorNode);
 
@@ -7399,7 +7374,6 @@ var PannerNode = function (_BasePannerNode) {
   /**
    * @param {AudioContext} context
    */
-
   function PannerNode(context) {
     _classCallCheck(this, PannerNode);
 
@@ -7472,7 +7446,6 @@ var PeriodicWave = function () {
    * @param {Float32Array} opts.imag
    * @param {boolean}      opts.constraints
    */
-
   function PeriodicWave(context, opts) {
     _classCallCheck(this, PeriodicWave);
 
@@ -7623,7 +7596,6 @@ var ScriptProcessorNode = function (_AudioNode) {
    * @param {number}       opts.numberOfInputChannels
    * @param {number}       opts.numberOfOutputChannels
    */
-
   function ScriptProcessorNode(context, opts) {
     _classCallCheck(this, ScriptProcessorNode);
 
@@ -7720,7 +7692,6 @@ var SpatialPannerNode = function (_BasePannerNode) {
   /**
    * @param {AudioContext}
    */
-
   function SpatialPannerNode(context) {
     _classCallCheck(this, SpatialPannerNode);
 
@@ -7824,7 +7795,6 @@ var StereoPannerNode = function (_BasePannerNode) {
   /**
    * @param {AudioContext} context
    */
-
   function StereoPannerNode(context) {
     _classCallCheck(this, StereoPannerNode);
 
@@ -7875,7 +7845,6 @@ var WaveShaperNode = function (_AudioNode) {
   /**
    * @param {AudioContext}
    */
-
   function WaveShaperNode(context) {
     _classCallCheck(this, WaveShaperNode);
 
@@ -7983,7 +7952,6 @@ var AudioBus = function () {
    * @param {number} length
    * @param {number} sampleRate
    */
-
   function AudioBus(numberOfChannels, length, sampleRate) {
     _classCallCheck(this, AudioBus);
 
@@ -8473,7 +8441,6 @@ var AudioNodeInput = function () {
    * @param {number}    opts.channelCount
    * @param {string}    opts.channelCountMode
    */
-
   function AudioNodeInput(opts) {
     _classCallCheck(this, AudioNodeInput);
 
@@ -8827,7 +8794,6 @@ var AudioNodeOutput = function () {
    * @param {number}    opts.numberOfChannels
    * @param {boolean}   opts.enabled
    */
-
   function AudioNodeOutput(opts) {
     _classCallCheck(this, AudioNodeOutput);
 
@@ -9612,10 +9578,10 @@ var BiquadFilterNodeDSP = {
     this._quantumStartFrame = quantumEndFrame;
   },
   dspUpdateCoefficients: function dspUpdateCoefficients() {
-    var frequency = this._frequency.getValue();
-    var detune = this._detune.getValue();
-    var Q = this._Q.getValue();
-    var gain = this._gain.getValue();
+    var frequency = this._frequency.getSampleAccurateValues()[0];
+    var detune = this._detune.getSampleAccurateValues()[0];
+    var Q = this._Q.getSampleAccurateValues()[0];
+    var gain = this._gain.getSampleAccurateValues()[0];
 
     if (frequency === this._prevFrequency && detune === this._prevDetune && Q === this._prevQ && gain === this._prevGain) {
       return false;
