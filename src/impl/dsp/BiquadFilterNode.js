@@ -122,10 +122,10 @@ const BiquadFilterNodeDSP = {
   },
 
   dspUpdateCoefficients() {
-    const frequency = this._frequency.getValue();
-    const detune = this._detune.getValue();
-    const Q = this._Q.getValue();
-    const gain = this._gain.getValue();
+    const frequency = this._frequency.getSampleAccurateValues()[0];
+    const detune = this._detune.getSampleAccurateValues()[0];
+    const Q = this._Q.getSampleAccurateValues()[0];
+    const gain = this._gain.getSampleAccurateValues()[0];
 
     if (frequency === this._prevFrequency && detune === this._prevDetune && Q === this._prevQ && gain === this._prevGain) {
       return false;
