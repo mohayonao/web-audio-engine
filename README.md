@@ -1,7 +1,7 @@
 # web-audio-engine
-[![Build Status](http://img.shields.io/travis/mohayonao/web-audio-engine.svg?style=flat-square)](https://travis-ci.org/mohayonao/web-audio-engine)
-[![NPM Version](http://img.shields.io/npm/v/web-audio-engine.svg?style=flat-square)](https://www.npmjs.org/package/web-audio-engine)
-[![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](http://mohayonao.mit-license.org/)
+[![Build Status](https://img.shields.io/travis/mohayonao/web-audio-engine.svg?style=flat-square)](https://travis-ci.org/mohayonao/web-audio-engine)
+[![NPM Version](https://img.shields.io/npm/v/web-audio-engine.svg?style=flat-square)](https://www.npmjs.org/package/web-audio-engine)
+[![License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](http://mohayonao.mit-license.org/)
 
 > Pure JS implementation of the [Web Audio API](https://www.w3.org/TR/webaudio/)
 
@@ -257,7 +257,7 @@ context.resume();
 ## Online Demo
 The online demo is here. In this site, you can compare `web-audio-engine` and the native Web Audio API.
 
-- http://mohayonao.github.io/web-audio-engine/demo/
+- https://mohayonao.github.io/web-audio-engine/demo/
 
 ## Offline Demo
 
@@ -285,7 +285,7 @@ $ node demo -o out.wav sines
 ## Online Benchmark
 Currently, this benchmark doesn't work in Chrome or Safari, please use Firefox.
 
-- http://mohayonao.github.io/web-audio-engine/benchmark/
+- https://mohayonao.github.io/web-audio-engine/benchmark/
 
 ## Offline Benchmark
 
