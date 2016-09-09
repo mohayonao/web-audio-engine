@@ -15,17 +15,17 @@
     "wav-encoder": "^1.1.0"
   },
   "devDependencies": {
-    "babel-cli": "^6.11.4",
-    "babel-plugin-transform-es2015-classes": "^6.9.0",
+    "babel-cli": "^6.14.0",
+    "babel-plugin-istanbul": "^2.0.1",
     "babel-plugin-unassert": "^2.1.1",
     "babel-preset-es2015": "^6.13.2",
     "babel-preset-power-assert": "^1.0.0",
     "babelify": "^7.3.0",
     "browserify": "^13.1.0",
-    "eslint": "^3.3.1",
+    "eslint": "^3.5.0",
     "mocha": "^3.0.2",
-    "npm-run-all": "^3.0.0",
-    "nyc": "^7.1.0",
+    "npm-run-all": "^3.1.0",
+    "nyc": "^8.1.0",
     "power-assert": "^1.4.1",
     "run-with-mocha": "^0.2.0",
     "sinon": "^1.17.5"
@@ -36,7 +36,6 @@
   "files": [
     "package.json",
     "README.md",
-    "index.js",
     "build",
     "lib"
   ],
@@ -45,12 +44,17 @@
     "web audio api"
   ],
   "license": "MIT",
-  "main": "index.js",
+  "main": "lib/index.js",
   "nyc": {
+    "require": [
+      "babel-register"
+    ],
     "exclude": [
       "src/impl/dsp/*.js",
       "test/**/*.js"
-    ]
+    ],
+    "sourceMap": false,
+    "instrument": false
   },
   "repository": {
     "type": "git",
@@ -58,16 +62,15 @@
   },
   "scripts": {
     "build": "npm-run-all build:*",
-    "build:browser": "BABEL_ENV=production browserify src -s WebAudioEngine -o build/web-audio-engine.js -t [ babelify ]",
-    "build:to5": "BABEL_ENV=production babel --out-dir=lib src",
+    "build:browser": "BABEL_ENV=build browserify src -s WebAudioEngine -o build/web-audio-engine.js -t [ babelify ]",
+    "build:to5": "BABEL_ENV=build babel --out-dir=lib src",
     "clean": "rm -rf lib coverage .nyc_output npm-debug.log",
-    "cover": "BABEL_ENV=coverage nyc --reporter text --reporter html npm test",
-    "gh-pages": "git checkout gh-pages && git merge master && git push origin gh-pages && git checkout master",
+    "cover": "BABEL_ENV=cover nyc --reporter text --reporter html npm test",
     "lint": "eslint src test",
     "postversion": "git push && git push --tags && npm run clean",
     "prepublish": "npm-run-all clean lint test build",
     "preversion": "npm-run-all clean lint test",
-    "test": "mocha",
+    "test": "BABEL_ENV=test mocha",
     "travis": "npm-run-all lint test",
     "version": "npm run build && git add -A build"
   }

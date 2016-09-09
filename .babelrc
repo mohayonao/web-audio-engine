@@ -1,25 +1,30 @@
 {
   "env": {
-    "production": {
+    "build": {
       "only": [ "src" ],
       "presets": [
-        "babel-preset-es2015"
+        "es2015"
       ],
       "plugins": [
-        [ "babel-plugin-unassert" ]
+        "unassert"
       ]
     },
     "development": {
+      "presets": [
+        "es2015",
+        "power-assert"
+      ],
+    },
+    "test": {
       "only": [ "src", "test" ],
       "presets": [
-        "babel-preset-power-assert"
+        "power-assert"
       ]
     },
-    "coverage": {
+    "cover": {
       "only": [ "src" ],
-      "sourceMaps": "inline",
       "plugins": [
-        [ "transform-es2015-classes", { "loose": true } ]
+        "istanbul"
       ]
     }
   }
