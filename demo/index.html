@@ -32,45 +32,43 @@
         Pure JS implementation of the Web Audio API - <a href="https://github.com/mohayonao/web-audio-engine">GitHub</a>
       </div>
     </div>
-    <div id="app">
-      <div class="form-horizontal">
-        <div class="form-group">
-          <label class="col-sm-1 control-label"></label>
-          <div class="col-sm-4">
-            <button class="btn" v-bind:class="isPlaying ? 'btn-success' : 'btn-default'" v-on:click="run">Run</button>
-            <button class="btn btn-default" v-on:click="stop">Stop</button>
-          </div>
-          <div class="col-sm-6"><div class="form-control error-message">{{ error }}</div></div>
+    <div id="app" class="form-horizontal">
+      <div class="form-group">
+        <label class="col-sm-1 control-label"></label>
+        <div class="col-sm-4">
+          <button class="btn" v-bind:class="isPlaying ? 'btn-success' : 'btn-default'" v-on:click="run">Run</button>
+          <button class="btn btn-default" v-on:click="stop">Stop</button>
         </div>
+        <div class="col-sm-6"><div class="form-control error-message">{{ error }}</div></div>
+      </div>
 
-        <div class="form-group">
-          <label class="col-sm-1 control-label">api</label>
-          <div class="col-sm-11">
-            <div class="radio-inline">
-              <input type="radio" id="engine" value="web-audio-engine" v-model="engine">
-              <label for="engine">web-audio-engine</label>
-            </div>
-            <div class="radio-inline">
-              <input type="radio" id="native" value="native" v-model="engine">
-              <label for="native">native Web Audio API</label>
-            </div>
+      <div class="form-group">
+        <label class="col-sm-1 control-label">api</label>
+        <div class="col-sm-11">
+          <div class="radio-inline">
+            <input type="radio" id="engine" value="web-audio-engine" v-model="engine">
+            <label for="engine">web-audio-engine</label>
+          </div>
+          <div class="radio-inline">
+            <input type="radio" id="native" value="native" v-model="engine">
+            <label for="native">native Web Audio API</label>
           </div>
         </div>
+      </div>
 
-        <div class="form-group">
-          <label class="col-sm-1 control-label">demo</label>
-          <div class="col-sm-11">
-            <select class="form-control" v-model="selected" v-on:change="loadScript">
-              <option v-for="name in list" v-bind:value="name">{{ name }}</option>
-            </select>
-          </div>
+      <div class="form-group">
+        <label class="col-sm-1 control-label">demo</label>
+        <div class="col-sm-11">
+          <select class="form-control" v-model="selected" v-on:change="loadScript">
+            <option v-for="name in list" v-bind:value="name">{{ name }}</option>
+          </select>
         </div>
+      </div>
 
-        <div class="form-group">
-          <label class="col-sm-1 control-label">code</label>
-          <div class="col-sm-11">
-            <textarea id="code"></textarea>
-          </div>
+      <div class="form-group">
+        <label class="col-sm-1 control-label">code</label>
+        <div class="col-sm-11">
+          <textarea id="code"></textarea>
         </div>
       </div>
     </div>
@@ -82,7 +80,18 @@
   window.addEventListener("DOMContentLoaded", function() {
     "use strict";
 
-    var demoList = [ "metronome", "sines", "filter", "delay", "chorus", "pan", "iir-filter", "drum" ];
+    var demoList = [
+      "metronome",
+      "sines",
+      "filter",
+      "delay",
+      "chorus",
+      "pan",
+      "drum",
+      "test: filter-modulation",
+      "test: delay-modulation",
+      "test: iir-filter",
+    ];
     var audioContext = new AudioContext();
     var destination = audioContext.destination;
 
@@ -195,7 +204,9 @@
           this.isPlaying = false;
         },
         loadScript: function() {
-          loadScript(this.selected).then(function(source) {
+          var selected = this.selected.replace(/: /m, "_");
+          location.hash = selected;
+          loadScript(selected).then(function(source) {
             editor.setValue(source);
           });
         }
@@ -214,7 +225,7 @@
     var hash = location.hash;
 
     if (hash) {
-      hash = hash.substr(1);
+      hash = hash.substr(1).replace(/_/m, ": ");
 
       if (vue.list.indexOf(hash) !== -1) {
         vue.selected = hash;
