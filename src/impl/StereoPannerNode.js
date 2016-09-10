@@ -2,6 +2,7 @@
 
 const BasePannerNode = require("./BasePannerNode");
 const StereoPannerNodeDSP = require("./dsp/StereoPannerNode");
+const { AUDIO_RATE } = require("../constants/AudioParamRate");
 
 class StereoPannerNode extends BasePannerNode {
   /**
@@ -9,7 +10,7 @@ class StereoPannerNode extends BasePannerNode {
    */
   constructor(context) {
     super(context);
-    this._pan = this.addParam("audio", 0);
+    this._pan = this.addParam(AUDIO_RATE, 0);
   }
 
   /**

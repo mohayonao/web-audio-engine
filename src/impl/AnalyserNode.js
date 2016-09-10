@@ -6,8 +6,8 @@ const AudioNode = require("./AudioNode");
 const AnalyserNodeDSP = require("./dsp/AnalyserNode");
 const { MAX } = require("../constants/ChannelCountMode");
 
-const MaxFFTSize = 32768;
 const MinFFTSize = 32;
+const MaxFFTSize = 32768;
 
 class AnalyserNode extends AudioNode {
   /**

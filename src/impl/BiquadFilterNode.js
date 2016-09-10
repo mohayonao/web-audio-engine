@@ -1,9 +1,21 @@
 "use strict";
 
-const assert = require("assert");
 const AudioNode = require("./AudioNode");
 const BiquadFilterNodeDSP = require("./dsp/BiquadFilterNode");
 const { MAX } = require("../constants/ChannelCountMode");
+const { CONTROL_RATE } = require("../constants/AudioParamRate");
+const { LOWPASS } = require("../constants/BiquadFilterType");
+const { HIGHPASS } = require("../constants/BiquadFilterType");
+const { BANDPASS } = require("../constants/BiquadFilterType");
+const { LOWSHELF } = require("../constants/BiquadFilterType");
+const { HIGHSHELF } = require("../constants/BiquadFilterType");
+const { PEAKING } = require("../constants/BiquadFilterType");
+const { NOTCH } = require("../constants/BiquadFilterType");
+const { ALLPASS } = require("../constants/BiquadFilterType");
+
+const allowedBiquadFilterTypes = [
+  LOWPASS, HIGHPASS, BANDPASS, LOWSHELF, HIGHSHELF, PEAKING, NOTCH, ALLPASS
+];
 
 class BiquadFilterNode extends AudioNode {
   /**
@@ -16,11 +28,11 @@ class BiquadFilterNode extends AudioNode {
       channelCount: 2,
       channelCountMode: MAX
     });
-    this._type = BiquadFilterNodeDSP.LOWPASS;
-    this._frequency = this.addParam("control", 350);
-    this._detune = this.addParam("control", 0);
-    this._Q = this.addParam("control", 1);
-    this._gain = this.addParam("control", 0);
+    this._type = LOWPASS;
+    this._frequency = this.addParam(CONTROL_RATE, 350);
+    this._detune = this.addParam(CONTROL_RATE, 0);
+    this._Q = this.addParam(CONTROL_RATE, 1);
+    this._gain = this.addParam(CONTROL_RATE, 0);
 
     this.dspInit();
     this.dspUpdateKernel(1);
@@ -30,16 +42,15 @@ class BiquadFilterNode extends AudioNode {
    * @return {string}
    */
   getType() {
-    return this.toFilterTypeName(this._type);
+    return this._type;
   }
 
   /**
    * @param {string} value
    */
   setType(value) {
-    value = this.fromFilterTypeName(value);
     /* istanbul ignore else */
-    if (BiquadFilterNodeDSP.FilterTypes.indexOf(value) !== -1) {
+    if (allowedBiquadFilterTypes.indexOf(value) !== -1) {
       this._type = value;
     }
   }
@@ -95,59 +106,6 @@ class BiquadFilterNode extends AudioNode {
    */
   getTailTime() {
     return 0.2;
-  }
-
-  /**
-   * @param {string} value
-   * @return {number}
-   */
-  fromFilterTypeName(value) {
-    switch (value) {
-    case "lowpass":
-      return BiquadFilterNodeDSP.LOWPASS;
-    case "highpass":
-      return BiquadFilterNodeDSP.HIGHPASS;
-    case "bandpass":
-      return BiquadFilterNodeDSP.BANDPASS;
-    case "lowshelf":
-      return BiquadFilterNodeDSP.LOWSHELF;
-    case "highshelf":
-      return BiquadFilterNodeDSP.HIGHSHELF;
-    case "peaking":
-      return BiquadFilterNodeDSP.PEAKING;
-    case "notch":
-      return BiquadFilterNodeDSP.NOTCH;
-    case "allpass":
-      return BiquadFilterNodeDSP.ALLPASS;
-    }
-    return -1;
-  }
-
-  /**
-   * @param {number} value
-   * @return {string}
-   */
-  toFilterTypeName(value) {
-    switch (value) {
-    case BiquadFilterNodeDSP.LOWPASS:
-      return "lowpass";
-    case BiquadFilterNodeDSP.HIGHPASS:
-      return "highpass";
-    case BiquadFilterNodeDSP.BANDPASS:
-      return "bandpass";
-    case BiquadFilterNodeDSP.LOWSHELF:
-      return "lowshelf";
-    case BiquadFilterNodeDSP.HIGHSHELF:
-      return "highshelf";
-    case BiquadFilterNodeDSP.PEAKING:
-      return "peaking";
-    case BiquadFilterNodeDSP.NOTCH:
-      return "notch";
-    case BiquadFilterNodeDSP.ALLPASS:
-      return "allpass";
-    }
-    /* istanbul ignore next */
-    assert(!"NOT REACHED");
   }
 }
 

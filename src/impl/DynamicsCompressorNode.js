@@ -3,6 +3,7 @@
 const AudioNode = require("./AudioNode");
 const DynamicsCompressorNodeDSP = require("./dsp/DynamicsCompressorNode");
 const { EXPLICIT } = require("../constants/ChannelCountMode");
+const { CONTROL_RATE } = require("../constants/AudioParamRate");
 
 class DynamicsCompressorNode extends AudioNode {
   /**
@@ -15,11 +16,11 @@ class DynamicsCompressorNode extends AudioNode {
       channelCount: 2,
       channelCountMode: EXPLICIT
     });
-    this._threshold = this.addParam("control", -24);
-    this._knee = this.addParam("control", 30);
-    this._ratio = this.addParam("control", 12);
-    this._attack = this.addParam("control", 0.003);
-    this._release = this.addParam("control", 0.250);
+    this._threshold = this.addParam(CONTROL_RATE, -24);
+    this._knee = this.addParam(CONTROL_RATE, 30);
+    this._ratio = this.addParam(CONTROL_RATE, 12);
+    this._attack = this.addParam(CONTROL_RATE, 0.003);
+    this._release = this.addParam(CONTROL_RATE, 0.250);
   }
 
   /**

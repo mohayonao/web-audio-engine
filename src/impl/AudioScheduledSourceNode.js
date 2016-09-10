@@ -2,6 +2,7 @@
 
 const util = require("../util");
 const AudioSourceNode = require("./AudioSourceNode");
+const { UNSCHEDULED, SCHEDULED, PLAYING, FINISHED } = require("../constants/PlaybackState");
 
 class AudioScheduledSourceNode extends AudioSourceNode {
   /**
@@ -39,15 +40,15 @@ class AudioScheduledSourceNode extends AudioSourceNode {
    */
   getPlaybackState() {
     if (this._startTime === Infinity) {
-      return "unscheduled";
+      return UNSCHEDULED;
     }
     if (this.context.currentTime < this._startTime) {
-      return "scheduled";
+      return SCHEDULED;
     }
     if (this._stopTime <= this.context.currentTime) {
-      return "finished";
+      return FINISHED;
     }
-    return "playing";
+    return PLAYING;
   }
 
   /**

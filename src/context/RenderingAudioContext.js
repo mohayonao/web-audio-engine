@@ -5,6 +5,7 @@ const util = require("../util");
 const config = require("../config");
 const AudioContext = require("../api/AudioContext");
 const encoder = require("../encoder");
+const { RUNNING, SUSPENDED } = require("../constants/AudioContextState");
 
 class RenderingAudioContext extends AudioContext {
   /**
@@ -75,7 +76,7 @@ class RenderingAudioContext extends AudioContext {
     const numberOfChannels = this._format.channels;
     const buffers = nmap(numberOfChannels, () => new Float32Array(bufferLength));
 
-    impl.changeState("running");
+    impl.changeState(RUNNING);
 
     for (let i = 0; i < iterations; i++) {
       impl.process(buffers, i * blockSize);
@@ -83,7 +84,7 @@ class RenderingAudioContext extends AudioContext {
 
     this._rendered.push(buffers);
 
-    impl.changeState("suspended");
+    impl.changeState(SUSPENDED);
   }
 
   /**

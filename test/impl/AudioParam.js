@@ -5,8 +5,13 @@ require("run-with-mocha");
 const assert = require("assert");
 const AudioContext = require("../../src/impl/AudioContext");
 const AudioParam = require("../../src/impl/AudioParam");
-const AudioParamDSP = require("../../src/impl/dsp/AudioParam");
 const AudioNode = require("../../src/impl/AudioNode");
+const { AUDIO_RATE, CONTROL_RATE } = require("../../src/constants/AudioParamRate");
+const { SET_VALUE_AT_TIME } = require("../../src/constants/AudioParamEvent");
+const { LINEAR_RAMP_TO_VALUE_AT_TIME } = require("../../src/constants/AudioParamEvent");
+const { EXPONENTIAL_RAMP_TO_VALUE_AT_TIME } = require("../../src/constants/AudioParamEvent");
+const { SET_TARGET_AT_TIME } = require("../../src/constants/AudioParamEvent");
+const { SET_VALUE_CURVE_AT_TIME } = require("../../src/constants/AudioParamEvent");
 
 describe("AudioParam", () => {
   let context;
@@ -16,14 +21,14 @@ describe("AudioParam", () => {
   });
 
   it("constructor", () => {
-    const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
+    const param = new AudioParam(context, { rate: CONTROL_RATE, defaultValue: 0 });
 
     assert(param instanceof AudioParam);
   });
 
   describe("attributes", () => {
     it(".value=", () => {
-      const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
+      const param = new AudioParam(context, { rate: CONTROL_RATE, defaultValue: 0 });
 
       assert(param.getValue() === param.getDefaultValue());
 
@@ -32,27 +37,27 @@ describe("AudioParam", () => {
     });
 
     it(".defaultValue", () => {
-      const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
+      const param = new AudioParam(context, { rate: CONTROL_RATE, defaultValue: 0 });
 
       assert(param.getDefaultValue() === 0);
     });
 
     it(".rate - audio rate", () => {
-      const param = new AudioParam(context, { rate: "audio", defaultValue: 0 });
+      const param = new AudioParam(context, { rate: AUDIO_RATE, defaultValue: 0 });
 
-      assert(param.getRate() === "audio");
+      assert(param.getRate() === AUDIO_RATE);
     });
 
     it(".rate - control rate", () => {
-      const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
+      const param = new AudioParam(context, { rate: CONTROL_RATE, defaultValue: 0 });
 
-      assert(param.getRate() === "control");
+      assert(param.getRate() === CONTROL_RATE);
     });
   });
 
   describe("scheduling", () => {
     it("works", () => {
-      const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
+      const param = new AudioParam(context, { rate: CONTROL_RATE, defaultValue: 0 });
       const curve = new Float32Array(44100);
 
       param.setValueAtTime(0.2, 0);
@@ -81,7 +86,7 @@ describe("AudioParam", () => {
     });
 
     it("replace", () => {
-      const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
+      const param = new AudioParam(context, { rate: CONTROL_RATE, defaultValue: 0 });
 
       param.setValueAtTime(0.2, 0);
       param.linearRampToValueAtTime(1, 0.5);
@@ -96,7 +101,7 @@ describe("AudioParam", () => {
     });
 
     it("sort", () => {
-      const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
+      const param = new AudioParam(context, { rate: CONTROL_RATE, defaultValue: 0 });
 
       param.setValueAtTime(1.0, 1.0);
       param.setValueAtTime(0.5, 0.5);
@@ -110,7 +115,7 @@ describe("AudioParam", () => {
     });
 
     it("cancel", () => {
-      const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
+      const param = new AudioParam(context, { rate: CONTROL_RATE, defaultValue: 0 });
       const curve = new Float32Array(44100);
 
       param.setValueAtTime(0.2, 0);
@@ -155,7 +160,7 @@ describe("AudioParam", () => {
     }
 
     it("setValueAtTime", () => {
-      const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
+      const param = new AudioParam(context, { rate: CONTROL_RATE, defaultValue: 0 });
 
       param.setValueAtTime(0.0, 0);
       param.setValueAtTime(0.1, 1);
@@ -164,17 +169,17 @@ describe("AudioParam", () => {
       param.setValueAtTime(0.4, 4);
 
       assert.deepEqual(param.getTimeline().map(pluck), [
-        //                                                 startTime, endTime, startValue, endValue
-        [ AudioParamDSP.SET_VALUE_AT_TIME                ,     fr(0),   fr(1),        0.0,      0.0 ],
-        [ AudioParamDSP.SET_VALUE_AT_TIME                ,     fr(1),   fr(2),        0.1,      0.1 ],
-        [ AudioParamDSP.SET_VALUE_AT_TIME                ,     fr(2),   fr(2),        0.2,      0.2 ],
-        [ AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME     ,     fr(2),   fr(3),        0.2,      0.3 ],
-        [ AudioParamDSP.SET_VALUE_AT_TIME                ,     fr(4),     inf,        0.4,      0.4 ]
+        //                                   startTime, endTime, startValue, endValue
+        [ SET_VALUE_AT_TIME                ,     fr(0),   fr(1),        0.0,      0.0 ],
+        [ SET_VALUE_AT_TIME                ,     fr(1),   fr(2),        0.1,      0.1 ],
+        [ SET_VALUE_AT_TIME                ,     fr(2),   fr(2),        0.2,      0.2 ],
+        [ LINEAR_RAMP_TO_VALUE_AT_TIME     ,     fr(2),   fr(3),        0.2,      0.3 ],
+        [ SET_VALUE_AT_TIME                ,     fr(4),     inf,        0.4,      0.4 ]
       ]);
     });
 
     it("linearRampToValueAtTime", () => {
-      const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
+      const param = new AudioParam(context, { rate: CONTROL_RATE, defaultValue: 0 });
 
       param.linearRampToValueAtTime(0.1, 1);
       param.linearRampToValueAtTime(0.2, 2);
@@ -182,16 +187,16 @@ describe("AudioParam", () => {
       param.linearRampToValueAtTime(0.4, 4);
 
       assert.deepEqual(param.getTimeline().map(pluck), [
-        //                                                 startTime, endTime, startValue, endValue
-        [ AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME     ,     fr(0),   fr(1),        0.0,      0.1 ],
-        [ AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME     ,     fr(1),   fr(2),        0.1,      0.2 ],
-        [ AudioParamDSP.SET_VALUE_AT_TIME                ,     fr(3),   fr(3),        0.3,      0.3 ],
-        [ AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME     ,     fr(3),   fr(4),        0.3,      0.4 ]
+        //                                   startTime, endTime, startValue, endValue
+        [ LINEAR_RAMP_TO_VALUE_AT_TIME     ,     fr(0),   fr(1),        0.0,      0.1 ],
+        [ LINEAR_RAMP_TO_VALUE_AT_TIME     ,     fr(1),   fr(2),        0.1,      0.2 ],
+        [ SET_VALUE_AT_TIME                ,     fr(3),   fr(3),        0.3,      0.3 ],
+        [ LINEAR_RAMP_TO_VALUE_AT_TIME     ,     fr(3),   fr(4),        0.3,      0.4 ]
       ]);
     });
 
     it("exponentialRampToValueAtTime", () => {
-      const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
+      const param = new AudioParam(context, { rate: CONTROL_RATE, defaultValue: 0 });
 
       param.exponentialRampToValueAtTime(0.1, 1);
       param.exponentialRampToValueAtTime(0.2, 2);
@@ -199,16 +204,16 @@ describe("AudioParam", () => {
       param.exponentialRampToValueAtTime(0.4, 4);
 
       assert.deepEqual(param.getTimeline().map(pluck), [
-        //                                                 startTime, endTime, startValue, endValue
-        [ AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME,     fr(0),   fr(1),       1e-6,      0.1 ],
-        [ AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME,     fr(1),   fr(2),        0.1,      0.2 ],
-        [ AudioParamDSP.SET_VALUE_AT_TIME                ,     fr(3),   fr(3),        0.3,      0.3 ],
-        [ AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME,     fr(3),   fr(4),        0.3,      0.4 ]
+        //                                   startTime, endTime, startValue, endValue
+        [ EXPONENTIAL_RAMP_TO_VALUE_AT_TIME,     fr(0),   fr(1),       1e-6,      0.1 ],
+        [ EXPONENTIAL_RAMP_TO_VALUE_AT_TIME,     fr(1),   fr(2),        0.1,      0.2 ],
+        [ SET_VALUE_AT_TIME                ,     fr(3),   fr(3),        0.3,      0.3 ],
+        [ EXPONENTIAL_RAMP_TO_VALUE_AT_TIME,     fr(3),   fr(4),        0.3,      0.4 ]
       ]);
     });
 
     it("setTargetAtTime", () => {
-      const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
+      const param = new AudioParam(context, { rate: CONTROL_RATE, defaultValue: 0 });
 
       param.setTargetAtTime(0.1, 1, 0.5);
       param.setTargetAtTime(0.2, 2, 0.4);
@@ -219,19 +224,19 @@ describe("AudioParam", () => {
       param.setTargetAtTime(0.7, 7, 0.1);
 
       assert.deepEqual(param.getTimeline().map(pluck), [
-        //                                                 startTime, endTime, startValue, endValue
-        [ AudioParamDSP.SET_TARGET_AT_TIME               ,     fr(1),   fr(2),        0.0,      0.1 ],
-        [ AudioParamDSP.SET_TARGET_AT_TIME               ,     fr(2),   fr(3),        0.0,      0.2 ],
-        [ AudioParamDSP.SET_TARGET_AT_TIME               ,     fr(3),   fr(4),        0.0,      0.3 ],
-        [ AudioParamDSP.SET_VALUE_AT_TIME                ,     fr(4),   fr(5),        0.4,      0.4 ],
-        [ AudioParamDSP.SET_TARGET_AT_TIME               ,     fr(5),   fr(5),        0.4,      0.5 ],
-        [ AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME     ,     fr(5),   fr(6),        0.4,      0.6 ],
-        [ AudioParamDSP.SET_TARGET_AT_TIME               ,     fr(7),     inf,        0.6,      0.7 ]
+        //                                   startTime, endTime, startValue, endValue
+        [ SET_TARGET_AT_TIME               ,     fr(1),   fr(2),        0.0,      0.1 ],
+        [ SET_TARGET_AT_TIME               ,     fr(2),   fr(3),        0.0,      0.2 ],
+        [ SET_TARGET_AT_TIME               ,     fr(3),   fr(4),        0.0,      0.3 ],
+        [ SET_VALUE_AT_TIME                ,     fr(4),   fr(5),        0.4,      0.4 ],
+        [ SET_TARGET_AT_TIME               ,     fr(5),   fr(5),        0.4,      0.5 ],
+        [ LINEAR_RAMP_TO_VALUE_AT_TIME     ,     fr(5),   fr(6),        0.4,      0.6 ],
+        [ SET_TARGET_AT_TIME               ,     fr(7),     inf,        0.6,      0.7 ]
       ]);
     });
 
     it("setValueCurveAtTime", () => {
-      const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
+      const param = new AudioParam(context, { rate: CONTROL_RATE, defaultValue: 0 });
       const curve1 = new Float32Array([ 0.1, 0.2, 0.3 ]);
       const curve2 = new Float32Array([ 0.4, 0.5, 0.6 ]);
       const f32 = Math.fround;
@@ -242,16 +247,16 @@ describe("AudioParam", () => {
       param.linearRampToValueAtTime(1.0, 5);
 
       assert.deepEqual(param.getTimeline().map(pluck), [
-        //                                                 startTime, endTime, startValue, endValue
-        [ AudioParamDSP.SET_VALUE_CURVE_AT_TIME          ,     fr(0),   fr(1),   f32(0.1), f32(0.3) ],
-        [ AudioParamDSP.SET_VALUE_AT_TIME                ,     fr(2),   fr(3),       0.2 ,     0.2  ],
-        [ AudioParamDSP.SET_VALUE_CURVE_AT_TIME          ,     fr(3),   fr(4),   f32(0.4), f32(0.6) ],
-        [ AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME     ,     fr(4),   fr(5),   f32(0.6),     1.0  ]
+        //                                   startTime, endTime, startValue, endValue
+        [ SET_VALUE_CURVE_AT_TIME          ,     fr(0),   fr(1),   f32(0.1), f32(0.3) ],
+        [ SET_VALUE_AT_TIME                ,     fr(2),   fr(3),       0.2 ,     0.2  ],
+        [ SET_VALUE_CURVE_AT_TIME          ,     fr(3),   fr(4),   f32(0.4), f32(0.6) ],
+        [ LINEAR_RAMP_TO_VALUE_AT_TIME     ,     fr(4),   fr(5),   f32(0.6),     1.0  ]
       ]);
     });
 
     it("cancel", () => {
-      const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
+      const param = new AudioParam(context, { rate: CONTROL_RATE, defaultValue: 0 });
 
       param.setValueAtTime(0.0, 0);
       param.setValueAtTime(0.1, 1);
@@ -259,16 +264,16 @@ describe("AudioParam", () => {
       param.cancelScheduledValues(2);
 
       assert.deepEqual(param.getTimeline().map(pluck), [
-        //                                                 startTime, endTime, startValue, endValue
-        [ AudioParamDSP.SET_VALUE_AT_TIME                ,     fr(0),   fr(1),        0.0,      0.0 ],
-        [ AudioParamDSP.SET_VALUE_AT_TIME                ,     fr(1),     inf,        0.1,      0.1 ]
+        //                                   startTime, endTime, startValue, endValue
+        [ SET_VALUE_AT_TIME                ,     fr(0),   fr(1),        0.0,      0.0 ],
+        [ SET_VALUE_AT_TIME                ,     fr(1),     inf,        0.1,      0.1 ]
       ]);
     });
   });
 
   describe("connection", () => {
     it("basic operation", () => {
-      const param = new AudioParam(context, { rate: "control", defaultValue: 0 });
+      const param = new AudioParam(context, { rate: CONTROL_RATE, defaultValue: 0 });
       const node = new AudioNode(context, { outputs: [ 1 ] });
 
       node.outputs[0].enable();

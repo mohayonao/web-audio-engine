@@ -4,6 +4,7 @@ const util = require("../util");
 const AudioNode = require("./AudioNode");
 const DelayNodeDSP = require("./dsp/DelayNode");
 const { MAX } = require("../constants/ChannelCountMode");
+const { AUDIO_RATE } = require("../constants/AudioParamRate");
 
 class DelayNode extends AudioNode {
   /**
@@ -21,7 +22,7 @@ class DelayNode extends AudioNode {
       channelCountMode: MAX
     });
     this._maxDelayTime = Math.max(0, util.toNumber(maxDelayTime));
-    this._delayTime = this.addParam("audio", 0);
+    this._delayTime = this.addParam(AUDIO_RATE, 0);
 
     this.dspInit(this._maxDelayTime);
     this.dspUpdateKernel(1);

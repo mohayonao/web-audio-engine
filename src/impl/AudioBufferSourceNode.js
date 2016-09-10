@@ -4,6 +4,8 @@ const util = require("../util");
 const AudioScheduledSourceNode = require("./AudioScheduledSourceNode");
 const AudioBuffer = require("./AudioBuffer");
 const AudioBufferSourceNodeDSP = require("./dsp/AudioBufferSourceNode");
+const { CONTROL_RATE } = require("../constants/AudioParamRate");
+const { FINISHED } = require("../constants/PlaybackState");
 
 class AudioBufferSourceNode extends AudioScheduledSourceNode {
   /**
@@ -13,8 +15,8 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
     super(context);
     this._buffer = null;
     this._audioData = null;
-    this._playbackRate = this.addParam("control", 1);
-    this._detune = this.addParam("control", 0);
+    this._playbackRate = this.addParam(CONTROL_RATE, 1);
+    this._detune = this.addParam(CONTROL_RATE, 0);
     this._loop = false;
     this._loopStart = 0;
     this._loopEnd = 0;
@@ -65,7 +67,7 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
    */
   getPlaybackState() {
     if (this._done) {
-      return "finished";
+      return FINISHED;
     }
     return super.getPlaybackState();
   }

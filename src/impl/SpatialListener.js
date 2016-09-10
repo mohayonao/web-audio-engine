@@ -1,6 +1,7 @@
 "use strict";
 
 const AudioParam = require("./AudioParam");
+const { AUDIO_RATE } = require("../constants/AudioParamRate");
 
 class SpatialListener {
   /**
@@ -8,15 +9,15 @@ class SpatialListener {
    */
   constructor(context) {
     this.context = context;
-    this._positionX = new AudioParam(context, { rate: "audio", defaultValue: 0 });
-    this._positionY = new AudioParam(context, { rate: "audio", defaultValue: 0 });
-    this._positionZ = new AudioParam(context, { rate: "audio", defaultValue: 0 });
-    this._forwardX = new AudioParam(context, { rate: "audio", defaultValue: 0 });
-    this._forwardY = new AudioParam(context, { rate: "audio", defaultValue: 0 });
-    this._forwardZ = new AudioParam(context, { rate: "audio", defaultValue: 0 });
-    this._upX = new AudioParam(context, { rate: "audio", defaultValue: 0 });
-    this._upY = new AudioParam(context, { rate: "audio", defaultValue: 0 });
-    this._upZ = new AudioParam(context, { rate: "audio", defaultValue: 0 });
+    this._positionX = new AudioParam(context, { rate: AUDIO_RATE, defaultValue: 0 });
+    this._positionY = new AudioParam(context, { rate: AUDIO_RATE, defaultValue: 0 });
+    this._positionZ = new AudioParam(context, { rate: AUDIO_RATE, defaultValue: 0 });
+    this._forwardX = new AudioParam(context, { rate: AUDIO_RATE, defaultValue: 0 });
+    this._forwardY = new AudioParam(context, { rate: AUDIO_RATE, defaultValue: 0 });
+    this._forwardZ = new AudioParam(context, { rate: AUDIO_RATE, defaultValue: 0 });
+    this._upX = new AudioParam(context, { rate: AUDIO_RATE, defaultValue: 0 });
+    this._upY = new AudioParam(context, { rate: AUDIO_RATE, defaultValue: 0 });
+    this._upZ = new AudioParam(context, { rate: AUDIO_RATE, defaultValue: 0 });
   }
 
   /**

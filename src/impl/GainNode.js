@@ -3,6 +3,7 @@
 const AudioNode = require("./AudioNode");
 const GainNodeDSP = require("./dsp/GainNode");
 const { MAX } = require("../constants/ChannelCountMode");
+const { AUDIO_RATE } = require("../constants/AudioParamRate");
 
 class GainNode extends AudioNode {
   /**
@@ -15,7 +16,7 @@ class GainNode extends AudioNode {
       channelCount: 2,
       channelCountMode: MAX
     });
-    this._gain = this.addParam("audio", 1);
+    this._gain = this.addParam(AUDIO_RATE, 1);
   }
 
   /**

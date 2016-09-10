@@ -3,6 +3,7 @@
 const util = require("../util");
 const config = require("../config");
 const AudioContext = require("../api/AudioContext");
+
 const DSPAlgorithm = [];
 
 class WebAudioContext extends AudioContext {

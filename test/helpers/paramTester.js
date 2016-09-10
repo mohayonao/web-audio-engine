@@ -2,10 +2,11 @@
 
 const assert = require("assert");
 const AudioParam = require("../../src/impl/AudioParam");
+const { AUDIO_RATE } = require("../../src/constants/AudioParamRate");
 
 function makeTests(context, expectedValues, sched1, sched2) {
   it("works", () => {
-    const param = new AudioParam(context, { rate: "audio", defaultValue: 0 });
+    const param = new AudioParam(context, { rate: AUDIO_RATE, defaultValue: 0 });
 
     sched1(param);
 
@@ -23,7 +24,7 @@ function makeTests(context, expectedValues, sched1, sched2) {
   });
 
   it("works partially", () => {
-    const param = new AudioParam(context, { rate: "audio", defaultValue: 0 });
+    const param = new AudioParam(context, { rate: AUDIO_RATE, defaultValue: 0 });
 
     sched1(param);
 
@@ -41,7 +42,7 @@ function makeTests(context, expectedValues, sched1, sched2) {
   });
 
   it("works with dynamic insertion", () => {
-    const param = new AudioParam(context, { rate: "audio", defaultValue: 0 });
+    const param = new AudioParam(context, { rate: AUDIO_RATE, defaultValue: 0 });
 
     sched1(param);
 

@@ -3,14 +3,11 @@
 const assert = require("assert");
 const util = require("../../util");
 const audioParamUtil = require("../../util/audioParamUtil");
-
-const SET_VALUE_AT_TIME = 1;
-const LINEAR_RAMP_TO_VALUE_AT_TIME = 2;
-const EXPONENTIAL_RAMP_TO_VALUE_AT_TIME = 3;
-const SET_TARGET_AT_TIME = 4;
-const SET_VALUE_CURVE_AT_TIME = 5;
-const CONTROL = 1;
-const AUDIO = 2;
+const { SET_VALUE_AT_TIME } = require("../../constants/AudioParamEvent");
+const { LINEAR_RAMP_TO_VALUE_AT_TIME } = require("../../constants/AudioParamEvent");
+const { EXPONENTIAL_RAMP_TO_VALUE_AT_TIME } = require("../../constants/AudioParamEvent");
+const { SET_TARGET_AT_TIME } = require("../../constants/AudioParamEvent");
+const { SET_VALUE_CURVE_AT_TIME } = require("../../constants/AudioParamEvent");
 
 const AudioParamDSP = {
   dspInit() {
@@ -325,13 +322,5 @@ const AudioParamDSP = {
     this._quantumStartFrame = quantumEndFrame;
   }
 };
-
-AudioParamDSP.SET_VALUE_AT_TIME = SET_VALUE_AT_TIME;
-AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME = LINEAR_RAMP_TO_VALUE_AT_TIME;
-AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME = EXPONENTIAL_RAMP_TO_VALUE_AT_TIME;
-AudioParamDSP.SET_TARGET_AT_TIME = SET_TARGET_AT_TIME;
-AudioParamDSP.SET_VALUE_CURVE_AT_TIME = SET_VALUE_CURVE_AT_TIME;
-AudioParamDSP.CONTROL = CONTROL;
-AudioParamDSP.AUDIO = AUDIO;
 
 module.exports = AudioParamDSP;

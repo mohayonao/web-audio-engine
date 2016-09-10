@@ -4,9 +4,13 @@ const util = require("../util");
 const AudioScheduledSourceNode = require("./AudioScheduledSourceNode");
 const PeriodicWave = require("./PeriodicWave");
 const OscillatorNodeDSP = require("./dsp/OscillatorNode");
+const { AUDIO_RATE } = require("../constants/AudioParamRate");
+const { SINE, SAWTOOTH, TRIANGLE, SQUARE, CUSTOM } = require("../constants/OscillatorType");
 
-const OscillatorTypes = PeriodicWave.BasicWaveForms;
 const DefaultPeriodicWaves = {};
+const allowedOscillatorTypes = [
+  SINE, SAWTOOTH, TRIANGLE, SQUARE
+];
 
 class OscillatorNode extends AudioScheduledSourceNode {
   /**
@@ -14,9 +18,9 @@ class OscillatorNode extends AudioScheduledSourceNode {
    */
   constructor(context) {
     super(context);
-    this._frequency = this.addParam("audio", 440);
-    this._detune = this.addParam("audio", 0);
-    this._type = "sine";
+    this._frequency = this.addParam(AUDIO_RATE, 440);
+    this._detune = this.addParam(AUDIO_RATE, 0);
+    this._type = SINE;
     this._periodicWave = this.buildPeriodicWave(this._type);
     this._waveTable = null;
     this.dspInit();
@@ -34,7 +38,7 @@ class OscillatorNode extends AudioScheduledSourceNode {
    */
   setType(value) {
     /* istanbul ignore else */
-    if (OscillatorTypes.indexOf(value) !== -1) {
+    if (allowedOscillatorTypes.indexOf(value) !== -1) {
       this._type = value;
       this._periodicWave = this.buildPeriodicWave(value);
       this._waveTable = this._periodicWave.getWaveTable();
@@ -63,7 +67,7 @@ class OscillatorNode extends AudioScheduledSourceNode {
 
     /* istanbul ignore else */
     if (periodicWave instanceof PeriodicWave) {
-      this._type = "custom";
+      this._type = CUSTOM;
       this._periodicWave = periodicWave;
       this._waveTable = this._periodicWave.getWaveTable();
     }
