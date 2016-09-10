@@ -93,11 +93,6 @@ class AudioContext extends EventTarget {
     return new AudioBufferSourceNode(this);
   }
 
-  /* istanbul ignore next */
-  createAudioWorker() {
-    throw new TypeError("NOT SUPPORTED");
-  }
-
   createScriptProcessor(bufferSize, numberOfInputChannels, numberOfOutputChannels) {
     return new ScriptProcessorNode(this, { bufferSize, numberOfInputChannels, numberOfOutputChannels });
   }
