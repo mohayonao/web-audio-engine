@@ -70,7 +70,7 @@
     "postversion": "git push && git push --tags && npm run clean",
     "prepublish": "npm-run-all clean lint test build",
     "preversion": "npm-run-all clean lint test",
-    "test": "BABEL_ENV=test mocha",
+    "test": "mocha",
     "travis": "npm-run-all lint test",
     "version": "npm run build && git add -A build"
   }

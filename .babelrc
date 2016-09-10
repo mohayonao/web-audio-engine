@@ -15,12 +15,6 @@
         "power-assert"
       ],
     },
-    "test": {
-      "only": [ "src", "test" ],
-      "presets": [
-        "power-assert"
-      ]
-    },
     "cover": {
       "only": [ "src" ],
       "plugins": [
