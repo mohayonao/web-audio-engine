@@ -15,24 +15,6 @@ class AudioSourceNode extends AudioNode {
     });
   }
 
-  getChannelCount() {
-    return 0;
-  }
-
-  setChannelCount() {}
-
-  getChannelCountMode() {
-    return "explicit";
-  }
-
-  setChannelCountMode() {}
-
-  getChannelInterpretation() {
-    return "discrete";
-  }
-
-  setChannelInterpretation() {}
-
   enableOutputsIfNecessary() {
     assert(!"SHOULD NOT BE CALLED");
   }

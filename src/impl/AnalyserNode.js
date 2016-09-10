@@ -4,6 +4,7 @@ const fft = require("fourier-transform");
 const util = require("../util");
 const AudioNode = require("./AudioNode");
 const AnalyserNodeDSP = require("./dsp/AnalyserNode");
+const { MAX } = require("../constants/ChannelCountMode");
 
 const MaxFFTSize = 32768;
 const MinFFTSize = 32;
@@ -17,7 +18,7 @@ class AnalyserNode extends AudioNode {
       inputs: [ 1 ],
       outputs: [ 1 ],
       channelCount: 1,
-      channelCountMode: "max"
+      channelCountMode: MAX
     });
     this._fftSize = 2048;
     this._minDecibels = -100;

@@ -3,6 +3,8 @@
 const assert = require("assert");
 const util = require("../../util");
 const AudioData = require("./AudioData");
+const { DISCRETE } = require("../../constants/ChannelInterpretation");
+
 const DSPAlgorithm = {};
 
 /**
@@ -18,23 +20,21 @@ class AudioBus {
   constructor(numberOfChannels, length, sampleRate) {
     this.audioData = new AudioData(numberOfChannels, length, sampleRate);
     this.isSilent = true;
-    this._channelInterpretation = "discrete";
+    this.channelInterpretation = DISCRETE;
   }
 
   /**
-   * @return {string} [ "speakers", "discrete" ]
+   * @return {string} [ SPEAKERS, DISCRETE ]
    */
   getChannelInterpretation() {
-    return this._channelInterpretation;
+    return this.channelInterpretation;
   }
 
   /**
-   * @param {string} value - [ "speakers", "discrete" ]
+   * @param {string} value - [ SPEAKERS, DISCRETE ]
    */
   setChannelInterpretation(value) {
-    if (value !== this._channelInterpretation && isValidChannelInterpretation(value)) {
-      this._channelInterpretation = value;
-    }
+    this.channelInterpretation = value;
   }
 
   /**
@@ -50,7 +50,7 @@ class AudioBus {
   setNumberOfChannels(numberOfChannels) {
     const audioBus = new AudioBus(numberOfChannels, this.getLength(), this.getSampleRate());
 
-    audioBus._channelInterpretation = this._channelInterpretation;
+    audioBus.channelInterpretation = this.channelInterpretation;
     audioBus.sumFrom(this);
 
     this.audioData = audioBus.audioData;
@@ -184,7 +184,7 @@ class AudioBus {
     let mixFunction;
     let algoIndex = source.length * 1000 + destination.length;
 
-    if (this._channelInterpretation === "discrete") {
+    if (this.channelInterpretation === DISCRETE) {
       algoIndex += 2000000;
     } else {
       algoIndex += 1000000;
@@ -393,9 +393,5 @@ DSPAlgorithm[1006004] = (source, destination, length) => {
     outputSR[i] += inputSR[i];
   }
 };
-
-function isValidChannelInterpretation(value) {
-  return value === "speakers" || value === "discrete";
-}
 
 module.exports = AudioBus;

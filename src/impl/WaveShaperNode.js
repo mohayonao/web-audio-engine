@@ -2,6 +2,7 @@
 
 const AudioNode = require("./AudioNode");
 const WaveShaperNodeDSP = require("./dsp/WaveShaperNode");
+const { MAX } = require("../constants/ChannelCountMode");
 
 const OverSampleTypes = [ "none", "2x", "4x" ];
 
@@ -14,7 +15,7 @@ class WaveShaperNode extends AudioNode {
       inputs: [ 1 ],
       outputs: [ 1 ],
       channelCount: 2,
-      channelCountMode: "max"
+      channelCountMode: MAX
     });
     this._curve = null;
     this._overSample = "none";

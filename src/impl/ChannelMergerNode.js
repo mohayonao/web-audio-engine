@@ -3,6 +3,7 @@
 const util = require("../util");
 const AudioNode = require("./AudioNode");
 const ChannelMergerNodeDSP = require("./dsp/ChannelMergerNode");
+const { EXPLICIT } = require("../constants/ChannelCountMode");
 
 class ChannelMergerNode extends AudioNode {
   /**
@@ -19,36 +20,9 @@ class ChannelMergerNode extends AudioNode {
       inputs: new Array(numberOfInputs).fill(1),
       outputs: [ numberOfInputs ],
       channelCount: 1,
-      channelCountMode: "explicit"
-    });
-  }
-
-  getChannelCount() {
-    return 1;
-  }
-
-  setChannelCount() {
-    // This node's channelCount cannot be changed.
-  }
-
-  getChannelCountMode() {
-    return "explicit";
-  }
-
-  setChannelCountMode() {
-    // This node's channelCountMode cannot be changed.
-  }
-
-  getChannelInterpretation() {
-    return this.inputs[0].getChannelInterpretation();
-  }
-
-  /**
-   * @param {string} value
-   */
-  setChannelInterpretation(value) {
-    this.inputs.forEach((input) => {
-      input.setChannelInterpretation(value);
+      channelCountMode: EXPLICIT,
+      allowedMaxChannelCount: 1,
+      allowedChannelCountMode: [ EXPLICIT ]
     });
   }
 

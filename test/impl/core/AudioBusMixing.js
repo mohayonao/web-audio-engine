@@ -5,6 +5,7 @@ require("run-with-mocha");
 const assert = require("assert");
 const np = require("../../helpers/np");
 const AudioBus = require("../../../src/impl/core/AudioBus");
+const { DISCRETE, SPEAKERS } = require("../../../src/constants/ChannelInterpretation");
 
 describe("impl/core/AudioBus - mixing", () => {
   function mixBy() {
@@ -34,7 +35,7 @@ describe("impl/core/AudioBus - mixing", () => {
     const bus2 = new AudioBus(1, 128, 44100);
     const bus3 = new AudioBus(1, 128, 44100);
 
-    bus3.setChannelInterpretation("speakers");
+    bus3.setChannelInterpretation(SPEAKERS);
     bus3.sumFrom(bus1);
 
     bus3.zeros();
@@ -56,7 +57,7 @@ describe("impl/core/AudioBus - mixing", () => {
 
     bus1.getMutableData()[0].set(np.random_sample(128));
     bus2.getMutableData()[0].set(np.random_sample(128));
-    bus3.setChannelInterpretation("discrete");
+    bus3.setChannelInterpretation(DISCRETE);
     bus3.zeros();
 
     bus3.sumFrom(bus1);
@@ -86,7 +87,7 @@ describe("impl/core/AudioBus - mixing", () => {
     bus1.getMutableData()[1].set(np.random_sample(128));
     bus2.getMutableData()[0].set(np.random_sample(128));
     bus2.getMutableData()[1].set(np.random_sample(128));
-    bus3.setChannelInterpretation("discrete");
+    bus3.setChannelInterpretation(DISCRETE);
     bus3.zeros();
 
     bus3.sumFrom(bus1);
@@ -114,7 +115,7 @@ describe("impl/core/AudioBus - mixing", () => {
 
     bus1.getMutableData()[0].set(np.random_sample(128));
     bus2.getMutableData()[0].set(np.random_sample(128));
-    bus3.setChannelInterpretation("speakers");
+    bus3.setChannelInterpretation(SPEAKERS);
     bus3.zeros();
 
     bus3.sumFrom(bus1);
@@ -142,7 +143,7 @@ describe("impl/core/AudioBus - mixing", () => {
 
     bus1.getMutableData()[0].set(np.random_sample(128));
     bus2.getMutableData()[0].set(np.random_sample(128));
-    bus3.setChannelInterpretation("speakers");
+    bus3.setChannelInterpretation(SPEAKERS);
     bus3.zeros();
 
     bus3.sumFrom(bus1);
@@ -170,7 +171,7 @@ describe("impl/core/AudioBus - mixing", () => {
 
     bus1.getMutableData()[0].set(np.random_sample(128));
     bus2.getMutableData()[0].set(np.random_sample(128));
-    bus3.setChannelInterpretation("speakers");
+    bus3.setChannelInterpretation(SPEAKERS);
     bus3.zeros();
 
     bus3.sumFrom(bus1);
@@ -198,7 +199,7 @@ describe("impl/core/AudioBus - mixing", () => {
 
     bus1.getMutableData()[0].set(np.random_sample(128));
     bus2.getMutableData()[0].set(np.random_sample(128));
-    bus3.setChannelInterpretation("speakers");
+    bus3.setChannelInterpretation(SPEAKERS);
     bus3.zeros();
 
     bus3.sumFrom(bus1);
@@ -228,7 +229,7 @@ describe("impl/core/AudioBus - mixing", () => {
     bus1.getMutableData()[1].set(np.random_sample(128));
     bus2.getMutableData()[0].set(np.random_sample(128));
     bus2.getMutableData()[1].set(np.random_sample(128));
-    bus3.setChannelInterpretation("speakers");
+    bus3.setChannelInterpretation(SPEAKERS);
     bus3.zeros();
 
     bus3.sumFrom(bus1);
@@ -258,7 +259,7 @@ describe("impl/core/AudioBus - mixing", () => {
     bus1.getMutableData()[1].set(np.random_sample(128));
     bus2.getMutableData()[0].set(np.random_sample(128));
     bus2.getMutableData()[1].set(np.random_sample(128));
-    bus3.setChannelInterpretation("speakers");
+    bus3.setChannelInterpretation(SPEAKERS);
     bus3.zeros();
 
     bus3.sumFrom(bus1);
@@ -288,7 +289,7 @@ describe("impl/core/AudioBus - mixing", () => {
     bus1.getMutableData()[1].set(np.random_sample(128));
     bus2.getMutableData()[0].set(np.random_sample(128));
     bus2.getMutableData()[1].set(np.random_sample(128));
-    bus3.setChannelInterpretation("speakers");
+    bus3.setChannelInterpretation(SPEAKERS);
     bus3.zeros();
 
     bus3.sumFrom(bus1);
@@ -322,7 +323,7 @@ describe("impl/core/AudioBus - mixing", () => {
     bus2.getMutableData()[1].set(np.random_sample(128));
     bus2.getMutableData()[2].set(np.random_sample(128));
     bus2.getMutableData()[3].set(np.random_sample(128));
-    bus3.setChannelInterpretation("speakers");
+    bus3.setChannelInterpretation(SPEAKERS);
     bus3.zeros();
 
     bus3.sumFrom(bus1);
@@ -356,7 +357,7 @@ describe("impl/core/AudioBus - mixing", () => {
     bus2.getMutableData()[1].set(np.random_sample(128));
     bus2.getMutableData()[2].set(np.random_sample(128));
     bus2.getMutableData()[3].set(np.random_sample(128));
-    bus3.setChannelInterpretation("speakers");
+    bus3.setChannelInterpretation(SPEAKERS);
     bus3.zeros();
 
     bus3.sumFrom(bus1);
@@ -386,7 +387,7 @@ describe("impl/core/AudioBus - mixing", () => {
     bus1.getMutableData()[1].set(np.random_sample(128));
     bus2.getMutableData()[0].set(np.random_sample(128));
     bus2.getMutableData()[1].set(np.random_sample(128));
-    bus3.setChannelInterpretation("speakers");
+    bus3.setChannelInterpretation(SPEAKERS);
     bus3.zeros();
 
     bus3.sumFrom(bus1);
@@ -420,7 +421,7 @@ describe("impl/core/AudioBus - mixing", () => {
     bus2.getMutableData()[1].set(np.random_sample(128));
     bus2.getMutableData()[2].set(np.random_sample(128));
     bus2.getMutableData()[3].set(np.random_sample(128));
-    bus3.setChannelInterpretation("speakers");
+    bus3.setChannelInterpretation(SPEAKERS);
     bus3.zeros();
 
     bus3.sumFrom(bus1);
@@ -458,7 +459,7 @@ describe("impl/core/AudioBus - mixing", () => {
     bus2.getMutableData()[3].set(np.random_sample(128));
     bus2.getMutableData()[4].set(np.random_sample(128));
     bus2.getMutableData()[5].set(np.random_sample(128));
-    bus3.setChannelInterpretation("speakers");
+    bus3.setChannelInterpretation(SPEAKERS);
     bus3.zeros();
 
     bus3.sumFrom(bus1);
@@ -492,7 +493,7 @@ describe("impl/core/AudioBus - mixing", () => {
     bus2.getMutableData()[1].set(np.random_sample(128));
     bus2.getMutableData()[2].set(np.random_sample(128));
     bus2.getMutableData()[3].set(np.random_sample(128));
-    bus3.setChannelInterpretation("speakers");
+    bus3.setChannelInterpretation(SPEAKERS);
     bus3.zeros();
 
     bus3.sumFrom(bus1);
@@ -530,7 +531,7 @@ describe("impl/core/AudioBus - mixing", () => {
     bus2.getMutableData()[3].set(np.random_sample(128));
     bus2.getMutableData()[4].set(np.random_sample(128));
     bus2.getMutableData()[5].set(np.random_sample(128));
-    bus3.setChannelInterpretation("speakers");
+    bus3.setChannelInterpretation(SPEAKERS);
     bus3.zeros();
 
     bus3.sumFrom(bus1);
@@ -568,7 +569,7 @@ describe("impl/core/AudioBus - mixing", () => {
     bus2.getMutableData()[3].set(np.random_sample(128));
     bus2.getMutableData()[4].set(np.random_sample(128));
     bus2.getMutableData()[5].set(np.random_sample(128));
-    bus3.setChannelInterpretation("speakers");
+    bus3.setChannelInterpretation(SPEAKERS);
     bus3.zeros();
 
     bus3.sumFrom(bus1);
@@ -604,7 +605,7 @@ describe("impl/core/AudioBus - mixing", () => {
     bus3.getMutableData()[1].set(np.random_sample(128));
     bus4.getMutableData()[0].set(np.random_sample(128));
     bus4.getMutableData()[1].set(np.random_sample(128));
-    bus5.setChannelInterpretation("speakers");
+    bus5.setChannelInterpretation(SPEAKERS);
     bus5.zeros();
 
     bus5.sumFromWithOffset(bus1, 0);

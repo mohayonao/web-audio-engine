@@ -57,15 +57,12 @@ describe("impl/ConvolverNode", () => {
 
       node.setChannelCountMode("max");
       assert(node.getChannelCountMode() === "clamped-max");
-      assert(node.inputs[0].getChannelCountMode() === "clamped-max");
 
       node.setChannelCountMode("explicit");
       assert(node.getChannelCountMode() === "explicit");
-      assert(node.inputs[0].getChannelCountMode() === "explicit");
 
       node.setChannelCountMode("clamped-max");
       assert(node.getChannelCountMode() === "clamped-max");
-      assert(node.inputs[0].getChannelCountMode() === "clamped-max");
     });
 
     it(".buffer=", () => {

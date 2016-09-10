@@ -2,6 +2,7 @@
 
 const AudioNode = require("./AudioNode");
 const DynamicsCompressorNodeDSP = require("./dsp/DynamicsCompressorNode");
+const { EXPLICIT } = require("../constants/ChannelCountMode");
 
 class DynamicsCompressorNode extends AudioNode {
   /**
@@ -12,7 +13,7 @@ class DynamicsCompressorNode extends AudioNode {
       inputs: [ 1 ],
       outputs: [ 2 ],
       channelCount: 2,
-      channelCountMode: "explicit"
+      channelCountMode: EXPLICIT
     });
     this._threshold = this.addParam("control", -24);
     this._knee = this.addParam("control", 30);

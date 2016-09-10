@@ -5,6 +5,7 @@ const util = require("../util");
 const AudioNodeInput = require("./core/AudioNodeInput");
 const AudioBus = require("./core/AudioBus");
 const AudioParamDSP = require("./dsp/AudioParam");
+const { EXPLICIT } = require("../constants/ChannelCountMode");
 
 /**
  * @prop {AudioContext}      context
@@ -32,7 +33,7 @@ class AudioParam {
         index: 0,
         numberOfChannels: 1,
         channelCount: 1,
-        channelCountMode: "explicit"
+        channelCountMode: EXPLICIT
       })
     ];
     this.outputBus = new AudioBus(1, this.blockSize, this.sampleRate);

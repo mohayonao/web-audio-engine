@@ -47,27 +47,19 @@ describe("impl/ChannelMergerNode", () => {
       const node = new ChannelMergerNode(context, { numberOfInputs: 2 });
 
       assert(node.getChannelCountMode() === "explicit");
-      assert(node.inputs[0].getChannelCountMode() === "explicit");
-      assert(node.inputs[1].getChannelCountMode() === "explicit");
 
       node.setChannelCountMode("max");
       assert(node.getChannelCountMode() === "explicit");
-      assert(node.inputs[0].getChannelCountMode() === "explicit");
-      assert(node.inputs[1].getChannelCountMode() === "explicit");
     });
 
     it(".channelInterpretation=", () => {
       const node = new ChannelMergerNode(context, { numberOfInputs: 2 });
 
       assert(node.getChannelInterpretation() === "speakers");
-      assert(node.inputs[0].getChannelInterpretation() === "speakers");
-      assert(node.inputs[1].getChannelInterpretation() === "speakers");
 
       node.setChannelInterpretation("discrete");
 
       assert(node.getChannelInterpretation() === "discrete");
-      assert(node.inputs[0].getChannelInterpretation() === "discrete");
-      assert(node.inputs[1].getChannelInterpretation() === "discrete");
     });
   });
 

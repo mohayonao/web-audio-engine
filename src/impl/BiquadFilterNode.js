@@ -3,6 +3,7 @@
 const assert = require("assert");
 const AudioNode = require("./AudioNode");
 const BiquadFilterNodeDSP = require("./dsp/BiquadFilterNode");
+const { MAX } = require("../constants/ChannelCountMode");
 
 class BiquadFilterNode extends AudioNode {
   /**
@@ -13,7 +14,7 @@ class BiquadFilterNode extends AudioNode {
       inputs: [ 1 ],
       outputs: [ 1 ],
       channelCount: 2,
-      channelCountMode: "max"
+      channelCountMode: MAX
     });
     this._type = BiquadFilterNodeDSP.LOWPASS;
     this._frequency = this.addParam("control", 350);
