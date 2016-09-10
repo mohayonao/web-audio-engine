@@ -2,7 +2,7 @@
 
 const toNumber = require("./toNumber");
 const clamp = require("./clamp");
-const MAX_NUMBER_OF_CHANNELS = 32;
+const { MAX_NUMBER_OF_CHANNELS } = require("../constants");
 
 /**
  * @param {number} value
