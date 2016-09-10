@@ -12,9 +12,7 @@ class ScriptProcessorNode extends AudioNode {
    * @param {number}       opts.numberOfInputChannels
    * @param {number}       opts.numberOfOutputChannels
    */
-  constructor(context, opts) {
-    opts = opts || /* istanbul ignore next */ {};
-
+  constructor(context, /* istanbul ignore next */ opts = {}) {
     let bufferSize = opts.bufferSize;
     let numberOfInputChannels = opts.numberOfInputChannels;
     let numberOfOutputChannels = opts.numberOfOutputChannels;

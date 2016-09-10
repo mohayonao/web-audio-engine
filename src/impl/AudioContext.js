@@ -21,9 +21,7 @@ class AudioContext extends EventTarget {
    * @param {number} opts.blockSize
    * @param {number} opts.numberOfChannels
    */
-  constructor(opts) {
-    opts = opts || /* istanbul ignore next */ {};
-
+  constructor(opts = {}) {
     super();
 
     let sampleRate = util.defaults(opts.sampleRate, config.sampleRate);

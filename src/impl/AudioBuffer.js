@@ -14,9 +14,7 @@ class AudioBuffer {
    * @param {number}       opts.length
    * @param {number}       opts.sampleRate
    */
-  constructor(context, opts) {
-    opts = opts || /* istanbul ignore next */ {};
-
+  constructor(context, /* istanbul ignore next */ opts = {}) {
     let numberOfChannels = opts.numberOfChannels;
     let length = opts.length;
     let sampleRate = opts.sampleRate;

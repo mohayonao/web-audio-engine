@@ -10,9 +10,7 @@ class DelayNode extends AudioNode {
    * @param {object}       opts
    * @param {number}       opts.maxDelayTime
    */
-  constructor(context, opts) {
-    opts = opts || /* istanbul ignore next */ {};
-
+  constructor(context, /* istanbul ignore next */ opts = {}) {
     let maxDelayTime = util.defaults(opts.maxDelayTime, 1);
 
     super(context, {

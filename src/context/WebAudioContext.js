@@ -14,9 +14,7 @@ class WebAudioContext extends AudioContext {
    * @param {number}       opts.numberOfChannels
    * @param {number}       opts.bufferSize
    */
-  constructor(opts) {
-    opts = opts || /* istanbul ignore next */ {};
-
+  constructor(opts = {}) {
     let destination = opts.destination || opts.context.destination;
     let context = destination.context;
     let sampleRate = context.sampleRate;

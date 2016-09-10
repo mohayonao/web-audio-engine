@@ -7,8 +7,7 @@ const audioDataUtil = require("./audioDataUtil");
  * @param {AudioData} audioData
  * @param {object}    opts
  */
-function encode(encodeFn, audioData, opts) {
-  opts = opts /* istanbul ignore next */ || {};
+function encode(encodeFn, audioData, /* istanbul ignore next */ opts = {}) {
   if (!audioDataUtil.isAudioData(audioData)) {
     audioData = audioDataUtil.toAudioData(audioData);
   }

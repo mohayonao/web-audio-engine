@@ -10,9 +10,7 @@ class ChannelMergerNode extends AudioNode {
    * @param {object}       opts
    * @param {number}       opts.numberOfInputs
    */
-  constructor(context, opts) {
-    opts = opts || /* istanbul ignore next */ {};
-
+  constructor(context, /* istanbul ignore next */ opts = {}) {
     let numberOfInputs = util.defaults(opts.numberOfInputs, 6);
 
     numberOfInputs = util.toValidNumberOfChannels(numberOfInputs);

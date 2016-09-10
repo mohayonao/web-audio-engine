@@ -22,9 +22,7 @@ class AudioNode extends EventTarget {
    * @param {number}       opts.channelCount
    * @param {string}       opts.channelCountMode
    */
-  constructor(context, opts) {
-    opts = opts || /* istanbul ignore next */ {};
-
+  constructor(context, /* istanbul ignore next */ opts = {}) {
     let inputs = util.defaults(opts.inputs, []);
     let outputs = util.defaults(opts.outputs, []);
     let channelCount = util.defaults(opts.channelCount, 1);

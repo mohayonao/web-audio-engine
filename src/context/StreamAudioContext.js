@@ -17,9 +17,7 @@ class StreamAudioContext extends AudioContext {
    * @param {number}  opts.bitDepth
    * @param {boolean} opts.floatingPoint
    */
-  constructor(opts) {
-    opts = opts || /* istanbul ignore next */ {};
-
+  constructor(opts = {}) {
     let sampleRate = util.defaults(opts.sampleRate, config.sampleRate);
     let blockSize = util.defaults(opts.blockSize, config.blockSize);
     let numberOfChannels = util.defaults(opts.channels || opts.numberOfChannels, config.numberOfChannels);

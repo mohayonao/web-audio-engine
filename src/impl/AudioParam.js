@@ -19,9 +19,7 @@ class AudioParam {
    * @param {string}       opts.rate - [ "audio", "control "]
    * @param {number}       opts.defaultValue
    */
-  constructor(context, opts) {
-    opts = opts || /* istanbul ignore next */ {};
-
+  constructor(context, /* istanbul ignore next */ opts = {}) {
     let rate = util.defaults(opts.rate, "control");
     let defaultValue = util.defaults(opts.defaultValue, 0);
 

@@ -29,8 +29,7 @@ function set(type, fn) {
  * @param {object}    opts
  * @return {Promise<ArrayBuffer>}
  */
-function encode(audioData, opts) {
-  opts = opts || /* istanbul ignore next */ {};
+function encode(audioData, /* istanbul ignore next */ opts = {}) {
   const type = opts.type || "wav";
   const encodeFn = encoders[type];
 
