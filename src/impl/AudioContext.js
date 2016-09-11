@@ -6,6 +6,7 @@ const config = require("../config");
 const EventTarget = require("./EventTarget");
 const AudioDestinationNode = require("./AudioDestinationNode");
 const AudioListener = require("./AudioListener");
+const { RUNNING, SUSPENDED, CLOSED } = require("../constants/AudioContextState");
 
 /**
  * @prop {number} sampleRate
@@ -21,9 +22,7 @@ class AudioContext extends EventTarget {
    * @param {number} opts.blockSize
    * @param {number} opts.numberOfChannels
    */
-  constructor(opts) {
-    opts = opts || /* istanbul ignore next */ {};
-
+  constructor(opts = {}) {
     super();
 
     let sampleRate = util.defaults(opts.sampleRate, config.sampleRate);
@@ -39,7 +38,7 @@ class AudioContext extends EventTarget {
     this.numberOfChannels = numberOfChannels|0;
     this.currentTime = 0;
     this.currentSampleFrame = 0;
-    this.state = "suspended";
+    this.state = SUSPENDED;
     this._destination = new AudioDestinationNode(this, { numberOfChannels });
     this._listener = new AudioListener(this);
     this._sched = {};
@@ -86,8 +85,8 @@ class AudioContext extends EventTarget {
    * @return {Promise<void>}
    */
   suspend() {
-    if (this.state === "running") {
-      return this.changeState("suspended");
+    if (this.state === RUNNING) {
+      return this.changeState(SUSPENDED);
     }
     return this.notChangeState();
   }
@@ -96,8 +95,8 @@ class AudioContext extends EventTarget {
    * @return {Promise<void>}
    */
   resume() {
-    if (this.state === "suspended") {
-      return this.changeState("running");
+    if (this.state === SUSPENDED) {
+      return this.changeState(RUNNING);
     }
     return this.notChangeState();
   }
@@ -106,8 +105,8 @@ class AudioContext extends EventTarget {
    * @return {Promise<void>}
    */
   close() {
-    if (this.state !== "closed") {
-      return this.changeState("closed");
+    if (this.state !== CLOSED) {
+      return this.changeState(CLOSED);
     }
     return this.notChangeState();
   }
@@ -164,7 +163,7 @@ class AudioContext extends EventTarget {
   process(channelData, offset) {
     const destination = this._destination;
 
-    if (this.state !== "running") {
+    if (this.state !== RUNNING) {
       const numberOfChannels = channelData.length;
       const offsetEnd = offset + this.blockSize;
 
@@ -208,7 +207,7 @@ class AudioContext extends EventTarget {
   reset() {
     this.currentTime = 0;
     this.currentSampleFrame = 0;
-    this.state = "suspended";
+    this.state = SUSPENDED;
     this._destination = new AudioDestinationNode(this, { numberOfChannels: this.numberOfChannels });
     this._listener = new AudioListener(this);
     this._sched = [];

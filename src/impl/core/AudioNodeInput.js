@@ -3,6 +3,8 @@
 const assert = require("assert");
 const util = require("../../util");
 const AudioBus = require("./AudioBus");
+const { CLAMPED_MAX, EXPLICIT } = require("../../constants/ChannelCountMode");
+const { SPEAKERS } = require("../../constants/ChannelInterpretation");
 
 /**
  * @prop {AudioNode} node
@@ -29,7 +31,7 @@ class AudioNodeInput {
     this.index = index|0;
     this.bus = new AudioBus(numberOfChannels, node.blockSize, node.sampleRate);
 
-    this.bus.setChannelInterpretation("speakers");
+    this.bus.setChannelInterpretation(SPEAKERS);
     this.outputs = [];
     this._disabledOutputs = new WeakSet();
     this._channelCount = channelCount|0;
@@ -68,7 +70,7 @@ class AudioNodeInput {
    */
   setChannelCountMode(value) {
     /* istanbul ignore else */
-    if (value !== this._channelCountMode && isValidChannelCountMode(value)) {
+    if (value !== this._channelCountMode) {
       this._channelCountMode = value;
       this.updateNumberOfChannels();
     }
@@ -99,7 +101,7 @@ class AudioNodeInput {
    *
    */
   computeNumberOfChannels() {
-    if (this._channelCountMode === "explicit") {
+    if (this._channelCountMode === EXPLICIT) {
       return this._channelCount;
     }
 
@@ -107,7 +109,7 @@ class AudioNodeInput {
       return Math.max(maxChannels, output.getNumberOfChannels());
     }, 1);
 
-    if (this._channelCountMode === "clamped-max") {
+    if (this._channelCountMode === CLAMPED_MAX) {
       return Math.min(this._channelCount, maxChannels);
     }
 
@@ -279,10 +281,6 @@ function removeItem(target, source) {
 
 function moveItem(target, source, destination) {
   return removeItem(target, source) && addItem(target, destination);
-}
-
-function isValidChannelCountMode(value) {
-  return value === "max" || value === "clamped-max" || value === "explicit";
 }
 
 module.exports = AudioNodeInput;

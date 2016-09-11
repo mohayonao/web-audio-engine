@@ -1,10 +1,16 @@
 "use strict";
 
-const assert = require("assert");
 const util = require("../util");
 const AudioNodeInput = require("./core/AudioNodeInput");
 const AudioBus = require("./core/AudioBus");
 const AudioParamDSP = require("./dsp/AudioParam");
+const { EXPLICIT } = require("../constants/ChannelCountMode");
+const { CONTROL_RATE } = require("../constants/AudioParamRate");
+const { SET_VALUE_AT_TIME } = require("../constants/AudioParamEvent");
+const { LINEAR_RAMP_TO_VALUE_AT_TIME } = require("../constants/AudioParamEvent");
+const { EXPONENTIAL_RAMP_TO_VALUE_AT_TIME } = require("../constants/AudioParamEvent");
+const { SET_TARGET_AT_TIME } = require("../constants/AudioParamEvent");
+const { SET_VALUE_CURVE_AT_TIME } = require("../constants/AudioParamEvent");
 
 /**
  * @prop {AudioContext}      context
@@ -16,13 +22,11 @@ const AudioParamDSP = require("./dsp/AudioParam");
 class AudioParam {
   /**
    * @param {AudioContext} context
-   * @param {string}       opts.rate - [ "audio", "control "]
+   * @param {string}       opts.rate - [ AUDIO_RATE, CONTROL_RATE ]
    * @param {number}       opts.defaultValue
    */
-  constructor(context, opts) {
-    opts = opts || /* istanbul ignore next */ {};
-
-    let rate = util.defaults(opts.rate, "control");
+  constructor(context, /* istanbul ignore next */ opts = {}) {
+    let rate = util.defaults(opts.rate, CONTROL_RATE);
     let defaultValue = util.defaults(opts.defaultValue, 0);
 
     this.context = context;
@@ -34,12 +38,12 @@ class AudioParam {
         index: 0,
         numberOfChannels: 1,
         channelCount: 1,
-        channelCountMode: "explicit"
+        channelCountMode: EXPLICIT
       })
     ];
     this.outputBus = new AudioBus(1, this.blockSize, this.sampleRate);
 
-    this._rate = this.fromRateName(rate);
+    this._rate = rate;
     this._defaultValue = util.toNumber(defaultValue);
     this._value = this._defaultValue;
     this._userValue = this._value;
@@ -78,7 +82,7 @@ class AudioParam {
     startTime = Math.max(0, util.toNumber(startTime));
 
     const eventItem = {
-      type: AudioParamDSP.SET_VALUE_AT_TIME,
+      type: SET_VALUE_AT_TIME,
       time: startTime,
       args: [ value, startTime ],
       startFrame: Math.round(startTime * this.sampleRate),
@@ -92,8 +96,8 @@ class AudioParam {
 
     if (prevEventItem) {
       switch (prevEventItem.type) {
-      case AudioParamDSP.SET_VALUE_AT_TIME:
-      case AudioParamDSP.SET_TARGET_AT_TIME:
+      case SET_VALUE_AT_TIME:
+      case SET_TARGET_AT_TIME:
         prevEventItem.endFrame = eventItem.startFrame;
         break;
       }
@@ -101,8 +105,8 @@ class AudioParam {
 
     if (nextEventItem) {
       switch (nextEventItem.type) {
-      case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
-      case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
+      case LINEAR_RAMP_TO_VALUE_AT_TIME:
+      case EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
         nextEventItem.startFrame = eventItem.startFrame;
         nextEventItem.startValue = eventItem.startValue;
         break;
@@ -125,7 +129,7 @@ class AudioParam {
     endTime = Math.max(0, util.toNumber(endTime));
 
     const eventItem = {
-      type: AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME,
+      type: LINEAR_RAMP_TO_VALUE_AT_TIME,
       time: endTime,
       args: [ value, endTime ],
       startFrame: 0,
@@ -139,15 +143,15 @@ class AudioParam {
 
     if (prevEventItem) {
       switch (prevEventItem.type) {
-      case AudioParamDSP.SET_VALUE_AT_TIME:
-      case AudioParamDSP.SET_TARGET_AT_TIME:
+      case SET_VALUE_AT_TIME:
+      case SET_TARGET_AT_TIME:
         eventItem.startFrame = prevEventItem.startFrame;
         eventItem.startValue = prevEventItem.startValue;
         prevEventItem.endFrame = eventItem.startFrame;
         break;
-      case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
-      case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
-      case AudioParamDSP.SET_VALUE_CURVE_AT_TIME:
+      case LINEAR_RAMP_TO_VALUE_AT_TIME:
+      case EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
+      case SET_VALUE_CURVE_AT_TIME:
         eventItem.startFrame = prevEventItem.endFrame;
         eventItem.startValue = prevEventItem.endValue;
         break;
@@ -156,8 +160,8 @@ class AudioParam {
 
     if (nextEventItem) {
       switch (nextEventItem.type) {
-      case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
-      case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
+      case LINEAR_RAMP_TO_VALUE_AT_TIME:
+      case EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
         nextEventItem.startFrame = eventItem.endFrame;
         nextEventItem.startValue = eventItem.endValue;
         break;
@@ -179,7 +183,7 @@ class AudioParam {
     endTime = Math.max(0, util.toNumber(endTime));
 
     const eventItem = {
-      type: AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME,
+      type: EXPONENTIAL_RAMP_TO_VALUE_AT_TIME,
       time: endTime,
       args: [ value, endTime ],
       startFrame: 0,
@@ -193,15 +197,15 @@ class AudioParam {
 
     if (prevEventItem) {
       switch (prevEventItem.type) {
-      case AudioParamDSP.SET_VALUE_AT_TIME:
-      case AudioParamDSP.SET_TARGET_AT_TIME:
+      case SET_VALUE_AT_TIME:
+      case SET_TARGET_AT_TIME:
         eventItem.startFrame = prevEventItem.startFrame;
         eventItem.startValue = prevEventItem.startValue;
         prevEventItem.endFrame = eventItem.startFrame;
         break;
-      case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
-      case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
-      case AudioParamDSP.SET_VALUE_CURVE_AT_TIME:
+      case LINEAR_RAMP_TO_VALUE_AT_TIME:
+      case EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
+      case SET_VALUE_CURVE_AT_TIME:
         eventItem.startFrame = prevEventItem.endFrame;
         eventItem.startValue = prevEventItem.endValue;
         break;
@@ -210,8 +214,8 @@ class AudioParam {
 
     if (nextEventItem) {
       switch (nextEventItem.type) {
-      case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
-      case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
+      case LINEAR_RAMP_TO_VALUE_AT_TIME:
+      case EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
         nextEventItem.startFrame = eventItem.endFrame;
         nextEventItem.startValue = eventItem.endValue;
         break;
@@ -235,7 +239,7 @@ class AudioParam {
     timeConstant = Math.max(0, util.toNumber(timeConstant));
 
     const eventItem = {
-      type: AudioParamDSP.SET_TARGET_AT_TIME,
+      type: SET_TARGET_AT_TIME,
       time: startTime,
       args: [ target, startTime, timeConstant ],
       startFrame: Math.round(startTime * this.sampleRate),
@@ -249,17 +253,17 @@ class AudioParam {
 
     if (prevEventItem) {
       switch (prevEventItem.type) {
-      case AudioParamDSP.SET_VALUE_AT_TIME:
+      case SET_VALUE_AT_TIME:
         eventItem.startValue = prevEventItem.endValue;
         prevEventItem.endFrame = eventItem.startFrame;
         break;
-      case AudioParamDSP.SET_TARGET_AT_TIME:
+      case SET_TARGET_AT_TIME:
         eventItem.startValue = 0;
         prevEventItem.endFrame = eventItem.startFrame;
         break;
-      case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
-      case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
-      case AudioParamDSP.SET_VALUE_CURVE_AT_TIME:
+      case LINEAR_RAMP_TO_VALUE_AT_TIME:
+      case EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
+      case SET_VALUE_CURVE_AT_TIME:
         eventItem.startValue = prevEventItem.endValue;
         break;
       }
@@ -267,8 +271,8 @@ class AudioParam {
 
     if (nextEventItem) {
       switch (nextEventItem.type) {
-      case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
-      case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
+      case LINEAR_RAMP_TO_VALUE_AT_TIME:
+      case EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
         nextEventItem.startFrame = eventItem.startFrame;
         nextEventItem.startValue = eventItem.startValue;
         break;
@@ -296,7 +300,7 @@ class AudioParam {
     }
 
     const eventItem = {
-      type: AudioParamDSP.SET_VALUE_CURVE_AT_TIME,
+      type: SET_VALUE_CURVE_AT_TIME,
       time: startTime,
       args: [ values, startTime, duration ],
       startFrame: Math.round(startTime * this.sampleRate),
@@ -310,8 +314,8 @@ class AudioParam {
 
     if (prevEventItem) {
       switch (prevEventItem.type) {
-      case AudioParamDSP.SET_VALUE_AT_TIME:
-      case AudioParamDSP.SET_TARGET_AT_TIME:
+      case SET_VALUE_AT_TIME:
+      case SET_TARGET_AT_TIME:
         prevEventItem.endFrame = eventItem.startFrame;
         break;
       }
@@ -319,8 +323,8 @@ class AudioParam {
 
     if (nextEventItem) {
       switch (nextEventItem.type) {
-      case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
-      case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
+      case LINEAR_RAMP_TO_VALUE_AT_TIME:
+      case EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
         nextEventItem.startFrame = eventItem.startFrame;
         nextEventItem.startValue = eventItem.endValue;
         break;
@@ -346,8 +350,8 @@ class AudioParam {
 
     if (lastEventItem) {
       switch (lastEventItem.type) {
-      case AudioParamDSP.SET_VALUE_AT_TIME:
-      case AudioParamDSP.SET_TARGET_AT_TIME:
+      case SET_VALUE_AT_TIME:
+      case SET_TARGET_AT_TIME:
         lastEventItem.endFrame = Infinity;
         break;
       }
@@ -363,7 +367,7 @@ class AudioParam {
    * @return {string}
    */
   getRate() {
-    return this.toRateName(this._rate);
+    return this._rate;
   }
 
   /**
@@ -402,11 +406,7 @@ class AudioParam {
    */
   getEvents() {
     return this._timeline.map((event) => {
-      return {
-        type: this.toMethodName(event.type),
-        time: event.time,
-        args: event.args
-      };
+      return { type: event.type, time: event.time, args: event.args };
     });
   }
 
@@ -440,49 +440,6 @@ class AudioParam {
     timeline.splice(pos, replace, eventItem);
 
     return pos
-  }
-
-  /**
-   * @param {string} value
-   * @return {number}
-   */
-  fromRateName(value) {
-    if (value === "audio") {
-      return AudioParamDSP.AUDIO;
-    }
-    return AudioParamDSP.CONTROL;
-  }
-
-  /**
-   * @param {number} value
-   * @return {string}
-   */
-  toRateName(value) {
-    if (value === AudioParamDSP.AUDIO) {
-      return "audio";
-    }
-    return "control";
-  }
-
-  /**
-   * @param {number} value
-   * @return {string}
-   */
-  toMethodName(value) {
-    switch (value) {
-    case AudioParamDSP.SET_VALUE_AT_TIME:
-      return "setValueAtTime";
-    case AudioParamDSP.LINEAR_RAMP_TO_VALUE_AT_TIME:
-      return "linearRampToValueAtTime";
-    case AudioParamDSP.EXPONENTIAL_RAMP_TO_VALUE_AT_TIME:
-      return "exponentialRampToValueAtTime";
-    case AudioParamDSP.SET_TARGET_AT_TIME:
-      return "setTargetAtTime";
-    case AudioParamDSP.SET_VALUE_CURVE_AT_TIME:
-      return "setValueCurveAtTime"
-    }
-    /* istanbul ignore next */
-    assert(!"NOT REACHED");
   }
 }
 

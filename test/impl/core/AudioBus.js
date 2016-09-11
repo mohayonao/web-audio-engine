@@ -6,6 +6,7 @@ const assert = require("assert");
 const np = require("../../helpers/np");
 const AudioBus = require("../../../src/impl/core/AudioBus");
 const AudioData = require("../../../src/impl/core/AudioData");
+const { DISCRETE, SPEAKERS } = require("../../../src/constants/ChannelInterpretation");
 
 describe("impl/core/AudioBus", () => {
   it("constructor(numberOfChannels, length, sampleRate)", () => {
@@ -18,10 +19,10 @@ describe("impl/core/AudioBus", () => {
     it(".channelInterpretation=", () => {
       const bus = new AudioBus(2, 128, 44100);
 
-      assert(bus.getChannelInterpretation() === "discrete");
+      assert(bus.getChannelInterpretation() === DISCRETE);
 
-      bus.setChannelInterpretation("speakers");
-      assert(bus.getChannelInterpretation() === "speakers");
+      bus.setChannelInterpretation(SPEAKERS);
+      assert(bus.getChannelInterpretation() === SPEAKERS);
     });
 
     it(".numberOfChannels=", () => {

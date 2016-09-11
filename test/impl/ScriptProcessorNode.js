@@ -6,6 +6,7 @@ const assert = require("assert");
 const AudioContext = require("../../src/impl/AudioContext");
 const ScriptProcessorNode = require("../../src/impl/ScriptProcessorNode");
 const AudioNode = require("../../src/impl/AudioNode");
+const { EXPLICIT } = require("../../src/constants/ChannelCountMode");
 
 const bufferSize = 256, numberOfInputChannels = 1, numberOfOutputChannels = 2;
 
@@ -40,11 +41,11 @@ describe("impl/ScriptProcessorNode", () => {
       const node = new ScriptProcessorNode(context, { bufferSize, numberOfInputChannels, numberOfOutputChannels });
 
       assert(node.getChannelCountMode() === "explicit");
-      assert(node.inputs[0].getChannelCountMode() === "explicit");
+      assert(node.inputs[0].getChannelCountMode() === EXPLICIT);
 
       node.setChannelCountMode("max");
       assert(node.getChannelCountMode() === "explicit");
-      assert(node.inputs[0].getChannelCountMode() === "explicit");
+      assert(node.inputs[0].getChannelCountMode() === EXPLICIT);
     });
 
     it(".channelCount=", () => {

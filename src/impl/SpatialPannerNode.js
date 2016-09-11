@@ -2,6 +2,7 @@
 
 const BasePannerNode = require("./BasePannerNode");
 const SpatialPannerNodeDSP = require("./dsp/SpatialPannerNode");
+const { AUDIO_RATE } = require("../constants/AudioParamRate");
 
 class SpatialPannerNode extends BasePannerNode {
   /**
@@ -9,12 +10,12 @@ class SpatialPannerNode extends BasePannerNode {
    */
   constructor(context) {
     super(context);
-    this._positionX = this.addParam("audio", 0);
-    this._positionY = this.addParam("audio", 0);
-    this._positionZ = this.addParam("audio", 0);
-    this._orientationX = this.addParam("audio", 0);
-    this._orientationY = this.addParam("audio", 0);
-    this._orientationZ = this.addParam("audio", 0);
+    this._positionX = this.addParam(AUDIO_RATE, 0);
+    this._positionY = this.addParam(AUDIO_RATE, 0);
+    this._positionZ = this.addParam(AUDIO_RATE, 0);
+    this._orientationX = this.addParam(AUDIO_RATE, 0);
+    this._orientationY = this.addParam(AUDIO_RATE, 0);
+    this._orientationZ = this.addParam(AUDIO_RATE, 0);
   }
 
   /**

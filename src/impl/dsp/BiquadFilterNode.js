@@ -2,16 +2,15 @@
 
 const assert = require("assert");
 
-const LOWPASS = 0;
-const HIGHPASS = 1;
-const BANDPASS = 2;
-const LOWSHELF = 3;
-const HIGHSHELF = 4;
-const PEAKING = 5;
-const NOTCH = 6;
-const ALLPASS = 7;
+const { LOWPASS } = require("../../constants/BiquadFilterType");
+const { HIGHPASS } = require("../../constants/BiquadFilterType");
+const { BANDPASS } = require("../../constants/BiquadFilterType");
+const { LOWSHELF } = require("../../constants/BiquadFilterType");
+const { HIGHSHELF } = require("../../constants/BiquadFilterType");
+const { PEAKING } = require("../../constants/BiquadFilterType");
+const { NOTCH } = require("../../constants/BiquadFilterType");
+const { ALLPASS } = require("../../constants/BiquadFilterType");
 
-const FilterTypes = [ LOWPASS, HIGHPASS, BANDPASS, LOWSHELF, HIGHSHELF, PEAKING, NOTCH, ALLPASS ];
 const computeCoefficients = {};
 
 const BiquadFilterNodeDSP = {
@@ -468,15 +467,5 @@ computeCoefficients[ALLPASS] = (frequency, Q) => {
 function flushDenormalFloatToZero(f) {
   return (Math.abs(f) < 1.175494e-38) ? 0.0 : f;
 }
-
-BiquadFilterNodeDSP.FilterTypes = FilterTypes;
-BiquadFilterNodeDSP.LOWPASS = LOWPASS;
-BiquadFilterNodeDSP.HIGHPASS = HIGHPASS;
-BiquadFilterNodeDSP.BANDPASS = BANDPASS;
-BiquadFilterNodeDSP.LOWSHELF = LOWSHELF;
-BiquadFilterNodeDSP.HIGHSHELF = HIGHSHELF;
-BiquadFilterNodeDSP.PEAKING = PEAKING;
-BiquadFilterNodeDSP.NOTCH = NOTCH;
-BiquadFilterNodeDSP.ALLPASS = ALLPASS;
 
 module.exports = BiquadFilterNodeDSP;

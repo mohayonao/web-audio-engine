@@ -3,6 +3,7 @@
 const util = require("../util");
 const AudioNode = require("./AudioNode");
 const IIRFilterNodeDSP = require("./dsp/IIRFilterNode");
+const { MAX } = require("../constants/ChannelCountMode");
 
 class IIRFilterNode extends AudioNode {
   /**
@@ -11,9 +12,7 @@ class IIRFilterNode extends AudioNode {
    * @param {Float32Array} opts.feedforward
    * @param {Float32Array} opts.feedback
    */
-  constructor(context, opts) {
-    opts = opts || /* istanbul ignore next */ {};
-
+  constructor(context, /* istanbul ignore next */ opts = {}) {
     let feedforward = util.defaults(opts.feedforward, [ 0 ]);
     let feedback = util.defaults(opts.feedback, [ 1 ]);
 
@@ -21,7 +20,7 @@ class IIRFilterNode extends AudioNode {
       inputs: [ 1 ],
       outputs: [ 1 ],
       channelCount: 2,
-      channelCountMode: "max"
+      channelCountMode: MAX
     });
     this._feedforward = feedforward;
     this._feedback = feedback;

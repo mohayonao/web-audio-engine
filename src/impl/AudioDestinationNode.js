@@ -2,6 +2,7 @@
 
 const util = require("../util");
 const AudioNode = require("./AudioNode");
+const { EXPLICIT } = require("../constants/ChannelCountMode");
 
 /**
  * @prop {AudioNodeOutput} output
@@ -13,9 +14,7 @@ class AudioDestinationNode extends AudioNode {
    * @param {object}       opts
    * @param {number}       opts.numberOfChannels
    */
-  constructor(context, opts) {
-    opts = opts || /* istanbul ignore next */ {};
-
+  constructor(context, /* istanbul ignore next */ opts = {}) {
     let numberOfChannels = opts.numberOfChannels;
 
     numberOfChannels = util.toValidNumberOfChannels(numberOfChannels);
@@ -24,7 +23,8 @@ class AudioDestinationNode extends AudioNode {
       inputs: [ numberOfChannels ],
       outputs: [],
       channelCount: numberOfChannels,
-      channelCountMode: "explicit"
+      channelCountMode: EXPLICIT,
+      allowedMaxChannelCount: numberOfChannels
     });
 
     this._numberOfChannels = numberOfChannels|0;
@@ -36,14 +36,6 @@ class AudioDestinationNode extends AudioNode {
    */
   getMaxChannelCount() {
     return this._numberOfChannels;
-  }
-
-  /**
-   * @param {number} value
-   */
-  setChannelCount(value) {
-    value = util.clamp(value|0, 1, this.getMaxChannelCount());
-    super.setChannelCount(value);
   }
 
   /**

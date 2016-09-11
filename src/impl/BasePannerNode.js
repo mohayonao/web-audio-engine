@@ -2,6 +2,7 @@
 
 const util = require("../util");
 const AudioNode = require("./AudioNode");
+const { CLAMPED_MAX, EXPLICIT } = require("../constants/ChannelCountMode");
 
 const PanningModelTypes = [ "equalpower", "HRTF" ];
 const DistanceModelTypes = [ "linear", "inverse", "exponential" ];
@@ -15,7 +16,9 @@ class BasePannerNode extends AudioNode {
       inputs: [ 1 ],
       outputs: [ 2 ],
       channelCount: 2,
-      channelCountMode: "clamped-max"
+      channelCountMode: CLAMPED_MAX,
+      allowedMaxChannelCount: 2,
+      allowedChannelCountMode: [ CLAMPED_MAX, EXPLICIT ]
     });
     this._panningModel = "equalpower";
     this._distanceModel = "inverse";
@@ -25,24 +28,6 @@ class BasePannerNode extends AudioNode {
     this._coneInnerAngle = 360;
     this._coneOuterAngle = 360;
     this._coneOuterGain = 0;
-  }
-
-  /**
-   * @param {number} value
-   */
-  setChannelCount(value) {
-    value = util.clamp(value|0, 1, 2);
-    super.setChannelCount(value);
-  }
-
-  /**
-   * @param {number} value
-   */
-  setChannelCountMode(value) {
-    /* istanbul ignore else */
-    if (value === "clamped-max" || value === "explicit") {
-      super.setChannelCountMode(value);
-    }
   }
 
   /**

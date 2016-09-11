@@ -4,12 +4,11 @@ require("run-with-mocha");
 
 const assert = require("assert");
 const audioParamUtil = require("../../src/util/audioParamUtil");
-
-const SET_VALUE_AT_TIME = 1;
-const LINEAR_RAMP_TO_VALUE_AT_TIME = 2;
-const EXPONENTIAL_RAMP_TO_VALUE_AT_TIME = 3;
-const SET_TARGET_AT_TIME = 4;
-const SET_VALUE_CURVE_AT_TIME = 5;
+const { SET_VALUE_AT_TIME } = require("../../src/constants/AudioParamEvent");
+const { LINEAR_RAMP_TO_VALUE_AT_TIME } = require("../../src/constants/AudioParamEvent");
+const { EXPONENTIAL_RAMP_TO_VALUE_AT_TIME } = require("../../src/constants/AudioParamEvent");
+const { SET_TARGET_AT_TIME } = require("../../src/constants/AudioParamEvent");
+const { SET_VALUE_CURVE_AT_TIME } = require("../../src/constants/AudioParamEvent");
 
 function closeTo(a, b, delta) {
   return Math.abs(a - b) <= delta;

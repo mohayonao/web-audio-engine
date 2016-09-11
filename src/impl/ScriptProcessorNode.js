@@ -3,6 +3,10 @@
 const util = require("../util");
 const AudioNode = require("./AudioNode");
 const ScriptProcessorNodeDSP = require("./dsp/ScriptProcessorNode");
+const { EXPLICIT } = require("../constants/ChannelCountMode");
+
+const MinBufferSize = 256;
+const MaxBufferSize = 16384;
 
 class ScriptProcessorNode extends AudioNode {
   /**
@@ -12,14 +16,12 @@ class ScriptProcessorNode extends AudioNode {
    * @param {number}       opts.numberOfInputChannels
    * @param {number}       opts.numberOfOutputChannels
    */
-  constructor(context, opts) {
-    opts = opts || /* istanbul ignore next */ {};
-
+  constructor(context, /* istanbul ignore next */ opts = {}) {
     let bufferSize = opts.bufferSize;
     let numberOfInputChannels = opts.numberOfInputChannels;
     let numberOfOutputChannels = opts.numberOfOutputChannels;
 
-    bufferSize = Math.max(256, Math.min(bufferSize|0, 16384));
+    bufferSize = util.clamp(bufferSize|0, MinBufferSize, MaxBufferSize);
     bufferSize = util.toPowerOfTwo(bufferSize, Math.ceil);
     numberOfInputChannels = util.toValidNumberOfChannels(numberOfInputChannels);
     numberOfOutputChannels = util.toValidNumberOfChannels(numberOfOutputChannels);
@@ -28,7 +30,10 @@ class ScriptProcessorNode extends AudioNode {
       inputs: [ numberOfInputChannels ],
       outputs: [ numberOfOutputChannels ],
       channelCount: numberOfInputChannels,
-      channelCountMode: "explicit"
+      channelCountMode: EXPLICIT,
+      allowedMaxChannelCount: numberOfInputChannels,
+      allowedMinChannelCount: numberOfInputChannels,
+      allowedChannelCountMode: [ EXPLICIT ]
     });
     this._bufferSize = bufferSize;
     this.enableOutputsIfNecessary();
@@ -40,14 +45,6 @@ class ScriptProcessorNode extends AudioNode {
    */
   getBufferSize() {
     return this._bufferSize;
-  }
-
-  setChannelCount() {
-    // This node's channelCount cannot be changed.
-  }
-
-  setChannelCountMode() {
-    // This node's channelCountMode cannot be changed.
   }
 
   /**

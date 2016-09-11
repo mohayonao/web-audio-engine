@@ -1,5 +1,7 @@
 "use strict";
 
+const { SINE } = require("../../constants/OscillatorType");
+
 const OscillatorNodeDSP = {
   dspInit() {
     this._phase = 0;
@@ -15,7 +17,7 @@ const OscillatorNodeDSP = {
 
     let writeIndex = 0;
 
-    if (this._type === "sine") {
+    if (this._type === SINE) {
       writeIndex = this.dspSine(output, sampleOffset, fillToSample, this.sampleRate);
     } else {
       writeIndex = this.dspWave(output, sampleOffset, fillToSample, this.sampleRate);
@@ -35,7 +37,6 @@ const OscillatorNodeDSP = {
       }
 
       this.context.addPostProcess(() => {
-        this._playbackState = "finished";
         this.outputs[0].bus.zeros();
         this.outputs[0].disable();
         this.dispatchEvent({ type: "ended" });

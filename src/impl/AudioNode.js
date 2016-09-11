@@ -1,11 +1,13 @@
 "use strict";
 
-const assert = require("assert");
 const util = require("../util");
 const EventTarget = require("./EventTarget");
 const AudioNodeInput = require("./core/AudioNodeInput");
 const AudioNodeOutput = require("./core/AudioNodeOutput");
 const AudioParam = require("./AudioParam");
+const { MIN_NUMBER_OF_CHANNELS, MAX_NUMBER_OF_CHANNELS } = require("../constants");
+const { MAX, CLAMPED_MAX, EXPLICIT } = require("../constants/ChannelCountMode");
+const { DISCRETE, SPEAKERS } = require("../constants/ChannelInterpretation");
 
 /**
  * @prop {AudioContext}      context
@@ -22,13 +24,15 @@ class AudioNode extends EventTarget {
    * @param {number}       opts.channelCount
    * @param {string}       opts.channelCountMode
    */
-  constructor(context, opts) {
-    opts = opts || /* istanbul ignore next */ {};
-
+  constructor(context, /* istanbul ignore next */ opts = {}) {
     let inputs = util.defaults(opts.inputs, []);
     let outputs = util.defaults(opts.outputs, []);
     let channelCount = util.defaults(opts.channelCount, 1);
-    let channelCountMode = util.defaults(opts.channelCountMode, "max");
+    let channelCountMode = util.defaults(opts.channelCountMode, MAX);
+    let allowedMinChannelCount = util.defaults(opts.allowedMinChannelCount, MIN_NUMBER_OF_CHANNELS);
+    let allowedMaxChannelCount = util.defaults(opts.allowedMaxChannelCount, MAX_NUMBER_OF_CHANNELS);
+    let allowedChannelCountMode = util.defaults(opts.allowedChannelCountMode, [ MAX, CLAMPED_MAX, EXPLICIT ]);
+    let allowedChannelInterpretation = util.defaults(opts.allowedChannelInterpretation, [ DISCRETE, SPEAKERS ]);
 
     super();
 
@@ -37,6 +41,13 @@ class AudioNode extends EventTarget {
     this.sampleRate = context.sampleRate;
     this.inputs = [];
     this.outputs = [];
+    this.channelCount = channelCount;
+    this.channelCountMode = channelCountMode;
+    this.channelInterpretation = SPEAKERS;
+    this.allowedMinChannelCount = allowedMinChannelCount;
+    this.allowedMaxChannelCount = allowedMaxChannelCount;
+    this.allowedChannelCountMode = allowedChannelCountMode;
+    this.allowedChannelInterpretation = allowedChannelInterpretation;
     this.currentSampleFrame = -1;
 
     this._params = [];
@@ -69,48 +80,65 @@ class AudioNode extends EventTarget {
    * @return {number}
    */
   getChannelCount() {
-    assert(this.inputs.length === 1);
-    return this.inputs[0].getChannelCount();
+    return this.channelCount;
   }
 
   /**
    * @param {number} value
    */
   setChannelCount(value) {
-    assert(this.inputs.length === 1);
-    this.inputs[0].setChannelCount(value);
+    value = util.toNumber(value);
+
+    const channelCount = util.clamp(value, this.allowedMinChannelCount, this.allowedMaxChannelCount);
+
+    if (channelCount !== this.channelCount) {
+      this.channelCount = channelCount;
+      this.inputs.forEach(input => {
+        input.setChannelCount(value);
+      });
+    }
   }
 
   /**
    * @return {string}
    */
   getChannelCountMode() {
-    assert(this.inputs.length === 1);
-    return this.inputs[0].getChannelCountMode();
+    return this.channelCountMode;
   }
 
   /**
    * @param {string} value
    */
   setChannelCountMode(value) {
-    assert(this.inputs.length === 1);
-    this.inputs[0].setChannelCountMode(value);
+    if (this.allowedChannelCountMode.indexOf(value) !== -1) {
+      if (value !== this.channelCountMode) {
+        this.channelCountMode = value;
+        this.inputs.forEach((input) => {
+          input.setChannelCountMode(value);
+        });
+      }
+    }
   }
 
   /**
    * @return {string}
    */
   getChannelInterpretation() {
-    assert(this.inputs.length === 1);
-    return this.inputs[0].getChannelInterpretation();
+    return this.channelInterpretation;
   }
 
   /**
    * @param {string} value
    */
   setChannelInterpretation(value) {
-    assert(this.inputs.length === 1);
-    this.inputs[0].setChannelInterpretation(value);
+    if (this.allowedChannelInterpretation.indexOf(value) !== -1) {
+      if (value !== this.channelInterpretation) {
+        this.channelInterpretation = value;
+        this.inputs.forEach((input) => {
+          input.setChannelInterpretation(value);
+        });
+      }
+    }
   }
 
   /**

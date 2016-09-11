@@ -4,6 +4,7 @@ const util = require("../util");
 const AudioNode = require("./AudioNode");
 const AudioBuffer = require("./AudioBuffer");
 const ConvolverNodeDSP = require("./dsp/ConvolverNode");
+const { CLAMPED_MAX, EXPLICIT } = require("../constants/ChannelCountMode");
 
 class ConvolverNode extends AudioNode {
   /**
@@ -14,29 +15,13 @@ class ConvolverNode extends AudioNode {
       inputs: [ 1 ],
       outputs: [ 1 ],
       channelCount: 2,
-      channelCountMode: "clamped-max"
+      channelCountMode: CLAMPED_MAX,
+      allowedMaxChannelCount: 2,
+      allowedChannelCountMode: [ CLAMPED_MAX, EXPLICIT ]
     });
     this._buffer = null;
     this._audioData = null;
     this._normalize = true;
-  }
-
-  /**
-   * @param {number} value
-   */
-  setChannelCount(value) {
-    value = util.clamp(value|0, 1, 2);
-    super.setChannelCount(value);
-  }
-
-  /**
-   * @param {string} value
-   */
-  setChannelCountMode(value) {
-    /* istanbul ignore else */
-    if (value === "clamped-max" || value === "explicit") {
-      super.setChannelCountMode(value);
-    }
   }
 
   /**

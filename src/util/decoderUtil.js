@@ -9,9 +9,7 @@ const resampler = require("./resampler");
  * @param {object}      opts
  * @return {Promise<AudioData>}
  */
-function decode(decodeFn, audioData, opts) {
-  opts = opts /* istanbul ignore next */ || {};
-
+function decode(decodeFn, audioData, /* istanbul ignore next */ opts = {}) {
   return new Promise((resolve, reject) => {
     return decodeFn(audioData, opts).then((result) => {
       if (audioDataUtil.isAudioData(result)) {

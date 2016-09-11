@@ -3,6 +3,7 @@
 const util = require("../util");
 const AudioNode = require("./AudioNode");
 const ChannelSplitterNodeDSP = require("./dsp/ChannelSplitterNode");
+const { MAX } = require("../constants/ChannelCountMode");
 
 class ChannelSplitterNode extends AudioNode {
   /**
@@ -10,9 +11,7 @@ class ChannelSplitterNode extends AudioNode {
    * @param {object}       opts
    * @param {number}       opts.numberOfOutputs
    */
-  constructor(context, opts) {
-    opts = opts || /* istanbul ignore next */ {};
-
+  constructor(context, /* istanbul ignore next */ opts = {}) {
     let numberOfOutputs = util.defaults(opts.numberOfOutputs, 6);
 
     numberOfOutputs = util.toValidNumberOfChannels(numberOfOutputs);
@@ -21,7 +20,7 @@ class ChannelSplitterNode extends AudioNode {
       inputs: [ 1 ],
       outputs: new Array(numberOfOutputs).fill(1),
       channelCount: 2,
-      channelCountMode: "max"
+      channelCountMode: MAX
     });
   }
 }

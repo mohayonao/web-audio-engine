@@ -2,8 +2,7 @@
 
 const toNumber = require("./toNumber");
 const clamp = require("./clamp");
-const MIN_SAMPLERATE = 3000;
-const MAX_SAMPLERATE = 192000;
+const { MIN_SAMPLERATE, MAX_SAMPLERATE } = require("../constants");
 
 /**
  * @param {number} value

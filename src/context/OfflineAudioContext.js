@@ -6,6 +6,7 @@ const audioDataUtil = require("../util/audioDataUtil");
 const AudioContext = require("../api/AudioContext");
 const AudioBuffer = require("../api/AudioBuffer");
 const setImmediate = require("../util/setImmediate");
+const { RUNNING, SUSPENDED, CLOSED } = require("../constants/AudioContextState");
 
 class OfflineAudioContext extends AudioContext {
   /**
@@ -61,7 +62,7 @@ class OfflineAudioContext extends AudioContext {
    */
   resume() {
     /* istanbul ignore next */
-    if (this._impl.state === "closed") {
+    if (this._impl.state === CLOSED) {
       return Promise.reject(new TypeError("cannot startRendering when an OfflineAudioContext is closed"));
     }
     /* istanbul ignore next */
@@ -69,7 +70,7 @@ class OfflineAudioContext extends AudioContext {
       return Promise.reject(new TypeError("cannot resume an offline context that has not started"));
     }
     /* istanbul ignore else */
-    if (this._impl.state === "suspended") {
+    if (this._impl.state === SUSPENDED) {
       render.call(this, this._impl);
     }
     return Promise.resolve();
@@ -81,7 +82,7 @@ class OfflineAudioContext extends AudioContext {
    */
   suspend(time) {
     /* istanbul ignore next */
-    if (this._impl.state === "closed") {
+    if (this._impl.state === CLOSED) {
       return Promise.reject(new TypeError("cannot startRendering when an OfflineAudioContext is closed"));
     }
     /* istanbul ignore next */
@@ -112,7 +113,7 @@ class OfflineAudioContext extends AudioContext {
    */
   startRendering() {
     /* istanbul ignore next */
-    if (this._impl.state === "closed") {
+    if (this._impl.state === CLOSED) {
       return Promise.reject(new TypeError("cannot startRendering when an OfflineAudioContext is closed"));
     }
     /* istanbul ignore next */
@@ -148,7 +149,7 @@ function suspendRendering() {
   this._suspendResolve();
   this._suspendedTime = Infinity;
   this._suspendPromise = this._suspendResolve = null;
-  this._impl.changeState("suspended");
+  this._impl.changeState(SUSPENDED);
 }
 
 function doneRendering(audioData) {
@@ -161,7 +162,7 @@ function doneRendering(audioData) {
 
   const audioBuffer = audioDataUtil.toAudioBuffer(audioData, AudioBuffer);
 
-  this._impl.changeState("closed");
+  this._impl.changeState(CLOSED);
   this._impl.dispatchEvent({ type: "complete", renderedBuffer: audioBuffer });
 
   this._renderingResolve(audioBuffer);
@@ -199,7 +200,7 @@ function render(impl) {
     }
   };
 
-  impl.changeState("running");
+  impl.changeState(RUNNING);
 
   setImmediate(loop);
 }

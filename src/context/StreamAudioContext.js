@@ -6,6 +6,7 @@ const config = require("../config");
 const AudioContext = require("../api/AudioContext");
 const PCMEncoder = require("../util/PCMEncoder");
 const setImmediate = require("../util/setImmediate");
+const { RUNNING, SUSPENDED, CLOSED } = require("../constants/AudioContextState");
 const noopWriter = { write: () => true };
 
 class StreamAudioContext extends AudioContext {
@@ -17,9 +18,7 @@ class StreamAudioContext extends AudioContext {
    * @param {number}  opts.bitDepth
    * @param {boolean} opts.floatingPoint
    */
-  constructor(opts) {
-    opts = opts || /* istanbul ignore next */ {};
-
+  constructor(opts = {}) {
     let sampleRate = util.defaults(opts.sampleRate, config.sampleRate);
     let blockSize = util.defaults(opts.blockSize, config.blockSize);
     let numberOfChannels = util.defaults(opts.channels || opts.numberOfChannels, config.numberOfChannels);
@@ -80,7 +79,7 @@ class StreamAudioContext extends AudioContext {
    */
   resume() {
     /* istanbul ignore else */
-    if (this.state === "suspended") {
+    if (this.state === SUSPENDED) {
       this._resume();
     }
     return super.resume();
@@ -91,7 +90,7 @@ class StreamAudioContext extends AudioContext {
    */
   suspend() {
     /* istanbul ignore else */
-    if (this.state === "running") {
+    if (this.state === RUNNING) {
       this._suspend();
     }
     return super.suspend();
@@ -103,7 +102,7 @@ class StreamAudioContext extends AudioContext {
    */
   close() {
     /* istanbul ignore else */
-    if (this.state !== "closed") {
+    if (this.state !== CLOSED) {
       this._close();
     }
     return super.close();

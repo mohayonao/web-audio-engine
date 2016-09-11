@@ -1,10 +1,10 @@
 "use strict";
 
-const SET_VALUE_AT_TIME = 1;
-const LINEAR_RAMP_TO_VALUE_AT_TIME = 2;
-const EXPONENTIAL_RAMP_TO_VALUE_AT_TIME = 3;
-const SET_TARGET_AT_TIME = 4;
-const SET_VALUE_CURVE_AT_TIME = 5;
+const { SET_VALUE_AT_TIME } = require("../constants/AudioParamEvent");
+const { LINEAR_RAMP_TO_VALUE_AT_TIME } = require("../constants/AudioParamEvent");
+const { EXPONENTIAL_RAMP_TO_VALUE_AT_TIME } = require("../constants/AudioParamEvent");
+const { SET_TARGET_AT_TIME } = require("../constants/AudioParamEvent");
+const { SET_VALUE_CURVE_AT_TIME } = require("../constants/AudioParamEvent");
 
 /**
  * @param {object[]} timeline
