@@ -1,25 +1,17 @@
 {
+  "presets": [
+    "es2015"
+  ],
   "env": {
     "build": {
       "only": [ "src" ],
-      "presets": [
-        "es2015"
-      ],
-      "plugins": [
-        "unassert"
-      ]
+      "plugins": [ "unassert" ]
     },
     "development": {
-      "presets": [
-        "es2015",
-        "power-assert"
-      ],
+      "presets": [ "power-assert" ]
     },
     "cover": {
-      "only": [ "src" ],
-      "plugins": [
-        "istanbul"
-      ]
+      "plugins": [ "istanbul" ]
     }
   }
 }
