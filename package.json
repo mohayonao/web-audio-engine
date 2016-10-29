@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "audio-type": "^1.0.2",
+    "biquad-coeffs-webaudio": "^1.2.0",
     "fourier-transform": "^1.0.2",
     "nmap": "^0.9.0",
     "scijs-window-functions": "^2.0.2",
