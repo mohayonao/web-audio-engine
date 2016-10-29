@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "audio-type": "^1.0.2",
+    "biquad-coeffs-webaudio": "^1.2.0",
     "fourier-transform": "^1.0.2",
     "nmap": "^0.9.0",
     "scijs-window-functions": "^2.0.2",
@@ -15,19 +16,19 @@
     "wav-encoder": "^1.1.0"
   },
   "devDependencies": {
-    "babel-cli": "^6.16.0",
-    "babel-plugin-istanbul": "^2.0.1",
+    "babel-cli": "^6.18.0",
+    "babel-plugin-istanbul": "^2.0.3",
     "babel-plugin-unassert": "^2.1.1",
-    "babel-preset-es2015": "^6.16.0",
+    "babel-preset-es2015": "^6.18.0",
     "babel-preset-power-assert": "^1.0.0",
     "babelify": "^7.3.0",
-    "browserify": "^13.1.0",
-    "eslint": "^3.7.0",
-    "mocha": "^3.1.0",
-    "npm-run-all": "^3.1.0",
-    "nyc": "^8.3.0",
+    "browserify": "^13.1.1",
+    "eslint": "^3.9.0",
+    "mocha": "^3.1.2",
+    "npm-run-all": "^3.1.1",
+    "nyc": "^8.3.2",
     "power-assert": "^1.4.1",
-    "run-with-mocha": "^1.0.0",
+    "run-with-mocha": "^1.1.0",
     "sinon": "^1.17.6"
   },
   "engines": {

@@ -1,17 +1,9 @@
 "use strict";
 
 const assert = require("assert");
-
-const { LOWPASS } = require("../../constants/BiquadFilterType");
-const { HIGHPASS } = require("../../constants/BiquadFilterType");
-const { BANDPASS } = require("../../constants/BiquadFilterType");
-const { LOWSHELF } = require("../../constants/BiquadFilterType");
-const { HIGHSHELF } = require("../../constants/BiquadFilterType");
-const { PEAKING } = require("../../constants/BiquadFilterType");
-const { NOTCH } = require("../../constants/BiquadFilterType");
-const { ALLPASS } = require("../../constants/BiquadFilterType");
-
-const computeCoefficients = {};
+const biquadCoeffs = require("biquad-coeffs-webaudio");
+const BiquadFilterKernel = require("./BiquadFilterKernel");
+const getFilterResponse = require("../../util/getFilterResponse");
 
 const BiquadFilterNodeDSP = {
   dspInit() {
@@ -59,9 +51,10 @@ const BiquadFilterNodeDSP = {
     const kernels = this._kernels;
 
     if (quantumStartFrame !== this._quantumStartFrame) {
-      kernels[0].processWithInitCoefficients(coefficients, inputs[0], outputs[0], blockSize);
+      kernels[0].coefficients = coefficients;
+      kernels[0].process(inputs[0], outputs[0], blockSize);
     } else if (isCoefficientsUpdated) {
-      kernels[0].processWithCoefficients(coefficients, inputs[0], outputs[0], blockSize);
+      kernels[0].processWithCoefficients(inputs[0], outputs[0], blockSize, coefficients);
     } else {
       kernels[0].process(inputs[0], outputs[0], blockSize);
     }
@@ -80,11 +73,13 @@ const BiquadFilterNodeDSP = {
     const kernels = this._kernels;
 
     if (quantumStartFrame !== this._quantumStartFrame) {
-      kernels[0].processWithInitCoefficients(coefficients, inputs[0], outputs[0], blockSize);
-      kernels[1].processWithInitCoefficients(coefficients, inputs[1], outputs[1], blockSize);
+      kernels[0].coefficients = coefficients;
+      kernels[1].coefficients = coefficients;
+      kernels[0].process(inputs[0], outputs[0], blockSize);
+      kernels[1].process(inputs[1], outputs[1], blockSize);
     } else if (isCoefficientsUpdated) {
-      kernels[0].processWithCoefficients(coefficients, inputs[0], outputs[0], blockSize);
-      kernels[1].processWithCoefficients(coefficients, inputs[1], outputs[1], blockSize);
+      kernels[0].processWithCoefficients(inputs[0], outputs[0], blockSize, coefficients);
+      kernels[1].processWithCoefficients(inputs[1], outputs[1], blockSize, coefficients);
     } else {
       kernels[0].process(inputs[0], outputs[0], blockSize);
       kernels[1].process(inputs[1], outputs[1], blockSize);
@@ -105,11 +100,12 @@ const BiquadFilterNodeDSP = {
 
     if (quantumStartFrame !== this._quantumStartFrame) {
       for (let i = 0, imax = kernels.length; i < imax; i++) {
-        kernels[i].processWithInitCoefficients(coefficients, inputs[i], outputs[i], blockSize);
+        kernels[i].coefficients = coefficients;
+        kernels[i].process(inputs[i], outputs[i], blockSize);
       }
     } else if (isCoefficientsUpdated) {
       for (let i = 0, imax = kernels.length; i < imax; i++) {
-        kernels[i].processWithCoefficients(coefficients, inputs[i], outputs[i], blockSize);
+        kernels[i].processWithCoefficients(inputs[i], outputs[i], blockSize, coefficients);
       }
     } else {
       for (let i = 0, imax = kernels.length; i < imax; i++) {
@@ -130,342 +126,31 @@ const BiquadFilterNodeDSP = {
       return false;
     }
 
-    const nyquist = this.sampleRate * 0.5;
-    const normalizedFrequency = (frequency / nyquist) * Math.pow(2, detune / 1200);
+    const normalizedFrequency = (frequency / this.sampleRate) * Math.pow(2, detune / 1200);
 
-    this._coefficients = computeCoefficients[this._type](normalizedFrequency, Q, gain);
+    this._coefficients = biquadCoeffs[this._type](normalizedFrequency, Q, gain);
     this._prevFrequency = frequency;
     this._prevDetune = detune;
     this._prevQ = Q;
     this._prevGain = gain;
 
     return true;
+  },
+
+  dspGetFrequencyResponse(frequencyHz, magResponse, phaseResponse) {
+    const frequency = this._frequency.getValue();
+    const detune = this._detune.getValue();
+    const Q = this._Q.getValue();
+    const gain = this._gain.getValue();
+    const normalizedFrequency = (frequency / this.sampleRate) * Math.pow(2, detune / 1200);
+    const coefficients = biquadCoeffs[this._type](normalizedFrequency, Q, gain);
+
+    const b = [ coefficients[0], coefficients[1], coefficients[2] ];
+    const a = [ 1, coefficients[3], coefficients[4] ];
+
+    getFilterResponse(b, a, frequencyHz, magResponse, phaseResponse, this.sampleRate);
   }
 };
 
-class BiquadFilterKernel {
-  constructor() {
-    this._coefficients = [ 0, 0, 0, 0, 0 ];
-    this._x1 = 0;
-    this._x2 = 0;
-    this._y1 = 0;
-    this._y2 = 0;
-  }
-
-  processWithInitCoefficients(coefficients, input, output, inNumSamples) {
-    this._coefficients = coefficients;
-    this.process(input, output, inNumSamples);
-  }
-
-  process(input, output, inNumSamples) {
-    const b0 = this._coefficients[0];
-    const b1 = this._coefficients[1];
-    const b2 = this._coefficients[2];
-    const a1 = this._coefficients[3];
-    const a2 = this._coefficients[4];
-
-    let x0;
-    let x1 = this._x1;
-    let x2 = this._x2;
-    let y0;
-    let y1 = this._y1;
-    let y2 = this._y2;
-
-    for (let i = 0; i < inNumSamples; i++) {
-      x0 = input[i];
-      y0 = (b0 * x0) + (b1 * x1) + (b2 * x2) - (a1 * y1) - (a2 * y2);
-
-      x2 = x1;
-      x1 = x0;
-      y2 = y1;
-      y1 = y0;
-
-      output[i] = y0;
-    }
-
-    this._x1 = flushDenormalFloatToZero(x1);
-    this._x2 = flushDenormalFloatToZero(x2);
-    this._y1 = flushDenormalFloatToZero(y1);
-    this._y2 = flushDenormalFloatToZero(y2);
-  }
-
-  processWithCoefficients(coefficients, input, output, inNumSamples) {
-    let b0 = this._coefficients[0];
-    let b1 = this._coefficients[1];
-    let b2 = this._coefficients[2];
-    let a1 = this._coefficients[3];
-    let a2 = this._coefficients[4];
-    let x0;
-    let x1 = this._x1;
-    let x2 = this._x2;
-    let y0;
-    let y1 = this._y1;
-    let y2 = this._y2;
-
-    const step = 1 / inNumSamples;
-    const b0Incr = (coefficients[0] - b0) * step;
-    const b1Incr = (coefficients[1] - b1) * step;
-    const b2Incr = (coefficients[2] - b2) * step;
-    const a1Incr = (coefficients[3] - a1) * step;
-    const a2Incr = (coefficients[4] - a2) * step;
-
-    for (let i = 0; i < inNumSamples; i++) {
-      x0 = input[i];
-      y0 = (b0 * x0) + (b1 * x1) + (b2 * x2) - (a1 * y1) - (a2 * y2);
-
-      x2 = x1;
-      x1 = x0;
-      y2 = y1;
-      y1 = y0;
-
-      b0 += b0Incr;
-      b1 += b1Incr;
-      b2 += b2Incr;
-      a1 += a1Incr;
-      a2 += a2Incr;
-
-      output[i] = y0;
-    }
-
-    this._x1 = flushDenormalFloatToZero(x1);
-    this._x2 = flushDenormalFloatToZero(x2);
-    this._y1 = flushDenormalFloatToZero(y1);
-    this._y2 = flushDenormalFloatToZero(y2);
-    this._coefficients = coefficients;
-  }
-}
-
-computeCoefficients[LOWPASS] = (cutoff, resonance) => {
-  cutoff = Math.max(0.0, Math.min(cutoff, 1.0));
-
-  if (cutoff === 1) {
-    return [ 1, 0, 0, 0, 0 ];
-  }
-
-  if (0 < cutoff) {
-    resonance = Math.max(0.0, resonance);
-
-    const g = Math.pow(10.0, 0.05 * resonance);
-    const d = Math.sqrt((4 - Math.sqrt(16 - 16 / (g * g))) / 2);
-    const theta = Math.PI * cutoff;
-    const sn = 0.5 * d * Math.sin(theta);
-    const beta = 0.5 * (1 - sn) / (1 + sn);
-    const gamma = (0.5 + beta) * Math.cos(theta);
-    const alpha = 0.25 * (0.5 + beta - gamma);
-
-    const b0 = 2 * alpha;
-    const b1 = 2 * 2 * alpha;
-    const b2 = 2 * alpha;
-    const a1 = 2 * -gamma;
-    const a2 = 2 * beta;
-
-    return [ b0, b1, b2, a1, a2 ];
-  }
-
-  return [ 0, 0, 0, 0, 0 ];
-};
-
-computeCoefficients[HIGHPASS] = (cutoff, resonance) => {
-  cutoff = Math.max(0.0, Math.min(cutoff, 1.0));
-
-  if (cutoff == 1) {
-    return [ 0, 0, 0, 0, 0 ];
-  }
-
-  if (0 < cutoff) {
-    resonance = Math.max(0.0, resonance);
-
-    const g = Math.pow(10.0, 0.05 * resonance);
-    const d = Math.sqrt((4 - Math.sqrt(16 - 16 / (g * g))) / 2);
-    const theta = Math.PI * cutoff;
-    const sn = 0.5 * d * Math.sin(theta);
-    const beta = 0.5 * (1 - sn) / (1 + sn);
-    const gamma = (0.5 + beta) * Math.cos(theta);
-    const alpha = 0.25 * (0.5 + beta + gamma);
-
-    const b0 = 2 * alpha;
-    const b1 = 2 * -2 * alpha;
-    const b2 = 2 * alpha;
-    const a1 = 2 * -gamma;
-    const a2 = 2 * beta;
-
-    return [ b0, b1, b2, a1, a2 ];
-  }
-
-  return [ 1, 0, 0, 0, 0 ];
-};
-
-computeCoefficients[BANDPASS] = (frequency, Q) => {
-  frequency = Math.max(0.0, frequency);
-  Q = Math.max(0.0, Q);
-
-  if (0 < frequency && frequency < 1) {
-    const w0 = Math.PI * frequency;
-
-    if (0 < Q) {
-      const alpha = Math.sin(w0) / (2 * Q);
-      const k = Math.cos(w0);
-
-      const b0 = alpha;
-      const b1 = 0;
-      const b2 = -alpha;
-      const a0 = 1 + alpha;
-      const a1 = -2 * k;
-      const a2 = 1 - alpha;
-
-      return [ b0/a0, b1/a0, b2/a0, a1/a0, a2/a0 ];
-    }
-
-    return [ 1, 0, 0, 0, 0 ];
-  }
-
-  return [ 0, 0, 0, 0, 0 ];
-};
-
-computeCoefficients[LOWSHELF] = (frequency, _, dbGain) => {
-  frequency = Math.max(0.0, Math.min(frequency, 1.0));
-
-  const A = Math.pow(10.0, dbGain / 40);
-
-  if (frequency == 1) {
-    return [ A*A, 0, 0, 0, 0 ];
-  }
-
-  if (0 < frequency) {
-    const w0 = Math.PI * frequency;
-    const S = 1;
-    const alpha = 0.5 * Math.sin(w0) * Math.sqrt((A + 1 / A) * (1 / S - 1) + 2);
-    const k = Math.cos(w0);
-    const k2 = 2 * Math.sqrt(A) * alpha;
-    const aPlusOne = A + 1;
-    const aMinusOne = A - 1;
-
-    const b0 = A * (aPlusOne - aMinusOne * k + k2);
-    const b1 = 2 * A * (aMinusOne - aPlusOne * k);
-    const b2 = A * (aPlusOne - aMinusOne * k - k2);
-    const a0 = aPlusOne + aMinusOne * k + k2;
-    const a1 = -2 * (aMinusOne + aPlusOne * k);
-    const a2 = aPlusOne + aMinusOne * k - k2;
-
-    return [ b0/a0, b1/a0, b2/a0, a1/a0, a2/a0 ];
-  }
-
-  return [ 1, 0, 0, 0, 0 ];
-};
-
-computeCoefficients[HIGHSHELF] = (frequency, _, dbGain) => {
-  frequency = Math.max(0.0, Math.min(frequency, 1.0));
-
-  const A = Math.pow(10.0, dbGain / 40);
-
-  if (frequency == 1) {
-    return [ 1, 0, 0, 0, 0 ];
-  }
-
-  if (0 < frequency) {
-    const w0 = Math.PI * frequency;
-    const S = 1;
-    const alpha = 0.5 * Math.sin(w0) * Math.sqrt((A + 1 / A) * (1 / S - 1) + 2);
-    const k = Math.cos(w0);
-    const k2 = 2 * Math.sqrt(A) * alpha;
-    const aPlusOne = A + 1;
-    const aMinusOne = A - 1;
-
-    const b0 = A * (aPlusOne + aMinusOne * k + k2);
-    const b1 = -2 * A * (aMinusOne + aPlusOne * k);
-    const b2 = A * (aPlusOne + aMinusOne * k - k2);
-    const a0 = aPlusOne - aMinusOne * k + k2;
-    const a1 = 2 * (aMinusOne - aPlusOne * k);
-    const a2 = aPlusOne - aMinusOne * k - k2;
-
-    return [ b0/a0, b1/a0, b2/a0, a1/a0, a2/a0 ];
-  }
-
-  return [ A*A, 0, 0, 0, 0 ];
-};
-
-computeCoefficients[PEAKING] = (frequency, Q, dbGain) => {
-  frequency = Math.max(0.0, Math.min(frequency, 1.0));
-  Q = Math.max(0.0, Q);
-
-  const A = Math.pow(10.0, dbGain / 40);
-
-  if (0 < frequency && frequency < 1) {
-    if (0 < Q) {
-      const w0 = Math.PI * frequency;
-      const alpha = Math.sin(w0) / (2 * Q);
-      const k = Math.cos(w0);
-
-      const b0 = 1 + alpha * A;
-      const b1 = -2 * k;
-      const b2 = 1 - alpha * A;
-      const a0 = 1 + alpha / A;
-      const a1 = -2 * k;
-      const a2 = 1 - alpha / A;
-
-      return [ b0/a0, b1/a0, b2/a0, a1/a0, a2/a0 ];
-    }
-
-    return [ A*A, 0, 0, 0, 0 ];
-  }
-
-  return [ 1, 0, 0, 0, 0 ];
-};
-
-computeCoefficients[NOTCH] = (frequency, Q) => {
-  frequency = Math.max(0.0, Math.min(frequency, 1.0));
-  Q = Math.max(0.0, Q);
-
-  if (0 < frequency && frequency < 1) {
-    if (0 < Q) {
-      const w0 = Math.PI * frequency;
-      const alpha = Math.sin(w0) / (2 * Q);
-      const k = Math.cos(w0);
-
-      const b0 = 1;
-      const b1 = -2 * k;
-      const b2 = 1;
-      const a0 = 1 + alpha;
-      const a1 = -2 * k;
-      const a2 = 1 - alpha;
-
-      return [ b0/a0, b1/a0, b2/a0, a1/a0, a2/a0 ];
-    }
-
-    return [ 0, 0, 0, 0, 0 ];
-  }
-
-  return [ 1, 0, 0, 0, 0 ];
-};
-
-computeCoefficients[ALLPASS] = (frequency, Q) => {
-  frequency = Math.max(0.0, Math.min(frequency, 1.0));
-  Q = Math.max(0.0, Q);
-
-  if (0 < frequency && frequency < 1) {
-    if (0 < Q) {
-      const w0 = Math.PI * frequency;
-      const alpha = Math.sin(w0) / (2 * Q);
-      const k = Math.cos(w0);
-
-      const b0 = 1 - alpha;
-      const b1 = -2 * k;
-      const b2 = 1 + alpha;
-      const a0 = 1 + alpha;
-      const a1 = -2 * k;
-      const a2 = 1 - alpha;
-
-      return [ b0/a0, b1/a0, b2/a0, a1/a0, a2/a0 ];
-    }
-
-    return [ -1, 0, 0, 0, 0 ];
-  }
-
-  return [ 1, 0, 0, 0, 0 ];
-};
-
-function flushDenormalFloatToZero(f) {
-  return (Math.abs(f) < 1.175494e-38) ? 0.0 : f;
-}
 
 module.exports = BiquadFilterNodeDSP;
