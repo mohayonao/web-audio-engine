@@ -34,10 +34,9 @@ class IIRFilterNode extends AudioNode {
    * @param {Float32Array} magResponse
    * @param {Float32Array} phaseResponse
    */
-  /* istanbul ignore next */
-  getFrequencyResponse() {
-    throw new TypeError("NOT YET IMPLEMENTED");
-  }
+   getFrequencyResponse(frequencyHz, magResponse, phaseResponse) {
+     this.dspGetFrequencyResponse(frequencyHz, magResponse, phaseResponse);
+   }
 
   /**
    * @return {Float32Array}

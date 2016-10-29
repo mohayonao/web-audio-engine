@@ -3,6 +3,7 @@
 const assert = require("assert");
 const biquadCoeffs = require("biquad-coeffs-webaudio");
 const BiquadFilterKernel = require("./BiquadFilterKernel");
+const getFilterResponse = require("../../util/getFilterResponse");
 
 const BiquadFilterNodeDSP = {
   dspInit() {
@@ -134,6 +135,20 @@ const BiquadFilterNodeDSP = {
     this._prevGain = gain;
 
     return true;
+  },
+
+  dspGetFrequencyResponse(frequencyHz, magResponse, phaseResponse) {
+    const frequency = this._frequency.getValue();
+    const detune = this._detune.getValue();
+    const Q = this._Q.getValue();
+    const gain = this._gain.getValue();
+    const normalizedFrequency = (frequency / this.sampleRate) * Math.pow(2, detune / 1200);
+    const coefficients = biquadCoeffs[this._type](normalizedFrequency, Q, gain);
+
+    const b = [ coefficients[0], coefficients[1], coefficients[2] ];
+    const a = [ 1, coefficients[3], coefficients[4] ];
+
+    getFilterResponse(b, a, frequencyHz, magResponse, phaseResponse, this.sampleRate);
   }
 };
 
