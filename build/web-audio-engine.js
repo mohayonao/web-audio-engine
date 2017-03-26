@@ -9165,15 +9165,20 @@ var AudioBufferSourceNodeDSP = {
 
       phase += playbackRateToPhaseIncr * Math.max(0, computedPlaybackRate);
 
-      var phaseTime = phase / bufferSampleRate;
-      var bufferDuration = bufferLength / bufferSampleRate;
+      if (this._loop) {
+        if (0 <= this._loopStart && this._loopStart < this._loopEnd) {
+          var loopEndSamples = this._loopEnd * bufferSampleRate;
 
-      if (bufferDuration <= phaseTime) {
-        if (this._loop) {
-          if (0 < this._loopEnd && this._loopEnd <= phaseTime) {
-            phase = Math.max(0, Math.min(this._loopStart, bufferDuration)) * bufferSampleRate;
+          if (loopEndSamples <= phase) {
+            phase = this._loopStart * bufferSampleRate;
           }
         } else {
+          if (bufferLength <= phase) {
+            phase = 0;
+          }
+        }
+      } else {
+        if (bufferLength <= phase) {
           this.dspEmitEnded();
           break;
         }
