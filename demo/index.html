@@ -22,6 +22,7 @@
     .error-message { color: #a94442; border: none; box-shadow: none }
     .CodeMirror { font-family: 'Courier', monospace; border: solid 1px #ddd; height: 800px }
     #app { margin-top: 15px }
+    #canvas { background: #2c3e50; width: 100%; height: 160px }
   </style>
 </head>
 <body>
@@ -34,42 +35,50 @@
     </div>
     <div id="app" class="form-horizontal">
       <div class="form-group">
-        <label class="col-sm-1 control-label"></label>
-        <div class="col-sm-4">
-          <button class="btn" v-bind:class="isPlaying ? 'btn-success' : 'btn-default'" v-on:click="run">Run</button>
-          <button class="btn btn-default" v-on:click="stop">Stop</button>
-        </div>
-        <div class="col-sm-6"><div class="form-control error-message">{{ error }}</div></div>
-      </div>
-
-      <div class="form-group">
-        <label class="col-sm-1 control-label">api</label>
-        <div class="col-sm-11">
-          <div class="radio-inline">
-            <input type="radio" id="engine" value="web-audio-engine" v-model="engine">
-            <label for="engine">web-audio-engine</label>
+        <div class="col-sm-7" class="form-group">
+          <div class="form-group">
+            <label class="col-sm-2 control-label"></label>
+            <div class="col-sm-10">
+              <button class="btn" v-bind:class="isPlaying ? 'btn-success' : 'btn-default'" v-on:click="run">Run</button>
+              <button class="btn btn-default" v-on:click="stop">Stop</button>
+            </div>
           </div>
-          <div class="radio-inline">
-            <input type="radio" id="native" value="native" v-model="engine">
-            <label for="native">native Web Audio API</label>
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label">api</label>
+            <div class="col-sm-10">
+              <div class="radio">
+                <label for="engine">
+                  <input type="radio" id="engine" value="web-audio-engine" v-model="engine">
+                  web-audio-engine
+                </label>
+              </div>
+              <div class="radio">
+                <label for="native">
+                  <input type="radio" id="native" value="native" v-model="engine">
+                  native Web Audio API
+                </label>
+              </div>
+            </div>
           </div>
+
+          <div class="form-group">
+            <label class="col-sm-2 control-label">demo</label>
+            <div class="col-sm-10">
+              <select class="form-control" v-model="selected" v-on:change="loadScript">
+                <option v-for="name in list" v-bind:value="name">{{ name }}</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
+        <div class="col-sm-5">
+          <canvas id="canvas"></canvas>
         </div>
       </div>
 
       <div class="form-group">
-        <label class="col-sm-1 control-label">demo</label>
-        <div class="col-sm-11">
-          <select class="form-control" v-model="selected" v-on:change="loadScript">
-            <option v-for="name in list" v-bind:value="name">{{ name }}</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="col-sm-1 control-label">code</label>
-        <div class="col-sm-11">
-          <textarea id="code"></textarea>
-        </div>
+        <textarea id="code"></textarea>
       </div>
     </div>
   </div>
@@ -95,6 +104,13 @@
     ];
     var audioContext = new AudioContext();
     var destination = audioContext.destination;
+    var timerId = 0;
+    var canvas = document.getElementById("canvas");
+
+    canvas.width = 320;
+    canvas.height = 160;
+
+    canvas.context = canvas.getContext("2d");
 
     Object.defineProperty(audioContext, "destination", {
       value: null, enumerate: false, writable: true, configurable: true
@@ -149,8 +165,11 @@
         return;
       }
 
-      audioContext.destination = audioContext.createGain();
+      var audioAnalyser = audioContext.createAnalyser();
+
+      audioContext.destination = audioAnalyser;
       audioContext.destination.connect(destination);
+      canvas.audioAnalyser = audioAnalyser;
 
       var context = null;
 
@@ -173,16 +192,75 @@
       }
 
       promise.then(function() {
+        if (timerId === 0) {
+          timerId = timerAPI.setInterval.call(window, capture, 100);
+        }
         context.resume();
       });
     }
 
     function stop() {
+      if (timerId !== 0) {
+        clearInterval(timerId);
+        timerId = 0;
+      }
       if (audioContext.destination) {
         audioContext.destination.disconnect();
         audioContext.destination = null;
       }
       timerAPI.reset();
+    }
+
+    function capture() {
+      var analyser = canvas.audioAnalyser;
+      var context = canvas.context;
+      var fft, sig;
+      var width = canvas.width;
+      var height = canvas.height;
+      var i, imax;
+
+      // fft
+      analyser.fftSize = 64;
+      fft = new Uint8Array(analyser.frequencyBinCount);
+      analyser.getByteFrequencyData(fft);
+
+      context.fillStyle = "#2c3e50";
+      context.fillRect(0, 0, width, height);
+
+      var w = width / fft.length;
+
+      for (i = 0, imax = fft.length; i < imax; i++) {
+        var x = w * i;
+        var y = linlin(fft[i], 0, 255, height, 0);
+        var r = linlin(fft[i], 0, 255, 100, 255)|0;
+
+        context.fillStyle = "rgb(" + r + ", 76, 60)";
+        context.fillRect(x, y, w - 1, height - y);
+      }
+
+      // signal
+      analyser.fftSize = 2048;
+      sig = new Uint8Array(analyser.fftSize);
+      analyser.getByteTimeDomainData(sig);
+
+      context.strokeStyle = "#2ecc71";
+      context.beginPath();
+
+      for (i = 0, imax = sig.length; i < imax; i++) {
+        var x = linlin(i, 0, imax, 0, width);
+        var y = linlin(sig[i], 0, 255, height, 0);
+
+        if (i === 0) {
+          context.moveTo(x, y);
+        } else {
+          context.lineTo(x, y);
+        }
+      }
+      context.stroke();
+    }
+
+    function linlin(value, inMin, inMax, outMin, outMax) {
+      return (value - inMin) / (inMax - inMin) * (outMax - outMin) + outMin;
     }
 
     var vue = new Vue({
