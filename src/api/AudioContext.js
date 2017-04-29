@@ -18,6 +18,7 @@ const PannerNode = require("./PannerNode");
 const SpatialPannerNode = require("./SpatialPannerNode");
 const StereoPannerNode = require("./StereoPannerNode");
 const ConvolverNode = require("./ConvolverNode");
+const ConstantSourceNode = require("./ConstantSourceNode");
 const ChannelSplitterNode = require("./ChannelSplitterNode");
 const ChannelMergerNode = require("./ChannelMergerNode");
 const DynamicsCompressorNode = require("./DynamicsCompressorNode");
@@ -91,6 +92,10 @@ class AudioContext extends EventTarget {
 
   createBufferSource() {
     return new AudioBufferSourceNode(this);
+  }
+
+  createConstantSource() {
+    return new ConstantSourceNode(this);
   }
 
   createScriptProcessor(bufferSize, numberOfInputChannels, numberOfOutputChannels) {
