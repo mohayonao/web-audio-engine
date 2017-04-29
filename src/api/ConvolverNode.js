@@ -9,6 +9,10 @@ class ConvolverNode extends AudioNode {
 
     this._impl = new impl.ConvolverNode(context._impl, opts);
     this._impl.$buffer = null;
+
+    if (opts && opts.buffer) {
+      this.buffer = opts.buffer;
+    }
   }
 
   get buffer() {

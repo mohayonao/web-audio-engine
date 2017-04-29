@@ -4,10 +4,10 @@ const impl = require("../impl");
 const AudioNode = require("./AudioNode");
 
 class WaveShaperNode extends AudioNode {
-  constructor(context) {
+  constructor(context, opts) {
     super(context);
 
-    this._impl = new impl.WaveShaperNode(context._impl);
+    this._impl = new impl.WaveShaperNode(context._impl, opts);
   }
 
   get curve() {

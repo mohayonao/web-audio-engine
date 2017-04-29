@@ -4,10 +4,10 @@ const impl = require("../impl");
 const AudioNode = require("./AudioNode");
 
 class PannerNode extends AudioNode {
-  constructor(context) {
+  constructor(context, opts) {
     super(context);
 
-    this._impl = new impl.PannerNode(context._impl);
+    this._impl = new impl.PannerNode(context._impl, opts);
   }
 
   get panningModel() {

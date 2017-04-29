@@ -15,8 +15,8 @@ describe("impl/core/AudioNode - DSP", () => {
   });
 
   it("pull from the single connection", () => {
-    const node1 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
-    const node2 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+    const node1 = new AudioNode(context, {}, { inputs: [ 1 ], outputs: [ 1 ] });
+    const node2 = new AudioNode(context, {}, { inputs: [ 1 ], outputs: [ 1 ] });
     const noise1 = np.random_sample(16);
     const noise2 = np.random_sample(16);
 
@@ -41,9 +41,9 @@ describe("impl/core/AudioNode - DSP", () => {
   });
 
   it("pull from some connections", () => {
-    const node1 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
-    const node2 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
-    const node3 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+    const node1 = new AudioNode(context, {}, { inputs: [ 1 ], outputs: [ 1 ] });
+    const node2 = new AudioNode(context, {}, { inputs: [ 1 ], outputs: [ 1 ] });
+    const node3 = new AudioNode(context, {}, { inputs: [ 1 ], outputs: [ 1 ] });
     const noise1 = np.random_sample(16);
     const noise2 = np.random_sample(16);
     const noise3 = np.random_sample(16);

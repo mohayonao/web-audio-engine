@@ -5,13 +5,17 @@ const AudioScheduledSourceNode = require("./AudioScheduledSourceNode");
 const AudioParam = require("./AudioParam");
 
 class OscillatorNode extends AudioScheduledSourceNode {
-  constructor(context) {
+  constructor(context, opts) {
     super(context);
 
-    this._impl = new impl.OscillatorNode(context._impl);
+    this._impl = new impl.OscillatorNode(context._impl, opts);
     this._impl.$frequency = new AudioParam(context, this._impl.getFrequency());
     this._impl.$detune = new AudioParam(context, this._impl.getDetune());
     this._impl.$onended = null;
+
+    if (opts && opts.periodicWave) {
+      this.setPeriodicWave(opts.periodicWave);
+    }
   }
 
   get type() {

@@ -23,7 +23,7 @@ describe("AudioParam", () => {
   let node1, node2, param;
 
   beforeEach(() => {
-    node1 = new AudioNode(context, { inputs: [], outputs: [ 1 ] });
+    node1 = new AudioNode(context, {}, { inputs: [], outputs: [ 1 ] });
     node2 = new GainNode(context);
     param = node2.getGain();
     node1.connect(param);

@@ -13,6 +13,10 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
     this._impl.$detune = new AudioParam(context, this._impl.getDetune());
     this._impl.$buffer = null;
     this._impl.$onended = null;
+
+    if (opts && opts.buffer) {
+      this.buffer = opts.buffer;
+    }
   }
 
   get buffer() {

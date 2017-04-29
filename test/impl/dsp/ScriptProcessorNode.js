@@ -22,7 +22,7 @@ describe("impl/dsp/ScriptProcessorNode", () => {
   before(() => {
     context.resume();
 
-    node1 = new AudioNode(context, { inputs: [], outputs: [ 2 ] });
+    node1 = new AudioNode(context, {}, { inputs: [], outputs: [ 2 ] });
     node2 = new ScriptProcessorNode(context, { bufferSize, numberOfInputChannels, numberOfOutputChannels });
 
     onaudioprocess = sinon.spy((e) => {

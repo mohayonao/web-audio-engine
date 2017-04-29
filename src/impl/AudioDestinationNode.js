@@ -14,12 +14,12 @@ class AudioDestinationNode extends AudioNode {
    * @param {object}       opts
    * @param {number}       opts.numberOfChannels
    */
-  constructor(context, /* istanbul ignore next */ opts = {}) {
+  constructor(context, opts = {}) {
     let numberOfChannels = opts.numberOfChannels;
 
     numberOfChannels = util.toValidNumberOfChannels(numberOfChannels);
 
-    super(context, {
+    super(context, opts, {
       inputs: [ numberOfChannels ],
       outputs: [],
       channelCount: numberOfChannels,

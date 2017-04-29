@@ -485,7 +485,7 @@ describe("impl/AudioBufferSourceNode", () => {
   describe("channel configuration", () => {
     it("should synchronize with the buffer if set", () => {
       const node1 = new AudioBufferSourceNode(context);
-      const node2 = new AudioNode(context, { inputs: [ 1 ] });
+      const node2 = new AudioNode(context, {}, { inputs: [ 1 ] });
       const buffer = new AudioBuffer({ numberOfChannels: 2, length: 32, sampleRate: 8000 });
 
       node1.outputs[0].enable();

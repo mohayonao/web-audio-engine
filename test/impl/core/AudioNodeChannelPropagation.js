@@ -48,8 +48,8 @@ describe("impl/core/AudioNode - ChannelPropagation", () => {
   });
 
   it("computedNumberOfChannels", () => {
-    const node1 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
-    const node2 = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+    const node1 = new AudioNode(context, {}, { inputs: [ 1 ], outputs: [ 1 ] });
+    const node2 = new AudioNode(context, {}, { inputs: [ 1 ], outputs: [ 1 ] });
 
     node1.connect(node2);
     node1.outputs[0].enable();

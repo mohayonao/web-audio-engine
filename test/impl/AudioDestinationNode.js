@@ -59,7 +59,7 @@ describe("impl/AudioDestinationNode", () => {
 
   describe("channel configuration", () => {
     it("should synchronize with the input, but clamped by max channel count", () => {
-      const node1 = new AudioNode(context, { outputs: [ 4 ] });
+      const node1 = new AudioNode(context, {}, { outputs: [ 4 ] });
       const node2 = new AudioDestinationNode(context, { numberOfChannels: 2 });
 
       node1.outputs[0].enable();

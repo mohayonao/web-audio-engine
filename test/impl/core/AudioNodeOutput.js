@@ -17,42 +17,42 @@ describe("impl/core/AudioNodeOutput", () => {
   });
 
   it("AudioNode().outputs[0]", () => {
-    const node = new AudioNode(context, { outputs: [ 1 ] });
+    const node = new AudioNode(context, {}, { outputs: [ 1 ] });
 
     assert(node.outputs[0] instanceof AudioNodeOutput);
   });
 
   describe("atrributes", () => {
     it(".node", () => {
-      const node = new AudioNode(context, { outputs: [ 1, 1 ] });
+      const node = new AudioNode(context, {}, { outputs: [ 1, 1 ] });
 
       assert(node.outputs[0].node === node);
       assert(node.outputs[1].node === node);
     });
 
     it(".index", () => {
-      const node = new AudioNode(context, { outputs: [ 1, 1 ] });
+      const node = new AudioNode(context, {}, { outputs: [ 1, 1 ] });
 
       assert(node.outputs[0].index === 0);
       assert(node.outputs[1].index === 1);
     });
 
     it(".bus", () => {
-      const node = new AudioNode(context, { outputs: [ 1, 1 ] });
+      const node = new AudioNode(context, {}, { outputs: [ 1, 1 ] });
 
       assert(node.outputs[0].bus instanceof AudioBus);
       assert(node.outputs[1].bus instanceof AudioBus);
     });
 
     it(".inputs", () => {
-      const node = new AudioNode(context, { outputs: [ 1, 1 ] });
+      const node = new AudioNode(context, {}, { outputs: [ 1, 1 ] });
 
       assert.deepEqual(node.outputs[0].inputs, []);
       assert.deepEqual(node.outputs[1].inputs, []);
     });
 
     it(".numberOfChannels=", () => {
-      const node = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1, 1 ] });
+      const node = new AudioNode(context, {}, { inputs: [ 1 ], outputs: [ 1, 1 ] });
 
       assert(node.outputs[0].getNumberOfChannels() === 1);
       assert(node.outputs[1].getNumberOfChannels() === 1);
@@ -65,7 +65,7 @@ describe("impl/core/AudioNodeOutput", () => {
 
   describe("methods", () => {
     it(".zeros()", () => {
-      const node = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
+      const node = new AudioNode(context, {}, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
 
       node.outputs[0].bus.getMutableData();
       node.outputs[1].bus.getMutableData();
@@ -78,7 +78,7 @@ describe("impl/core/AudioNodeOutput", () => {
     });
 
     it(".pull()", () => {
-      const node = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
+      const node = new AudioNode(context, {}, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
 
       node.dspProcess = sinon.spy();
 

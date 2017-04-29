@@ -37,9 +37,9 @@ describe("impl/ChannelSplitterNode", () => {
 
   describe("channel configuration", () => {
     it("should be kept by the initial configuration", () => {
-      const node1 = new AudioNode(context, { outputs: [ 4 ] });
+      const node1 = new AudioNode(context, {}, { outputs: [ 4 ] });
       const node2 = new ChannelSplitterNode(context, { numberOfOutputs: 6 });
-      const node3 = new AudioNode(context, { inputs: [ 1 ] });
+      const node3 = new AudioNode(context, {}, { inputs: [ 1 ] });
 
       node1.outputs[0].enable();
       node2.outputs[0].enable();

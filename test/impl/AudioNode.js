@@ -44,7 +44,7 @@ describe("impl/AudioNode", () => {
     });
 
     it(".inputs", () => {
-      const node = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
+      const node = new AudioNode(context, {}, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
 
       assert(node.inputs[0] instanceof AudioNodeInput);
       assert(node.inputs[1] instanceof AudioNodeInput);
@@ -52,7 +52,7 @@ describe("impl/AudioNode", () => {
     });
 
     it(".outputs", () => {
-      const node = new AudioNode(context, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
+      const node = new AudioNode(context, {}, { inputs: [ 1, 1 ], outputs: [ 1, 1 ] });
 
       assert(node.outputs[0] instanceof AudioNodeOutput);
       assert(node.outputs[1] instanceof AudioNodeOutput);
@@ -60,19 +60,19 @@ describe("impl/AudioNode", () => {
     });
 
     it(".numberOfInputs", () => {
-      const node = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      const node = new AudioNode(context, {}, { inputs: [ 1 ], outputs: [ 1 ] });
 
       assert(node.getNumberOfInputs() === 1);
     });
 
     it(".numberOfOutputs", () => {
-      const node = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      const node = new AudioNode(context, {}, { inputs: [ 1 ], outputs: [ 1 ] });
 
       assert(node.getNumberOfOutputs() === 1);
     });
 
     it(".channelCount=", () => {
-      const node = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      const node = new AudioNode(context, {}, { inputs: [ 1 ], outputs: [ 1 ] });
 
       assert(node.getChannelCount() === 1);
 
@@ -81,7 +81,7 @@ describe("impl/AudioNode", () => {
     });
 
     it(".channelCountMode=", () => {
-      const node = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      const node = new AudioNode(context, {}, { inputs: [ 1 ], outputs: [ 1 ] });
 
       assert(node.getChannelCountMode() === "max");
 
@@ -96,7 +96,7 @@ describe("impl/AudioNode", () => {
     });
 
     it(".channelInterpretation=", () => {
-      const node = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      const node = new AudioNode(context, {}, { inputs: [ 1 ], outputs: [ 1 ] });
 
       assert(node.getChannelInterpretation() === "speakers");
 
@@ -110,7 +110,7 @@ describe("impl/AudioNode", () => {
 
   describe("methods", () => {
     it(".enableOutputsIfNecessary()", () => {
-      const node = new AudioNode(context, { outputs: [ 1 ] });
+      const node = new AudioNode(context, {}, { outputs: [ 1 ] });
       const output = node.outputs[0];
 
       output.enable = sinon.spy();
@@ -132,7 +132,7 @@ describe("impl/AudioNode", () => {
     });
 
     it(".disableOutputsIfNecessary()", () => {
-      const node = new AudioNode(context, { outputs: [ 1 ] });
+      const node = new AudioNode(context, {}, { outputs: [ 1 ] });
       const output = node.outputs[0];
 
       node.enableOutputsIfNecessary();

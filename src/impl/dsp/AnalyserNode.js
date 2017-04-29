@@ -8,12 +8,11 @@ const util = require("../../util");
 const MAX_FFT_SIZE = 32768;
 
 const AnalyserNodeDSP = {
-  dspInit(fftSize, sampleRate) {
+  dspInit(sampleRate) {
     this._timeDomainBuffer = [];
     this._analyserBus = new AudioBus(1, MAX_FFT_SIZE, sampleRate);
     this._analyserBusOffset = 0;
     this._audioData = this._analyserBus.audioData.channelData[0];
-    this.dspUpdateSizes(fftSize);
   },
   dspUpdateSizes(fftSize) {
     const previousSmooth = new Float32Array(fftSize / 2);

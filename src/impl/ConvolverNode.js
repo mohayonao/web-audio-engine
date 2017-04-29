@@ -6,12 +6,18 @@ const AudioBuffer = require("./AudioBuffer");
 const ConvolverNodeDSP = require("./dsp/ConvolverNode");
 const { CLAMPED_MAX, EXPLICIT } = require("../constants/ChannelCountMode");
 
+const DEFAULT_DISABLE_NORMALIZATION = false;
+
 class ConvolverNode extends AudioNode {
   /**
    * @param {AudioContext} context
+   * @param {object}       opts
+   * @param {boolean}      opts.disableNormalization
    */
-  constructor(context) {
-    super(context, {
+  constructor(context, opts = {}) {
+    let disableNormalization = util.defaults(opts.disableNormalization, DEFAULT_DISABLE_NORMALIZATION);
+
+    super(context, opts, {
       inputs: [ 1 ],
       outputs: [ 1 ],
       channelCount: 2,
@@ -19,9 +25,10 @@ class ConvolverNode extends AudioNode {
       allowedMaxChannelCount: 2,
       allowedChannelCountMode: [ CLAMPED_MAX, EXPLICIT ]
     });
+
     this._buffer = null;
     this._audioData = null;
-    this._normalize = true;
+    this._normalize = !disableNormalization;
   }
 
   /**

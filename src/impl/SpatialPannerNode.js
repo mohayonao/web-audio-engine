@@ -8,8 +8,9 @@ class SpatialPannerNode extends BasePannerNode {
   /**
    * @param {AudioContext}
    */
-  constructor(context) {
-    super(context);
+  constructor(context, opts) {
+    super(context, opts);
+
     this._positionX = this.addParam(AUDIO_RATE, 0);
     this._positionY = this.addParam(AUDIO_RATE, 0);
     this._positionZ = this.addParam(AUDIO_RATE, 0);
