@@ -14,10 +14,10 @@ const ScriptProcessorNodeDSP = {
   dspSetEventItem(eventItem) {
     const numberOfInputChannels = this.inputs[0].getNumberOfChannels();
     const numberOfOutputChannels = this.outputs[0].getNumberOfChannels();
-    const inputBuffer = new AudioBuffer(this.context, {
+    const inputBuffer = new AudioBuffer({
       numberOfChannels: numberOfInputChannels, length: this._bufferSize, sampleRate: this.sampleRate
     });
-    const outputBuffer = new AudioBuffer(this.context, {
+    const outputBuffer = new AudioBuffer({
       numberOfChannels: numberOfOutputChannels, length: this._bufferSize, sampleRate: this.sampleRate
     });
 

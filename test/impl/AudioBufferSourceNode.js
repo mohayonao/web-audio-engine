@@ -58,7 +58,7 @@ describe("impl/AudioBufferSourceNode", () => {
 
     it(".buffer=", () => {
       const node = new AudioBufferSourceNode(context);
-      const buffer = new AudioBuffer(context, { numberOfChannels: 2, length: 32, sampleRate: 8000 });
+      const buffer = new AudioBuffer({ numberOfChannels: 2, length: 32, sampleRate: 8000 });
 
       assert(node.getBuffer() === null);
 
@@ -123,7 +123,7 @@ describe("impl/AudioBufferSourceNode", () => {
 
     it(".start(when)", () => {
       const node = new AudioBufferSourceNode(context);
-      const buffer = new AudioBuffer(context, { numberOfChannels: 2, length: 8000, sampleRate: 8000 });
+      const buffer = new AudioBuffer({ numberOfChannels: 2, length: 8000, sampleRate: 8000 });
 
       node.setBuffer(buffer);
       node.setLoop(true);
@@ -170,7 +170,7 @@ describe("impl/AudioBufferSourceNode", () => {
 
     it(".start(when, offset, duration)", () => {
       const node = new AudioBufferSourceNode(context);
-      const buffer = new AudioBuffer(context, { numberOfChannels: 2, length: 8000, sampleRate: 8000 });
+      const buffer = new AudioBuffer({ numberOfChannels: 2, length: 8000, sampleRate: 8000 });
       const onended = sinon.spy();
 
       node.setBuffer(buffer);
@@ -286,7 +286,7 @@ describe("impl/AudioBufferSourceNode", () => {
 
     it(".start(when) auto stop by buffer duration", () => {
       const node = new AudioBufferSourceNode(context);
-      const buffer = new AudioBuffer(context, { numberOfChannels: 2, length: 8000, sampleRate: 8000 });
+      const buffer = new AudioBuffer({ numberOfChannels: 2, length: 8000, sampleRate: 8000 });
       const onended = sinon.spy();
 
       node.setBuffer(buffer);
@@ -353,7 +353,7 @@ describe("impl/AudioBufferSourceNode", () => {
 
     it(".start(when, offset, duration) auto stop by buffer duration", () => {
       const node = new AudioBufferSourceNode(context);
-      const buffer = new AudioBuffer(context, { numberOfChannels: 2, length: 8000, sampleRate: 8000 });
+      const buffer = new AudioBuffer({ numberOfChannels: 2, length: 8000, sampleRate: 8000 });
       const onended = sinon.spy();
 
       node.setBuffer(buffer);
@@ -415,7 +415,7 @@ describe("impl/AudioBufferSourceNode", () => {
 
     it(".stop(when)", () => {
       const node = new AudioBufferSourceNode(context);
-      const buffer = new AudioBuffer(context, { numberOfChannels: 2, length: 8000, sampleRate: 8000 });
+      const buffer = new AudioBuffer({ numberOfChannels: 2, length: 8000, sampleRate: 8000 });
       const onended = sinon.spy();
 
       node.setBuffer(buffer);
@@ -486,7 +486,7 @@ describe("impl/AudioBufferSourceNode", () => {
     it("should synchronize with the buffer if set", () => {
       const node1 = new AudioBufferSourceNode(context);
       const node2 = new AudioNode(context, { inputs: [ 1 ] });
-      const buffer = new AudioBuffer(context, { numberOfChannels: 2, length: 32, sampleRate: 8000 });
+      const buffer = new AudioBuffer({ numberOfChannels: 2, length: 32, sampleRate: 8000 });
 
       node1.outputs[0].enable();
 

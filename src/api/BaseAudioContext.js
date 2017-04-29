@@ -79,7 +79,7 @@ class BaseAudioContext extends EventTarget {
   }
 
   createBuffer(numberOfChannels, length, sampleRate) {
-    return new AudioBuffer(this, { numberOfChannels, length, sampleRate });
+    return new AudioBuffer({ numberOfChannels, length, sampleRate });
   }
 
   decodeAudioData(audioData, successCallback, errorCallback) {

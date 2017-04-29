@@ -67,7 +67,11 @@ describe("impl/ConvolverNode", () => {
 
     it(".buffer=", () => {
       const node = new ConvolverNode(context);
-      const buffer = new AudioBuffer(2, 32, context.sampleRate);
+      const buffer = new AudioBuffer({
+        numberOfChannels: 2,
+        length: 32,
+        sampleRate: context.sampleRate
+      });
 
       assert(node.getBuffer() === null);
 

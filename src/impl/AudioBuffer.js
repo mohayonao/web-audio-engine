@@ -8,13 +8,12 @@ const AudioData = require("./core/AudioData");
  */
 class AudioBuffer {
   /**
-   * @param {AudioContext} context
    * @param {object}       opts
    * @param {number}       opts.numberOfChannels
    * @param {number}       opts.length
    * @param {number}       opts.sampleRate
    */
-  constructor(context, /* istanbul ignore next */ opts = {}) {
+  constructor(opts = {}) {
     let numberOfChannels = opts.numberOfChannels;
     let length = opts.length;
     let sampleRate = opts.sampleRate;
