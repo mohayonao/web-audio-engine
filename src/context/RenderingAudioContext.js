@@ -3,11 +3,11 @@
 const nmap = require("nmap");
 const util = require("../util");
 const config = require("../config");
-const AudioContext = require("../api/AudioContext");
+const BaseAudioContext = require("../api/BaseAudioContext");
 const encoder = require("../encoder");
 const { RUNNING, SUSPENDED } = require("../constants/AudioContextState");
 
-class RenderingAudioContext extends AudioContext {
+class RenderingAudioContext extends BaseAudioContext {
   /**
    * @param {object}  opts
    * @param {number}  opts.sampleRate

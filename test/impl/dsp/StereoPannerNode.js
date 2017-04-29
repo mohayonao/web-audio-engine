@@ -4,7 +4,7 @@ require("run-with-mocha");
 
 const assert = require("assert");
 const np = require("../../helpers/np");
-const AudioContext = require("../../../src/api/AudioContext");
+const AudioContext = require("../../../src/api/BaseAudioContext");
 
 const channelData = [ new Float32Array(16), new Float32Array(16) ];
 
