@@ -12,6 +12,7 @@ module.exports = {
   BiquadFilterNode: require("./BiquadFilterNode"),
   ChannelMergerNode: require("./ChannelMergerNode"),
   ChannelSplitterNode: require("./ChannelSplitterNode"),
+  ConstantSourceNode: require("./ConstantSourceNode"),
   ConvolverNode: require("./ConvolverNode"),
   DelayNode: require("./DelayNode"),
   DynamicsCompressorNode: require("./DynamicsCompressorNode"),
