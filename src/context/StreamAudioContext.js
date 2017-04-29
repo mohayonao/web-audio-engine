@@ -3,13 +3,13 @@
 const nmap = require("nmap");
 const util = require("../util");
 const config = require("../config");
-const AudioContext = require("../api/AudioContext");
+const BaseAudioContext = require("../api/BaseAudioContext");
 const PCMEncoder = require("../util/PCMEncoder");
 const setImmediate = require("../util/setImmediate");
 const { RUNNING, SUSPENDED, CLOSED } = require("../constants/AudioContextState");
 const noopWriter = { write: () => true };
 
-class StreamAudioContext extends AudioContext {
+class StreamAudioContext extends BaseAudioContext {
   /**
    * @param {object}  opts
    * @param {number}  opts.sampleRate

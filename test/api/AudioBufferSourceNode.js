@@ -5,7 +5,7 @@ require("run-with-mocha");
 const assert = require("assert");
 const sinon = require("sinon");
 const api = require("../../src/api");
-const AudioContext = require("../../src/api/AudioContext");
+const AudioContext = require("../../src/api/BaseAudioContext");
 const AudioParam = require("../../src/api/AudioParam");
 
 describe("api/AudioBufferSourceNode", () => {
@@ -14,6 +14,7 @@ describe("api/AudioBufferSourceNode", () => {
     const target = context.createBufferSource();
 
     assert(target instanceof api.AudioBufferSourceNode);
+    assert(target instanceof api.AudioScheduledSourceNode);
   });
 
   describe("attributes", () => {

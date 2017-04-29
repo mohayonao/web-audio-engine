@@ -8,8 +8,8 @@ class AudioSourceNode extends AudioNode {
   /**
    * @param {AudioContext} context
    */
-  constructor(context) {
-    super(context, {
+  constructor(context, opts) {
+    super(context, opts, {
       inputs: [],
       outputs: [ 1 ]
     });

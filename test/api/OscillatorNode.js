@@ -5,7 +5,7 @@ require("run-with-mocha");
 const assert = require("assert");
 const sinon = require("sinon");
 const api = require("../../src/api");
-const AudioContext = require("../../src/api/AudioContext");
+const AudioContext = require("../../src/api/BaseAudioContext");
 const AudioParam = require("../../src/api/AudioParam");
 
 describe("api/OscillatorNode", () => {
@@ -14,6 +14,7 @@ describe("api/OscillatorNode", () => {
     const target = context.createOscillator();
 
     assert(target instanceof api.OscillatorNode);
+    assert(target instanceof api.AudioScheduledSourceNode);
   });
 
   describe("attributes", () => {

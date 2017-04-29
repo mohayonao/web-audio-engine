@@ -7,12 +7,39 @@ const { CLAMPED_MAX, EXPLICIT } = require("../constants/ChannelCountMode");
 const PanningModelTypes = [ "equalpower", "HRTF" ];
 const DistanceModelTypes = [ "linear", "inverse", "exponential" ];
 
+const DEFAULT_PANNING_MODEL = "equalpower";
+const DEFAULT_DISTANCE_MODEL = "inverse";
+const DEFAULT_REF_DISTANCE = 1;
+const DEFAULT_MAX_DISTANCE = 10000;
+const DEFAULT_ROLLOFF_FACTOR = 1;
+const DEFAULT_CONE_INNER_ANGLE = 360;
+const DEFAULT_CONE_OUTER_ANGLE = 360;
+const DEFAULT_CONE_OUTER_GAIN = 0;
+
 class BasePannerNode extends AudioNode {
   /**
    * @param {AudioContext} context
+   * @param {object}       opts
+   * @param {string}       opts.panningModel
+   * @param {string}       opts.distanceModel
+   * @param {number}       opts.refDistance
+   * @param {number}       opts.maxDistance
+   * @param {number}       opts.rolloffFactor
+   * @param {number}       opts.coneInnerAngle
+   * @param {number}       opts.coneOuterAngle
+   * @param {number}       opts.coneOuterGain
    */
-  constructor(context) {
-    super(context, {
+  constructor(context, opts = {}) {
+    let panningModel = util.defaults(opts.panningModel, DEFAULT_PANNING_MODEL);
+    let distanceModel = util.defaults(opts.distanceModel, DEFAULT_DISTANCE_MODEL);
+    let refDistance = util.defaults(opts.refDistance, DEFAULT_REF_DISTANCE);
+    let maxDistance = util.defaults(opts.maxDistance, DEFAULT_MAX_DISTANCE);
+    let rolloffFactor = util.defaults(opts.rolloffFactor, DEFAULT_ROLLOFF_FACTOR);
+    let coneInnerAngle = util.defaults(opts.coneInnerAngle, DEFAULT_CONE_INNER_ANGLE);
+    let coneOuterAngle = util.defaults(opts.coneOuterAngle, DEFAULT_CONE_OUTER_ANGLE);
+    let coneOuterGain = util.defaults(opts.coneOuterGain, DEFAULT_CONE_OUTER_GAIN);
+
+    super(context, opts, {
       inputs: [ 1 ],
       outputs: [ 2 ],
       channelCount: 2,
@@ -20,14 +47,15 @@ class BasePannerNode extends AudioNode {
       allowedMaxChannelCount: 2,
       allowedChannelCountMode: [ CLAMPED_MAX, EXPLICIT ]
     });
-    this._panningModel = "equalpower";
-    this._distanceModel = "inverse";
-    this._refDistance = 1;
-    this._maxDistance = 10000;
-    this._rolloffFactor = 1;
-    this._coneInnerAngle = 360;
-    this._coneOuterAngle = 360;
-    this._coneOuterGain = 0;
+
+    this._panningModel = panningModel;
+    this._distanceModel = distanceModel;
+    this._refDistance = refDistance;
+    this._maxDistance = maxDistance;
+    this._rolloffFactor = rolloffFactor;
+    this._coneInnerAngle = coneInnerAngle;
+    this._coneOuterAngle = coneOuterAngle;
+    this._coneOuterGain = coneOuterGain;
   }
 
   /**

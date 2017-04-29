@@ -5,7 +5,7 @@ require("run-with-mocha");
 const assert = require("assert");
 const sinon = require("sinon");
 const api = require("../../src/api");
-const AudioContext = require("../../src/api/AudioContext");
+const AudioContext = require("../../src/api/BaseAudioContext");
 
 describe("api/IIRFilterNode", () => {
   it("context.createIIRFilter(feedforward, feedback)", () => {

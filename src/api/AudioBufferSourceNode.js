@@ -1,10 +1,10 @@
 "use strict";
 
 const impl = require("../impl");
-const AudioNode = require("./AudioNode");
+const AudioScheduledSourceNode = require("./AudioScheduledSourceNode");
 const AudioParam = require("./AudioParam");
 
-class AudioBufferSourceNode extends AudioNode {
+class AudioBufferSourceNode extends AudioScheduledSourceNode {
   constructor(context, opts) {
     super(context);
 
@@ -13,6 +13,10 @@ class AudioBufferSourceNode extends AudioNode {
     this._impl.$detune = new AudioParam(context, this._impl.getDetune());
     this._impl.$buffer = null;
     this._impl.$onended = null;
+
+    if (opts && opts.buffer) {
+      this.buffer = opts.buffer;
+    }
   }
 
   get buffer() {
@@ -56,21 +60,8 @@ class AudioBufferSourceNode extends AudioNode {
     this._impl.setLoopEnd(value);
   }
 
-  get onended() {
-    return this._impl.$onended;
-  }
-
-  set onended(callback) {
-    this._impl.replaceEventListener("ended", this._impl.$onended, callback);
-    this._impl.$onended = callback;
-  }
-
   start(when, offset, duration) {
     this._impl.start(when, offset, duration);
-  }
-
-  stop(when) {
-    this._impl.stop(when);
   }
 }
 

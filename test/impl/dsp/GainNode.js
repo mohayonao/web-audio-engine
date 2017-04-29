@@ -20,7 +20,7 @@ describe("impl/GainNode", () => {
       context.reset();
       context.resume();
 
-      node1 = new AudioNode(context, { outputs: [ 1 ] });
+      node1 = new AudioNode(context, {}, { outputs: [ 1 ] });
       node2 = new GainNode(context);
       node1.enableOutputsIfNecessary();
       node1.connect(node2);
@@ -106,7 +106,7 @@ describe("impl/GainNode", () => {
         context.reset();
         context.resume();
 
-        node1 = new AudioNode(context, { outputs: [ 2 ] });
+        node1 = new AudioNode(context, {}, { outputs: [ 2 ] });
         node2 = new GainNode(context);
         node1.enableOutputsIfNecessary();
         node1.connect(node2);
@@ -216,7 +216,7 @@ describe("impl/GainNode", () => {
         context.reset();
         context.resume();
 
-        node1 = new AudioNode(context, { outputs: [ 4 ] });
+        node1 = new AudioNode(context, {}, { outputs: [ 4 ] });
         node2 = new GainNode(context);
         node1.enableOutputsIfNecessary();
         node1.connect(node2);

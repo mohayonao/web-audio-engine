@@ -7,19 +7,38 @@ const AudioBufferSourceNodeDSP = require("./dsp/AudioBufferSourceNode");
 const { CONTROL_RATE } = require("../constants/AudioParamRate");
 const { FINISHED } = require("../constants/PlaybackState");
 
+const DEFAULT_PLAYBACK_RATE = 1;
+const DEFAULT_DETUNE = 0;
+const DEFAULT_LOOP = false;
+const DEFAULT_LOOP_START = 0;
+const DEFAULT_LOOP_END = 0;
+
 class AudioBufferSourceNode extends AudioScheduledSourceNode {
   /**
    * @param {AudioContext} context
+   * @param {object}       opts
+   * @param {number}       opts.playbackRate
+   * @param {number}       opts.detune
+   * @param {boolean}      opts.loop
+   * @param {number}       opts.loopStart
+   * @param {number}       opts.loopEnd
    */
-  constructor(context) {
-    super(context);
+  constructor(context, opts = {}) {
+    let playbackRate = util.defaults(opts.playbackRate, DEFAULT_PLAYBACK_RATE);
+    let detune = util.defaults(opts.detune, DEFAULT_DETUNE);
+    let loop = util.defaults(opts.loop, DEFAULT_LOOP);
+    let loopStart = util.defaults(opts.loopStart, DEFAULT_LOOP_START);
+    let loopEnd = util.defaults(opts.loopEnd, DEFAULT_LOOP_END);
+
+    super(context, opts);
+
     this._buffer = null;
     this._audioData = null;
-    this._playbackRate = this.addParam(CONTROL_RATE, 1);
-    this._detune = this.addParam(CONTROL_RATE, 0);
-    this._loop = false;
-    this._loopStart = 0;
-    this._loopEnd = 0;
+    this._playbackRate = this.addParam(CONTROL_RATE, playbackRate);
+    this._detune = this.addParam(CONTROL_RATE, detune);
+    this._loop = !!loop;
+    this._loopStart = loopStart;
+    this._loopEnd = loopEnd;
     this._offset = 0;
     this._duration = Infinity;
     this._done = false;

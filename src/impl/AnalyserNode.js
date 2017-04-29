@@ -5,25 +5,42 @@ const AudioNode = require("./AudioNode");
 const AnalyserNodeDSP = require("./dsp/AnalyserNode");
 const { MAX } = require("../constants/ChannelCountMode");
 
-const MinFFTSize = 32;
-const MaxFFTSize = 32768;
+const DEFAULT_FFT_SIZE = 2048;
+const DEFAULT_MIN_DECIBELS = -100;
+const DEFAULT_MAX_DECIBELS = -30;
+const DEFAULT_SMOOTHING_TIME_CONSTANT = 0.8;
+const MIN_FFT_SIZE = 32;
+const MAX_FFT_SIZE = 32768;
 
 class AnalyserNode extends AudioNode {
   /**
    * @param {AudioContext} context
+   * @param {object}       opts
+   * @param {number}       opts.fftSize
+   * @param {number}       opts.minDecibels
+   * @param {number}       opts.maxDecibels
+   * @param {number}       opts.smoothingTimeConstant
    */
-  constructor(context) {
-    super(context, {
+  constructor(context, opts = {}) {
+    let fftSize = util.defaults(opts.fftSize, DEFAULT_FFT_SIZE);
+    let minDecibels = util.defaults(opts.minDecibels, DEFAULT_MIN_DECIBELS);
+    let maxDecibels = util.defaults(opts.maxDecibels, DEFAULT_MAX_DECIBELS);
+    let smoothingTimeConstant = util.defaults(opts.smoothingTimeConstant, DEFAULT_SMOOTHING_TIME_CONSTANT);
+
+    super(context, opts, {
       inputs: [ 1 ],
       outputs: [ 1 ],
       channelCount: 1,
       channelCountMode: MAX
     });
-    this._fftSize = 2048;
-    this._minDecibels = -100;
-    this._maxDecibels = -30;
-    this._smoothingTimeConstant = 0.8;
-    this.dspInit(this._fftSize, context.sampleRate);
+
+    this._fftSize = fftSize;
+    this._minDecibels = minDecibels;
+    this._maxDecibels = maxDecibels;
+    this._smoothingTimeConstant = smoothingTimeConstant;
+
+    this.dspInit(context.sampleRate);
+    this.setFftSize(fftSize);
   }
 
   /**
@@ -37,7 +54,7 @@ class AnalyserNode extends AudioNode {
    * @param {number} value
    */
   setFftSize(value) {
-    value = util.clamp(value|0, MinFFTSize, MaxFFTSize);
+    value = util.clamp(value|0, MIN_FFT_SIZE, MAX_FFT_SIZE);
     value = util.toPowerOfTwo(value, Math.ceil);
     this._fftSize = value;
     this.dspUpdateSizes(this._fftSize);

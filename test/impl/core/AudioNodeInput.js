@@ -18,42 +18,42 @@ describe("impl/core/AudioNodeInput", () => {
   });
 
   it("AudioNode().inputs[0]", () => {
-    const node = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+    const node = new AudioNode(context, {}, { inputs: [ 1 ], outputs: [ 1 ] });
 
     assert(node.inputs[0] instanceof AudioNodeInput);
   });
 
   describe("attributes", () => {
     it(".node", () => {
-      const node = new AudioNode(context, { inputs: [ 1, 1 ] });
+      const node = new AudioNode(context, {}, { inputs: [ 1, 1 ] });
 
       assert(node.inputs[0].node === node);
       assert(node.inputs[1].node === node);
     });
 
     it(".index", () => {
-      const node = new AudioNode(context, { inputs: [ 1, 1 ] });
+      const node = new AudioNode(context, {}, { inputs: [ 1, 1 ] });
 
       assert(node.inputs[0].index === 0);
       assert(node.inputs[1].index === 1);
     });
 
     it(".bus", () => {
-      const node = new AudioNode(context, { inputs: [ 1, 1 ] });
+      const node = new AudioNode(context, {}, { inputs: [ 1, 1 ] });
 
       assert(node.inputs[0].bus instanceof AudioBus);
       assert(node.inputs[1].bus instanceof AudioBus);
     });
 
     it(".outputs", () => {
-      const node = new AudioNode(context, { inputs: [ 1, 1 ] });
+      const node = new AudioNode(context, {}, { inputs: [ 1, 1 ] });
 
       assert.deepEqual(node.inputs[0].outputs, []);
       assert.deepEqual(node.inputs[1].outputs, []);
     });
 
     it(".channelCount=", () => {
-      const node = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      const node = new AudioNode(context, {}, { inputs: [ 1 ], outputs: [ 1 ] });
 
       assert(node.inputs[0].getChannelCount() === 1);
 
@@ -71,7 +71,7 @@ describe("impl/core/AudioNodeInput", () => {
     });
 
     it(".channelCountMode=", () => {
-      const node = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      const node = new AudioNode(context, {}, { inputs: [ 1 ], outputs: [ 1 ] });
 
       assert(node.inputs[0].getChannelCountMode() === MAX);
 
@@ -86,7 +86,7 @@ describe("impl/core/AudioNodeInput", () => {
     });
 
     it(".channelInterpretation=", () => {
-      const node = new AudioNode(context, { inputs: [ 1 ], outputs: [ 1 ] });
+      const node = new AudioNode(context, {}, { inputs: [ 1 ], outputs: [ 1 ] });
 
       assert(node.inputs[0].getChannelInterpretation() === SPEAKERS);
 

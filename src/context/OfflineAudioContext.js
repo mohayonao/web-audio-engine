@@ -3,12 +3,12 @@
 const nmap = require("nmap");
 const util = require("../util");
 const audioDataUtil = require("../util/audioDataUtil");
-const AudioContext = require("../api/AudioContext");
+const BaseAudioContext = require("../api/BaseAudioContext");
 const AudioBuffer = require("../api/AudioBuffer");
 const setImmediate = require("../util/setImmediate");
 const { RUNNING, SUSPENDED, CLOSED } = require("../constants/AudioContextState");
 
-class OfflineAudioContext extends AudioContext {
+class OfflineAudioContext extends BaseAudioContext {
   /**
    * @param {number} numberOfChannels
    * @param {number} length

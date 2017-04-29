@@ -274,7 +274,7 @@ describe("AudioParam", () => {
   describe("connection", () => {
     it("basic operation", () => {
       const param = new AudioParam(context, { rate: CONTROL_RATE, defaultValue: 0 });
-      const node = new AudioNode(context, { outputs: [ 1 ] });
+      const node = new AudioNode(context, {}, { outputs: [ 1 ] });
 
       node.outputs[0].enable();
       node.connect(param);

@@ -26,7 +26,7 @@ const OscillatorNode = require("./OscillatorNode");
 const PeriodicWave = require("./PeriodicWave");
 const decoder = require("../decoder");
 
-class AudioContext extends EventTarget {
+class BaseAudioContext extends EventTarget {
   constructor(opts) {
     super();
 
@@ -79,7 +79,7 @@ class AudioContext extends EventTarget {
   }
 
   createBuffer(numberOfChannels, length, sampleRate) {
-    return new AudioBuffer(this, { numberOfChannels, length, sampleRate });
+    return new AudioBuffer({ numberOfChannels, length, sampleRate });
   }
 
   decodeAudioData(audioData, successCallback, errorCallback) {
@@ -161,21 +161,6 @@ class AudioContext extends EventTarget {
   createPeriodicWave(real, imag, constraints) {
     return new PeriodicWave(this, { real, imag, constraints });
   }
-
-  /* istanbul ignore next */
-  createMediaElementSource() {
-    throw new TypeError("NOT SUPPORTED");
-  }
-
-  /* istanbul ignore next */
-  createMediaStreamSource() {
-    throw new TypeError("NOT SUPPORTED");
-  }
-
-  /* istanbul ignore next */
-  createMediaStreamDestination() {
-    throw new TypeError("NOT SUPPORTED");
-  }
 }
 
-module.exports = AudioContext;
+module.exports = BaseAudioContext;

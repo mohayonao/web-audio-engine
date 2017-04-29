@@ -4,7 +4,7 @@ require("run-with-mocha");
 
 const assert = require("assert");
 const sinon = require("sinon");
-const AudioContext = require("../../src/api/AudioContext");
+const AudioContext = require("../../src/api/BaseAudioContext");
 const AudioDestinationNode = require("../../src/api/AudioDestinationNode");
 const AudioListener = require("../../src/api/AudioListener");
 const AudioBuffer = require("../../src/api/AudioBuffer");

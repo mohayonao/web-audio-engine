@@ -22,7 +22,7 @@ describe("impl/dsp/ScriptProcessorNode", () => {
   before(() => {
     context.resume();
 
-    node1 = new AudioNode(context, { inputs: [], outputs: [ 2 ] });
+    node1 = new AudioNode(context, {}, { inputs: [], outputs: [ 2 ] });
     node2 = new ScriptProcessorNode(context, { bufferSize, numberOfInputChannels, numberOfOutputChannels });
 
     onaudioprocess = sinon.spy((e) => {
@@ -32,8 +32,8 @@ describe("impl/dsp/ScriptProcessorNode", () => {
     node2.setEventItem({
       type: "audioprocess",
       playbackTime: 0,
-      inputBuffer: new AudioBuffer({ sampleRate: 8000 }),
-      outputBuffer: new AudioBuffer({ sampleRate: 8000 })
+      inputBuffer: new AudioBuffer(),
+      outputBuffer: new AudioBuffer()
     });
 
     node1.enableOutputsIfNecessary();

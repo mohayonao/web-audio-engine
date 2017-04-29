@@ -12,17 +12,31 @@ const allowedOscillatorTypes = [
   SINE, SAWTOOTH, TRIANGLE, SQUARE
 ];
 
+const DEFAULT_TYPE = SINE;
+const DEFAULT_FREQUENCY = 440;
+const DEFAULT_DETUNE = 0;
+
 class OscillatorNode extends AudioScheduledSourceNode {
   /**
    * @param {AudioContext} context
+   * @param {object}       opts
+   * @param {string}       opts.type
+   * @param {number}       opts.frequency
+   * @param {number}       opts.detune
    */
-  constructor(context) {
-    super(context);
-    this._frequency = this.addParam(AUDIO_RATE, 440);
-    this._detune = this.addParam(AUDIO_RATE, 0);
-    this._type = SINE;
+  constructor(context, opts = {}) {
+    let type = util.defaults(opts.type, DEFAULT_TYPE);
+    let frequency = util.defaults(opts.frequency, DEFAULT_FREQUENCY);
+    let detune = util.defaults(opts.detune, DEFAULT_DETUNE);
+
+    super(context, opts);
+
+    this._frequency = this.addParam(AUDIO_RATE, frequency);
+    this._detune = this.addParam(AUDIO_RATE, detune);
+    this._type = type;
     this._periodicWave = this.buildPeriodicWave(this._type);
     this._waveTable = null;
+
     this.dspInit();
   }
 

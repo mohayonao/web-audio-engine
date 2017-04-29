@@ -7,8 +7,8 @@ class PannerNode extends BasePannerNode {
   /**
    * @param {AudioContext} context
    */
-  constructor(context) {
-    super(context);
+  constructor(context, opts) {
+    super(context, opts);
   }
 
   /**

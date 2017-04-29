@@ -5,10 +5,10 @@ const AudioNode = require("./AudioNode");
 const AudioParam = require("./AudioParam");
 
 class SpatialPannerNode extends AudioNode {
-  constructor(context) {
+  constructor(context, opts) {
     super(context);
 
-    this._impl = new impl.SpatialPannerNode(context._impl);
+    this._impl = new impl.SpatialPannerNode(context._impl, opts);
     this._impl.$positionX = new AudioParam(context, this._impl.getPositionX());
     this._impl.$positionY = new AudioParam(context, this._impl.getPositionY());
     this._impl.$positionZ = new AudioParam(context, this._impl.getPositionZ());

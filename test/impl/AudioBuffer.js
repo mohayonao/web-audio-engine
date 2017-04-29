@@ -4,52 +4,45 @@ require("run-with-mocha");
 
 const assert = require("assert");
 const np = require("../helpers/np");
-const AudioContext = require("../../src/impl/AudioContext");
 const AudioBuffer = require("../../src/impl/AudioBuffer");
 const AudioData = require("../../src/impl/core/AudioData");
 
 const numberOfChannels = 2, length = 32, sampleRate = 8000;
 
 describe("impl/AudioBuffer", () => {
-  let context;
-
-  beforeEach(() => {
-    context = new AudioContext({ sampleRate: 8000, blockSize: 32 });
-  });
-
   it("constructor", () => {
-    const node = new AudioBuffer(context, { numberOfChannels, length, sampleRate });
+    const node = new AudioBuffer({ numberOfChannels, length, sampleRate });
 
     assert(node instanceof AudioBuffer);
   });
 
   describe("attributes", () => {
     it(".numberOfChannels", () => {
-      const node = new AudioBuffer(context, { numberOfChannels, length, sampleRate });
+      const node = new AudioBuffer({ numberOfChannels, length, sampleRate });
 
       assert(node.getNumberOfChannels() === numberOfChannels);
     });
 
     it(".length", () => {
-      const node = new AudioBuffer(context, { numberOfChannels, length, sampleRate });
+      const node = new AudioBuffer({ numberOfChannels, length, sampleRate });
 
       assert(node.getLength() === length);
     });
 
     it(".sampleRate", () => {
-      const node = new AudioBuffer(context, { numberOfChannels, length, sampleRate });
+      const node = new AudioBuffer({ numberOfChannels, length, sampleRate });
 
       assert(node.getSampleRate() === sampleRate);
     });
 
     it(".duration", () => {
-      const node = new AudioBuffer(context, { numberOfChannels, length, sampleRate });
+      const node = new AudioBuffer({ numberOfChannels, length, sampleRate });
 
       assert(node.getDuration() === length / sampleRate);
     });
 
     it(".audioData", () => {
-      const buffer = new AudioBuffer(context, { numberOfChannels, length, sampleRate });
+      const buffer = new AudioBuffer({ numberOfChannels, length, sampleRate });
 
       assert(buffer.audioData instanceof AudioData);
       assert(buffer.audioData.sampleRate === buffer.getSampleRate());
@@ -60,7 +53,7 @@ describe("impl/AudioBuffer", () => {
 
   describe("methods", () => {
     it(".copyFromChannel(destination, channelNumber, startInChannel)", () => {
-      const buffer = new AudioBuffer(context, { numberOfChannels, length, sampleRate });
+      const buffer = new AudioBuffer({ numberOfChannels, length, sampleRate });
       const destination = new Float32Array(8);
 
       buffer.getChannelData(0).set(np.random_sample(32));
@@ -71,7 +64,7 @@ describe("impl/AudioBuffer", () => {
     });
 
     it(".copyToChannel(source, channelNumber, startInChannel)", () => {
-      const buffer = new AudioBuffer(context, { numberOfChannels, length, sampleRate });
+      const buffer = new AudioBuffer({ numberOfChannels, length, sampleRate });
       const source = np.random_sample(8);
 
       buffer.getChannelData(0).set(np.random_sample(32));

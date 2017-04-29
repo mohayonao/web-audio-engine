@@ -12,7 +12,7 @@ describe("impl/dsp/WaveShaperNode", () => {
   it("works", () => {
     const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
     const channelData = [ new Float32Array(16), new Float32Array(16) ];
-    const node1 = new AudioNode(context, { outputs: [ 2 ] });
+    const node1 = new AudioNode(context, {}, { outputs: [ 2 ] });
     const node2 = new WaveShaperNode(context);
     const curve = new Float32Array([ 1, 0, 1 ]);
     const noise1 = np.random_sample(16).map(x => (x - 0.5) * 2);
@@ -39,7 +39,7 @@ describe("impl/dsp/WaveShaperNode", () => {
   it("works - without curve", () => {
     const context = new AudioContext({ sampleRate: 8000, blockSize: 16 });
     const channelData = [ new Float32Array(16), new Float32Array(16) ];
-    const node1 = new AudioNode(context, { outputs: [ 2 ] });
+    const node1 = new AudioNode(context, {}, { outputs: [ 2 ] });
     const node2 = new WaveShaperNode(context);
     const noise1 = np.random_sample(16).map(x => (x - 0.5) * 2);
     const noise2 = np.random_sample(16).map(x => (x - 0.5) * 2);

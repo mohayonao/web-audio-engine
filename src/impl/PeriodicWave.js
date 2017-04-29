@@ -12,7 +12,7 @@ class PeriodicWave {
    * @param {Float32Array} opts.imag
    * @param {boolean}      opts.constraints
    */
-  constructor(context, /* istanbul ignore next */ opts = {}) {
+  constructor(context, opts = {}) {
     let real = opts.real;
     let imag = opts.imag;
     let constraints = opts.constraints;

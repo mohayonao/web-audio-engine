@@ -12,16 +12,17 @@ class IIRFilterNode extends AudioNode {
    * @param {Float32Array} opts.feedforward
    * @param {Float32Array} opts.feedback
    */
-  constructor(context, /* istanbul ignore next */ opts = {}) {
+  constructor(context, opts = {}) {
     let feedforward = util.defaults(opts.feedforward, [ 0 ]);
     let feedback = util.defaults(opts.feedback, [ 1 ]);
 
-    super(context, {
+    super(context, opts, {
       inputs: [ 1 ],
       outputs: [ 1 ],
       channelCount: 2,
       channelCountMode: MAX
     });
+
     this._feedforward = feedforward;
     this._feedback = feedback;
 

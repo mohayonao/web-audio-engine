@@ -8,8 +8,8 @@ class AudioScheduledSourceNode extends AudioSourceNode {
   /**
    * @param {AudioContext} context
    */
-  constructor(context) {
-    super(context);
+  constructor(context, opts) {
+    super(context, opts);
 
     this._startTime = Infinity;
     this._stopTime = Infinity;
