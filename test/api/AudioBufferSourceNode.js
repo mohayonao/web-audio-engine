@@ -14,6 +14,7 @@ describe("api/AudioBufferSourceNode", () => {
     const target = context.createBufferSource();
 
     assert(target instanceof api.AudioBufferSourceNode);
+    assert(target instanceof api.AudioScheduledSourceNode);
   });
 
   describe("attributes", () => {

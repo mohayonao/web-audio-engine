@@ -13,6 +13,7 @@ describe("api/ConstantSourceNode", () => {
     const target = context.createConstantSource();
 
     assert(target instanceof api.ConstantSourceNode);
+    assert(target instanceof api.AudioScheduledSourceNode);
   });
 
   describe("attributes", () => {

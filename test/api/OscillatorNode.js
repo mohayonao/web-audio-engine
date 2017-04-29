@@ -14,6 +14,7 @@ describe("api/OscillatorNode", () => {
     const target = context.createOscillator();
 
     assert(target instanceof api.OscillatorNode);
+    assert(target instanceof api.AudioScheduledSourceNode);
   });
 
   describe("attributes", () => {

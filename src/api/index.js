@@ -9,6 +9,7 @@ module.exports = {
   AudioListener: require("./AudioListener"),
   AudioNode: require("./AudioNode"),
   AudioParam: require("./AudioParam"),
+  AudioScheduledSourceNode: require("./AudioScheduledSourceNode"),
   BiquadFilterNode: require("./BiquadFilterNode"),
   ChannelMergerNode: require("./ChannelMergerNode"),
   ChannelSplitterNode: require("./ChannelSplitterNode"),

@@ -1,10 +1,10 @@
 "use strict";
 
 const impl = require("../impl");
-const AudioNode = require("./AudioNode");
+const AudioScheduledSourceNode = require("./AudioScheduledSourceNode");
 const AudioParam = require("./AudioParam");
 
-class OscillatorNode extends AudioNode {
+class OscillatorNode extends AudioScheduledSourceNode {
   constructor(context) {
     super(context);
 
@@ -28,23 +28,6 @@ class OscillatorNode extends AudioNode {
 
   get detune() {
     return this._impl.$detune;
-  }
-
-  get onended() {
-    return this._impl.$onended;
-  }
-
-  set onended(callback) {
-    this._impl.replaceEventListener("ended", this._impl.$onended, callback);
-    this._impl.$onended = callback;
-  }
-
-  start(when) {
-    this._impl.start(when);
-  }
-
-  stop(when) {
-    this._impl.stop(when);
   }
 
   setPeriodicWave(periodicWave) {
