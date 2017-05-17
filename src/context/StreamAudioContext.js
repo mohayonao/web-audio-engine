@@ -4,7 +4,6 @@ const nmap = require("nmap");
 const config = require("../config");
 const BaseAudioContext = require("../api/BaseAudioContext");
 const PCMEncoder = require("../utils/PCMEncoder");
-const setImmediate = require("../utils/setImmediate");
 const { defaults, defineProp } = require("../utils");
 const { toValidSampleRate, toValidBlockSize, toValidNumberOfChannels, toValidBitDepth } = require("../utils");
 const { RUNNING, SUSPENDED, CLOSED } = require("../constants/AudioContextState");
