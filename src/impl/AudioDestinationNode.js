@@ -1,7 +1,7 @@
 "use strict";
 
-const util = require("../util");
 const AudioNode = require("./AudioNode");
+const { toValidNumberOfChannels } = require("../utils");
 const { EXPLICIT } = require("../constants/ChannelCountMode");
 
 /**
@@ -17,7 +17,7 @@ class AudioDestinationNode extends AudioNode {
   constructor(context, opts = {}) {
     let numberOfChannels = opts.numberOfChannels;
 
-    numberOfChannels = util.toValidNumberOfChannels(numberOfChannels);
+    numberOfChannels = toValidNumberOfChannels(numberOfChannels);
 
     super(context, opts, {
       inputs: [ numberOfChannels ],

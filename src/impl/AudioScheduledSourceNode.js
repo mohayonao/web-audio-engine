@@ -1,7 +1,7 @@
 "use strict";
 
-const util = require("../util");
 const AudioSourceNode = require("./AudioSourceNode");
+const { toNumber } = require("../utils");
 const { UNSCHEDULED, SCHEDULED, PLAYING, FINISHED } = require("../constants/PlaybackState");
 
 class AudioScheduledSourceNode extends AudioSourceNode {
@@ -60,7 +60,7 @@ class AudioScheduledSourceNode extends AudioSourceNode {
       return;
     }
 
-    when = Math.max(this.context.currentTime, util.toNumber(when));
+    when = Math.max(this.context.currentTime, toNumber(when));
 
     this._startTime = when;
     this._startFrame = Math.round(when * this.sampleRate);
@@ -79,7 +79,7 @@ class AudioScheduledSourceNode extends AudioSourceNode {
       return;
     }
 
-    when = Math.max(this.context.currentTime, this._startTime, util.toNumber(when));
+    when = Math.max(this.context.currentTime, this._startTime, toNumber(when));
 
     this._stopTime = when;
     this._stopFrame = Math.round(when * this.sampleRate);

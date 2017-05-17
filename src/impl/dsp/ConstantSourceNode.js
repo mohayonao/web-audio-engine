@@ -1,6 +1,6 @@
 "use strict";
 
-const fill = require("../../util/fill");
+const { fill } = require("../../utils");
 
 const ConstantSourceNode = {
   dspInit() {},

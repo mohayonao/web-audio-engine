@@ -1,8 +1,8 @@
 "use strict";
 
-const util = require("../util");
 const AudioNode = require("./AudioNode");
 const IIRFilterNodeDSP = require("./dsp/IIRFilterNode");
+const { defaults } = require("../utils");
 const { MAX } = require("../constants/ChannelCountMode");
 
 class IIRFilterNode extends AudioNode {
@@ -13,8 +13,8 @@ class IIRFilterNode extends AudioNode {
    * @param {Float32Array} opts.feedback
    */
   constructor(context, opts = {}) {
-    let feedforward = util.defaults(opts.feedforward, [ 0 ]);
-    let feedback = util.defaults(opts.feedback, [ 1 ]);
+    let feedforward = defaults(opts.feedforward, [ 0 ]);
+    let feedback = defaults(opts.feedback, [ 1 ]);
 
     super(context, opts, {
       inputs: [ 1 ],

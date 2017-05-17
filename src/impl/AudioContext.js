@@ -1,11 +1,12 @@
 "use strict";
 
 const assert = require("assert");
-const util = require("../util");
 const config = require("../config");
 const EventTarget = require("./EventTarget");
 const AudioDestinationNode = require("./AudioDestinationNode");
 const AudioListener = require("./AudioListener");
+const { defaults, fillRange } = require("../utils");
+const { toValidSampleRate, toValidBlockSize, toValidNumberOfChannels } = require("../utils");
 const { RUNNING, SUSPENDED, CLOSED } = require("../constants/AudioContextState");
 
 /**
@@ -25,13 +26,13 @@ class AudioContext extends EventTarget {
   constructor(opts = {}) {
     super();
 
-    let sampleRate = util.defaults(opts.sampleRate, config.sampleRate);
-    let blockSize = util.defaults(opts.blockSize, config.blockSize);
-    let numberOfChannels = util.defaults(opts.channels || opts.numberOfChannels, config.numberOfChannels);
+    let sampleRate = defaults(opts.sampleRate, config.sampleRate);
+    let blockSize = defaults(opts.blockSize, config.blockSize);
+    let numberOfChannels = defaults(opts.channels || opts.numberOfChannels, config.numberOfChannels);
 
-    sampleRate = util.toValidSampleRate(sampleRate);
-    blockSize = util.toValidBlockSize(blockSize);
-    numberOfChannels = util.toValidNumberOfChannels(numberOfChannels);
+    sampleRate = toValidSampleRate(sampleRate);
+    blockSize = toValidBlockSize(blockSize);
+    numberOfChannels = toValidNumberOfChannels(numberOfChannels);
 
     this.sampleRate = sampleRate|0;
     this.blockSize = blockSize|0;
@@ -168,7 +169,7 @@ class AudioContext extends EventTarget {
       const offsetEnd = offset + this.blockSize;
 
       for (let ch = 0; ch < numberOfChannels; ch++) {
-        util.fillRange(channelData[ch], offset, offsetEnd);
+        fillRange(channelData[ch], offset, offsetEnd);
       }
     } else {
       const sched = this._sched;

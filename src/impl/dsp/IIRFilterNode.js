@@ -2,7 +2,7 @@
 
 const assert = require("assert");
 const IIRFilterKernel = require("./IIRFilterKernel");
-const getFilterResponse = require("../../util/getFilterResponse");
+const { getFilterResponse } = require("../../utils/FilterUtils");
 
 const IIRFilterNodeDSP = {
   dspInit() {

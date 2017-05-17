@@ -1,11 +1,11 @@
 "use strict";
 
-const util = require("../util");
+const { defineProp } = require("../utils");
 
 class AudioParam {
   constructor(context, impl) {
-    util.defineProp(this, "_context", context);
-    util.defineProp(this, "_impl", impl);
+    defineProp(this, "_context", context);
+    defineProp(this, "_impl", impl);
   }
 
   get value() {

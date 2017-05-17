@@ -5,23 +5,23 @@ require("run-with-mocha");
 const assert = require("assert");
 const sinon = require("sinon");
 const decoder = require("../src/decoder");
-const decoderUtil = require("../src/util/decoderUtil");
+const DecoderUtils = require("../src/utils/DecoderUtils");
 const AudioBuffer = require("../src/api/AudioBuffer");
 
 describe("decoder", () => {
-  let defaultWavDecoder, decoderUtil$decode;
+  let defaultWavDecoder, DecoderUtils$decode;
 
   before(() => {
     defaultWavDecoder = decoder.get("wav");
-    decoderUtil$decode = decoderUtil.decode;
-    decoderUtil.decode = sinon.spy(decoderUtil.decode);
+    DecoderUtils$decode = DecoderUtils.decode;
+    DecoderUtils.decode = sinon.spy(DecoderUtils.decode);
   });
   afterEach(() => {
     decoder.set("wav", defaultWavDecoder);
-    decoderUtil.decode.reset();
+    DecoderUtils.decode.reset();
   });
   after(() => {
-    decoderUtil.decode = decoderUtil$decode;
+    DecoderUtils.decode = DecoderUtils$decode;
   });
 
   it(".get(type: string): function", () => {
@@ -57,8 +57,8 @@ describe("decoder", () => {
     return decoder.decode(audioData, opts).then((audioBuffer) => {
       assert(decodeFn.callCount === 1);
       assert(decodeFn.calledWith(audioData, opts));
-      assert(decoderUtil.decode.callCount === 1);
-      assert(decoderUtil.decode.calledWith(decodeFn, audioData, opts));
+      assert(DecoderUtils.decode.callCount === 1);
+      assert(DecoderUtils.decode.calledWith(decodeFn, audioData, opts));
       assert(audioBuffer instanceof AudioBuffer);
       assert(audioBuffer.numberOfChannels === 2);
       assert(audioBuffer.length === 16);

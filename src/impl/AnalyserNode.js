@@ -1,8 +1,9 @@
 "use strict";
 
-const util = require("../util");
 const AudioNode = require("./AudioNode");
 const AnalyserNodeDSP = require("./dsp/AnalyserNode");
+const { defaults, clamp } = require("../utils");
+const { toNumber, toPowerOfTwo } = require("../utils");
 const { MAX } = require("../constants/ChannelCountMode");
 
 const DEFAULT_FFT_SIZE = 2048;
@@ -22,10 +23,10 @@ class AnalyserNode extends AudioNode {
    * @param {number}       opts.smoothingTimeConstant
    */
   constructor(context, opts = {}) {
-    let fftSize = util.defaults(opts.fftSize, DEFAULT_FFT_SIZE);
-    let minDecibels = util.defaults(opts.minDecibels, DEFAULT_MIN_DECIBELS);
-    let maxDecibels = util.defaults(opts.maxDecibels, DEFAULT_MAX_DECIBELS);
-    let smoothingTimeConstant = util.defaults(opts.smoothingTimeConstant, DEFAULT_SMOOTHING_TIME_CONSTANT);
+    let fftSize = defaults(opts.fftSize, DEFAULT_FFT_SIZE);
+    let minDecibels = defaults(opts.minDecibels, DEFAULT_MIN_DECIBELS);
+    let maxDecibels = defaults(opts.maxDecibels, DEFAULT_MAX_DECIBELS);
+    let smoothingTimeConstant = defaults(opts.smoothingTimeConstant, DEFAULT_SMOOTHING_TIME_CONSTANT);
 
     super(context, opts, {
       inputs: [ 1 ],
@@ -54,8 +55,8 @@ class AnalyserNode extends AudioNode {
    * @param {number} value
    */
   setFftSize(value) {
-    value = util.clamp(value|0, MIN_FFT_SIZE, MAX_FFT_SIZE);
-    value = util.toPowerOfTwo(value, Math.ceil);
+    value = clamp(value|0, MIN_FFT_SIZE, MAX_FFT_SIZE);
+    value = toPowerOfTwo(value, Math.ceil);
     this._fftSize = value;
     this.dspUpdateSizes(this._fftSize);
   }
@@ -78,7 +79,7 @@ class AnalyserNode extends AudioNode {
    * @param {number} value
    */
   setMinDecibels(value) {
-    value = util.toNumber(value);
+    value = toNumber(value);
     /* istanbul ignore else */
     if (-Infinity < value && value < this._maxDecibels) {
       this._minDecibels = value;
@@ -96,7 +97,7 @@ class AnalyserNode extends AudioNode {
    * @param {number} value
    */
   setMaxDecibels(value) {
-    value = util.toNumber(value);
+    value = toNumber(value);
     /* istanbul ignore else */
     if (this._minDecibels < value && value < Infinity) {
       this._maxDecibels = value;
@@ -115,7 +116,7 @@ class AnalyserNode extends AudioNode {
    * @param {number}
    */
   setSmoothingTimeConstant(value) {
-    value = util.clamp(util.toNumber(value), 0, 1);
+    value = clamp(toNumber(value), 0, 1);
     this._smoothingTimeConstant = value;
   }
 

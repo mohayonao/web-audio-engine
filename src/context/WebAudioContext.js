@@ -1,8 +1,9 @@
 "use strict";
 
-const util = require("../util");
 const config = require("../config");
 const BaseAudioContext = require("../api/BaseAudioContext");
+const { defaults, defineProp } = require("../utils");
+const { toValidBlockSize, toValidNumberOfChannels, toPowerOfTwo } = require("../utils");
 
 const DSPAlgorithm = [];
 
@@ -19,13 +20,13 @@ class WebAudioContext extends BaseAudioContext {
     let destination = opts.destination || opts.context.destination;
     let context = destination.context;
     let sampleRate = context.sampleRate;
-    let blockSize = util.defaults(opts.blockSize, config.blockSize);
-    let numberOfChannels = util.defaults(opts.numberOfChannels, config.numberOfChannels);
-    let bufferSize = util.defaults(opts.bufferSize, 1024);
+    let blockSize = defaults(opts.blockSize, config.blockSize);
+    let numberOfChannels = defaults(opts.numberOfChannels, config.numberOfChannels);
+    let bufferSize = defaults(opts.bufferSize, 1024);
 
-    blockSize = util.toValidBlockSize(blockSize);
-    numberOfChannels = util.toValidNumberOfChannels(numberOfChannels);
-    bufferSize = util.toPowerOfTwo(bufferSize);
+    blockSize = toValidBlockSize(blockSize);
+    numberOfChannels = toValidNumberOfChannels(numberOfChannels);
+    bufferSize = toPowerOfTwo(bufferSize);
     bufferSize = Math.max(256, Math.min(bufferSize, 16384));
 
     super({ sampleRate, blockSize, numberOfChannels });
@@ -35,9 +36,9 @@ class WebAudioContext extends BaseAudioContext {
 
     processor.onaudioprocess = dspProcess(this._impl, numberOfChannels, bufferSize);
 
-    util.defineProp(this, "_originalContext", context);
-    util.defineProp(this, "_destination", destination);
-    util.defineProp(this, "_processor", processor);
+    defineProp(this, "_originalContext", context);
+    defineProp(this, "_destination", destination);
+    defineProp(this, "_processor", processor);
   }
 
   get originalContext() {

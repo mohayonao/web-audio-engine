@@ -1,8 +1,9 @@
 "use strict";
 
-const util = require("../util");
 const AudioNode = require("./AudioNode");
 const ScriptProcessorNodeDSP = require("./dsp/ScriptProcessorNode");
+const { defaults, clamp } = require("../utils");
+const { toPowerOfTwo, toValidNumberOfChannels } = require("../utils");
 const { EXPLICIT } = require("../constants/ChannelCountMode");
 
 const DEFAULT_BUFFER_SIZE = 1024;
@@ -20,14 +21,14 @@ class ScriptProcessorNode extends AudioNode {
    * @param {number}       opts.numberOfOutputChannels
    */
   constructor(context, opts = {}) {
-    let bufferSize = util.defaults(opts.bufferSize, DEFAULT_BUFFER_SIZE);
-    let numberOfInputChannels = util.defaults(opts.numberOfInputChannels, DEFAULT_NUMBER_OF_INPUT_CHANNELS);
-    let numberOfOutputChannels = util.defaults(opts.numberOfOutputChannels, DEFAULT_NUMBER_OF_OUTPUT_CHANNELS);
+    let bufferSize = defaults(opts.bufferSize, DEFAULT_BUFFER_SIZE);
+    let numberOfInputChannels = defaults(opts.numberOfInputChannels, DEFAULT_NUMBER_OF_INPUT_CHANNELS);
+    let numberOfOutputChannels = defaults(opts.numberOfOutputChannels, DEFAULT_NUMBER_OF_OUTPUT_CHANNELS);
 
-    bufferSize = util.clamp(bufferSize|0, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
-    bufferSize = util.toPowerOfTwo(bufferSize, Math.ceil);
-    numberOfInputChannels = util.toValidNumberOfChannels(numberOfInputChannels);
-    numberOfOutputChannels = util.toValidNumberOfChannels(numberOfOutputChannels);
+    bufferSize = clamp(bufferSize|0, MIN_BUFFER_SIZE, MAX_BUFFER_SIZE);
+    bufferSize = toPowerOfTwo(bufferSize, Math.ceil);
+    numberOfInputChannels = toValidNumberOfChannels(numberOfInputChannels);
+    numberOfOutputChannels = toValidNumberOfChannels(numberOfOutputChannels);
 
     super(context, opts, {
       inputs: [ numberOfInputChannels ],

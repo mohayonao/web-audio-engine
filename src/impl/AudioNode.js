@@ -1,10 +1,11 @@
 "use strict";
 
-const util = require("../util");
 const EventTarget = require("./EventTarget");
 const AudioNodeInput = require("./core/AudioNodeInput");
 const AudioNodeOutput = require("./core/AudioNodeOutput");
 const AudioParam = require("./AudioParam");
+const { defaults, clamp } = require("../utils");
+const { toNumber } = require("../utils");
 const { MIN_NUMBER_OF_CHANNELS, MAX_NUMBER_OF_CHANNELS } = require("../constants");
 const { MAX, CLAMPED_MAX, EXPLICIT } = require("../constants/ChannelCountMode");
 const { DISCRETE, SPEAKERS } = require("../constants/ChannelInterpretation");
@@ -29,15 +30,15 @@ class AudioNode extends EventTarget {
    * @param {string}       config.channelCountMode
    */
   constructor(context, opts = {}, config = {}) {
-    let inputs = util.defaults(config.inputs, []);
-    let outputs = util.defaults(config.outputs, []);
-    let channelCount = util.defaults(config.channelCount, 1);
-    let channelCountMode = util.defaults(config.channelCountMode, MAX);
+    let inputs = defaults(config.inputs, []);
+    let outputs = defaults(config.outputs, []);
+    let channelCount = defaults(config.channelCount, 1);
+    let channelCountMode = defaults(config.channelCountMode, MAX);
     let channelInterpretation = SPEAKERS;
-    let allowedMinChannelCount = util.defaults(config.allowedMinChannelCount, MIN_NUMBER_OF_CHANNELS);
-    let allowedMaxChannelCount = util.defaults(config.allowedMaxChannelCount, MAX_NUMBER_OF_CHANNELS);
-    let allowedChannelCountMode = util.defaults(config.allowedChannelCountMode, [ MAX, CLAMPED_MAX, EXPLICIT ]);
-    let allowedChannelInterpretation = util.defaults(config.allowedChannelInterpretation, [ DISCRETE, SPEAKERS ]);
+    let allowedMinChannelCount = defaults(config.allowedMinChannelCount, MIN_NUMBER_OF_CHANNELS);
+    let allowedMaxChannelCount = defaults(config.allowedMaxChannelCount, MAX_NUMBER_OF_CHANNELS);
+    let allowedChannelCountMode = defaults(config.allowedChannelCountMode, [ MAX, CLAMPED_MAX, EXPLICIT ]);
+    let allowedChannelInterpretation = defaults(config.allowedChannelInterpretation, [ DISCRETE, SPEAKERS ]);
 
     super();
 
@@ -102,9 +103,9 @@ class AudioNode extends EventTarget {
    * @param {number} value
    */
   setChannelCount(value) {
-    value = util.toNumber(value);
+    value = toNumber(value);
 
-    const channelCount = util.clamp(value, this.allowedMinChannelCount, this.allowedMaxChannelCount);
+    const channelCount = clamp(value, this.allowedMinChannelCount, this.allowedMaxChannelCount);
 
     if (channelCount !== this.channelCount) {
       this.channelCount = channelCount;

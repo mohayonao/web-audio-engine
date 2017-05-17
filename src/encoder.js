@@ -1,7 +1,7 @@
 "use strict";
 
 const WavEncoder = require("wav-encoder");
-const encoderUtil = require("./util/encoderUtil");
+const EncoderUtils = require("./utils/EncoderUtils");
 
 const encoders = {};
 
@@ -39,7 +39,7 @@ function encode(audioData, /* istanbul ignore next */ opts = {}) {
     );
   }
 
-  return encoderUtil.encode(encodeFn, audioData, opts);
+  return EncoderUtils.encode(encodeFn, audioData, opts);
 }
 
 set("wav", WavEncoder.encode);

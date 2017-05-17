@@ -1,8 +1,8 @@
 "use strict";
 
 const assert = require("assert");
-const util = require("../../util");
 const AudioData = require("./AudioData");
+const { fill } = require("../../utils");
 const { DISCRETE } = require("../../constants/ChannelInterpretation");
 
 const DSPAlgorithm = {};
@@ -94,7 +94,7 @@ class AudioBus {
       const channelData = this.audioData.channelData;
 
       for (let i = 0, imax = channelData.length; i < imax; i++) {
-        util.fill(channelData[i], 0);
+        fill(channelData[i], 0);
       }
     }
     this.isSilent = true;

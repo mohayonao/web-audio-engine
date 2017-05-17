@@ -1,11 +1,11 @@
 "use strict";
 
 const nmap = require("nmap");
-const util = require("../util");
-const audioDataUtil = require("../util/audioDataUtil");
+const AudioDataUtils = require("../utils/AudioDataUtils");
 const BaseAudioContext = require("../api/BaseAudioContext");
 const AudioBuffer = require("../api/AudioBuffer");
-const setImmediate = require("../util/setImmediate");
+const { defineProp } = require("../utils");
+const { toValidNumberOfChannels, toValidSampleRate, toNumber } = require("../utils");
 const { RUNNING, SUSPENDED, CLOSED } = require("../constants/AudioContextState");
 
 class OfflineAudioContext extends BaseAudioContext {
@@ -15,24 +15,24 @@ class OfflineAudioContext extends BaseAudioContext {
    * @param {number} sampleRate
    */
   constructor(numberOfChannels, length, sampleRate) {
-    numberOfChannels = util.toValidNumberOfChannels(numberOfChannels);
+    numberOfChannels = toValidNumberOfChannels(numberOfChannels);
     length = Math.max(0, length|0);
-    sampleRate = util.toValidSampleRate(sampleRate);
+    sampleRate = toValidSampleRate(sampleRate);
 
     super({ sampleRate, numberOfChannels });
 
     this._impl.$oncomplete = null;
 
-    util.defineProp(this, "_numberOfChannels", numberOfChannels);
-    util.defineProp(this, "_length", length);
-    util.defineProp(this, "_suspendedTime", Infinity);
-    util.defineProp(this, "_suspendPromise", null);
-    util.defineProp(this, "_suspendResolve", null);
-    util.defineProp(this, "_renderingPromise", null);
-    util.defineProp(this, "_renderingResolve", null);
-    util.defineProp(this, "_renderingIterations", 128);
-    util.defineProp(this, "_audioData", null);
-    util.defineProp(this, "_writeIndex", 0);
+    defineProp(this, "_numberOfChannels", numberOfChannels);
+    defineProp(this, "_length", length);
+    defineProp(this, "_suspendedTime", Infinity);
+    defineProp(this, "_suspendPromise", null);
+    defineProp(this, "_suspendResolve", null);
+    defineProp(this, "_renderingPromise", null);
+    defineProp(this, "_renderingResolve", null);
+    defineProp(this, "_renderingIterations", 128);
+    defineProp(this, "_audioData", null);
+    defineProp(this, "_writeIndex", 0);
   }
 
   /**
@@ -90,7 +90,7 @@ class OfflineAudioContext extends BaseAudioContext {
       return Promise.reject(new TypeError("cannot schedule more than one suspend"));
     }
 
-    time = Math.max(0, util.toNumber(time));
+    time = Math.max(0, toNumber(time));
 
     this._suspendedTime = time;
     this._suspendPromise = new Promise((resolve) => {
@@ -160,7 +160,7 @@ function doneRendering(audioData) {
   });
   audioData.length = length;
 
-  const audioBuffer = audioDataUtil.toAudioBuffer(audioData, AudioBuffer);
+  const audioBuffer = AudioDataUtils.toAudioBuffer(audioData, AudioBuffer);
 
   this._impl.changeState(CLOSED);
   this._impl.dispatchEvent({ type: "complete", renderedBuffer: audioBuffer });
