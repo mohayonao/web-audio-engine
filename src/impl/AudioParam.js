@@ -1,9 +1,10 @@
 "use strict";
 
-const util = require("../util");
 const AudioNodeInput = require("./core/AudioNodeInput");
 const AudioBus = require("./core/AudioBus");
 const AudioParamDSP = require("./dsp/AudioParam");
+const { defaults } = require("../utils");
+const { toNumber } = require("../utils");
 const { EXPLICIT } = require("../constants/ChannelCountMode");
 const { CONTROL_RATE } = require("../constants/AudioParamRate");
 const { SET_VALUE_AT_TIME } = require("../constants/AudioParamEvent");
@@ -26,8 +27,8 @@ class AudioParam {
    * @param {number}       opts.defaultValue
    */
   constructor(context, opts = {}) {
-    let rate = util.defaults(opts.rate, CONTROL_RATE);
-    let defaultValue = util.defaults(opts.defaultValue, 0);
+    let rate = defaults(opts.rate, CONTROL_RATE);
+    let defaultValue = defaults(opts.defaultValue, 0);
 
     this.context = context;
     this.blockSize = context.blockSize;
@@ -44,7 +45,7 @@ class AudioParam {
     this.outputBus = new AudioBus(1, this.blockSize, this.sampleRate);
 
     this._rate = rate;
-    this._defaultValue = util.toNumber(defaultValue);
+    this._defaultValue = toNumber(defaultValue);
     this._value = this._defaultValue;
     this._userValue = this._value;
     this._timeline = [];
@@ -63,7 +64,7 @@ class AudioParam {
    * @param {number} value
    */
   setValue(value) {
-    this._value = this._userValue = util.toNumber(value);
+    this._value = this._userValue = toNumber(value);
   }
 
   /**
@@ -78,8 +79,8 @@ class AudioParam {
    * @param {number} startTime
    */
   setValueAtTime(value, startTime) {
-    value = util.toNumber(value);
-    startTime = Math.max(0, util.toNumber(startTime));
+    value = toNumber(value);
+    startTime = Math.max(0, toNumber(startTime));
 
     const eventItem = {
       type: SET_VALUE_AT_TIME,
@@ -125,8 +126,8 @@ class AudioParam {
    * @param {number} endTime
    */
   linearRampToValueAtTime(value, endTime) {
-    value = util.toNumber(value);
-    endTime = Math.max(0, util.toNumber(endTime));
+    value = toNumber(value);
+    endTime = Math.max(0, toNumber(endTime));
 
     const eventItem = {
       type: LINEAR_RAMP_TO_VALUE_AT_TIME,
@@ -179,8 +180,8 @@ class AudioParam {
    * @param {number} endTime
    */
   exponentialRampToValueAtTime(value, endTime) {
-    value = Math.max(1e-6, util.toNumber(value));
-    endTime = Math.max(0, util.toNumber(endTime));
+    value = Math.max(1e-6, toNumber(value));
+    endTime = Math.max(0, toNumber(endTime));
 
     const eventItem = {
       type: EXPONENTIAL_RAMP_TO_VALUE_AT_TIME,
@@ -234,9 +235,9 @@ class AudioParam {
    * @param {number} timeConstant
    */
   setTargetAtTime(target, startTime, timeConstant) {
-    target = util.toNumber(target);
-    startTime = Math.max(0, util.toNumber(startTime));
-    timeConstant = Math.max(0, util.toNumber(timeConstant));
+    target = toNumber(target);
+    startTime = Math.max(0, toNumber(startTime));
+    timeConstant = Math.max(0, toNumber(timeConstant));
 
     const eventItem = {
       type: SET_TARGET_AT_TIME,
@@ -292,8 +293,8 @@ class AudioParam {
    * @param {number}         duration
    */
   setValueCurveAtTime(values, startTime, duration) {
-    startTime = Math.max(0, util.toNumber(startTime));
-    duration = Math.max(0, util.toNumber(duration));
+    startTime = Math.max(0, toNumber(startTime));
+    duration = Math.max(0, toNumber(duration));
 
     if (values.length === 0 || duration === 0) {
       return;
@@ -341,7 +342,7 @@ class AudioParam {
    * @param {number} startTime
    */
   cancelScheduledValues(startTime) {
-    startTime = Math.max(0, util.toNumber(startTime));
+    startTime = Math.max(0, toNumber(startTime));
 
     this._timeline = this._timeline.filter(eventItem => eventItem.time < startTime);
 

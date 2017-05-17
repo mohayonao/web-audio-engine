@@ -3,7 +3,7 @@
 const fft = require("fourier-transform");
 const blackman = require("scijs-window-functions/blackman");
 const AudioBus = require("../core/AudioBus");
-const util = require("../../util");
+const { toDecibel, normalize } = require("../../utils");
 
 const MAX_FFT_SIZE = 32768;
 
@@ -50,7 +50,7 @@ const AnalyserNodeDSP = {
         // 4. Smooth over data
         previousSmooth[i] = (s * previousSmooth[i]) + ((1 - s) * v0);
         // 5. Convert to dB
-        const v1 = util.toDecibel(previousSmooth[i]);
+        const v1 = toDecibel(previousSmooth[i]);
         // store in array
         array[i] = Number.isFinite(v1) ? v1 : 0;
       }
@@ -64,7 +64,7 @@ const AnalyserNodeDSP = {
     this.dspGetFloatFrequencyData(spectrum);
 
     for (let i = 0; i < length; i++) {
-      array[i] = Math.round(util.normalize(spectrum[i], dBMin, dBMax) * 255);
+      array[i] = Math.round(normalize(spectrum[i], dBMin, dBMax) * 255);
     }
   },
   dspGetByteTimeDomainData(array) {
@@ -74,7 +74,7 @@ const AnalyserNodeDSP = {
     this.dspGetFloatTimeDomainData(waveform);
 
     for (let i = 0; i < length; i++) {
-      array[i] = Math.round(util.normalize(waveform[i], -1, 1) * 255);
+      array[i] = Math.round(normalize(waveform[i], -1, 1) * 255);
     }
   },
   dspGetFloatTimeDomainData(array) {

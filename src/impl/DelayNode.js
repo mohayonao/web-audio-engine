@@ -1,8 +1,9 @@
 "use strict";
 
-const util = require("../util");
 const AudioNode = require("./AudioNode");
 const DelayNodeDSP = require("./dsp/DelayNode");
+const { defaults } = require("../utils");
+const { toNumber } = require("../utils");
 const { MAX } = require("../constants/ChannelCountMode");
 const { AUDIO_RATE } = require("../constants/AudioParamRate");
 
@@ -17,10 +18,10 @@ class DelayNode extends AudioNode {
    * @param {number}       opts.delayTime
    */
   constructor(context, opts = {}) {
-    let maxDelayTime = util.defaults(opts.maxDelayTime, DEFAULT_MAX_DELAY_TIME);
-    let delayTime = util.defaults(opts.delayTime, DEFAULT_DELAY_TIME);
+    let maxDelayTime = defaults(opts.maxDelayTime, DEFAULT_MAX_DELAY_TIME);
+    let delayTime = defaults(opts.delayTime, DEFAULT_DELAY_TIME);
 
-    maxDelayTime = Math.max(0, util.toNumber(maxDelayTime));
+    maxDelayTime = Math.max(0, toNumber(maxDelayTime));
     delayTime = Math.min(delayTime, maxDelayTime);
 
     super(context, opts, {

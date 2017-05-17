@@ -1,11 +1,12 @@
 "use strict";
 
 const nmap = require("nmap");
-const util = require("../util");
 const config = require("../config");
 const BaseAudioContext = require("../api/BaseAudioContext");
-const PCMEncoder = require("../util/PCMEncoder");
-const setImmediate = require("../util/setImmediate");
+const PCMEncoder = require("../utils/PCMEncoder");
+const setImmediate = require("../utils/setImmediate");
+const { defaults, defineProp } = require("../utils");
+const { toValidSampleRate, toValidBlockSize, toValidNumberOfChannels, toValidBitDepth } = require("../utils");
 const { RUNNING, SUSPENDED, CLOSED } = require("../constants/AudioContextState");
 const noopWriter = { write: () => true };
 
@@ -19,16 +20,16 @@ class StreamAudioContext extends BaseAudioContext {
    * @param {boolean} opts.floatingPoint
    */
   constructor(opts = {}) {
-    let sampleRate = util.defaults(opts.sampleRate, config.sampleRate);
-    let blockSize = util.defaults(opts.blockSize, config.blockSize);
-    let numberOfChannels = util.defaults(opts.channels || opts.numberOfChannels, config.numberOfChannels);
-    let bitDepth = util.defaults(opts.bitDepth, config.bitDepth);
+    let sampleRate = defaults(opts.sampleRate, config.sampleRate);
+    let blockSize = defaults(opts.blockSize, config.blockSize);
+    let numberOfChannels = defaults(opts.channels || opts.numberOfChannels, config.numberOfChannels);
+    let bitDepth = defaults(opts.bitDepth, config.bitDepth);
     let floatingPoint = opts.float || opts.floatingPoint;
 
-    sampleRate = util.toValidSampleRate(sampleRate);
-    blockSize = util.toValidBlockSize(blockSize);
-    numberOfChannels = util.toValidNumberOfChannels(numberOfChannels);
-    bitDepth = util.toValidBitDepth(bitDepth);
+    sampleRate = toValidSampleRate(sampleRate);
+    blockSize = toValidBlockSize(blockSize);
+    numberOfChannels = toValidNumberOfChannels(numberOfChannels);
+    bitDepth = toValidBitDepth(bitDepth);
     floatingPoint = !!floatingPoint;
 
     super({ sampleRate, blockSize, numberOfChannels });
@@ -36,12 +37,12 @@ class StreamAudioContext extends BaseAudioContext {
     const format = { sampleRate, channels: numberOfChannels, bitDepth, float: floatingPoint };
     const encoder = PCMEncoder.create(blockSize, format);
 
-    util.defineProp(this, "_numberOfChannels", numberOfChannels);
-    util.defineProp(this, "_encoder", encoder);
-    util.defineProp(this, "_blockSize", blockSize);
-    util.defineProp(this, "_stream", noopWriter);
-    util.defineProp(this, "_isPlaying", false);
-    util.defineProp(this, "_format", format);
+    defineProp(this, "_numberOfChannels", numberOfChannels);
+    defineProp(this, "_encoder", encoder);
+    defineProp(this, "_blockSize", blockSize);
+    defineProp(this, "_stream", noopWriter);
+    defineProp(this, "_isPlaying", false);
+    defineProp(this, "_format", format);
   }
 
   /**

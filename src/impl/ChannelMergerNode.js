@@ -1,8 +1,9 @@
 "use strict";
 
-const util = require("../util");
 const AudioNode = require("./AudioNode");
 const ChannelMergerNodeDSP = require("./dsp/ChannelMergerNode");
+const { defaults, fill } = require("../utils");
+const { toValidNumberOfChannels } = require("../utils");
 const { EXPLICIT } = require("../constants/ChannelCountMode");
 
 const DEFAULT_NUMBER_OF_INPUTS = 6;
@@ -14,12 +15,12 @@ class ChannelMergerNode extends AudioNode {
    * @param {number}       opts.numberOfInputs
    */
   constructor(context, opts = {}) {
-    let numberOfInputs = util.defaults(opts.numberOfInputs, DEFAULT_NUMBER_OF_INPUTS);
+    let numberOfInputs = defaults(opts.numberOfInputs, DEFAULT_NUMBER_OF_INPUTS);
 
-    numberOfInputs = util.toValidNumberOfChannels(numberOfInputs);
+    numberOfInputs = toValidNumberOfChannels(numberOfInputs);
 
     super(context, opts, {
-      inputs: new Array(numberOfInputs).fill(1),
+      inputs: fill(new Array(numberOfInputs), 1),
       outputs: [ numberOfInputs ],
       channelCount: 1,
       channelCountMode: EXPLICIT,

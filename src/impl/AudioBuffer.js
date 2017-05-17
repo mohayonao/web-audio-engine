@@ -1,7 +1,7 @@
 "use strict";
 
-const util = require("../util");
 const AudioData = require("./core/AudioData");
+const { toValidNumberOfChannels, toNumber, toValidSampleRate } = require("../utils");
 
 /**
  * @prop {AudioData} audioData
@@ -18,9 +18,9 @@ class AudioBuffer {
     let length = opts.length;
     let sampleRate = opts.sampleRate;
 
-    numberOfChannels = util.toValidNumberOfChannels(numberOfChannels);
-    length = Math.max(0, util.toNumber(length));
-    sampleRate = util.toValidSampleRate(sampleRate);
+    numberOfChannels = toValidNumberOfChannels(numberOfChannels);
+    length = Math.max(0, toNumber(length));
+    sampleRate = toValidSampleRate(sampleRate);
 
     this.audioData = new AudioData(numberOfChannels, length, sampleRate);
   }

@@ -1,8 +1,8 @@
 "use strict";
 
 const assert = require("assert");
-const util = require("../../util");
-const audioParamUtil = require("../../util/audioParamUtil");
+const AudioParamUtils = require("../../utils/AudioParamUtils");
+const { fill } = require("../../utils");
 const { SET_VALUE_AT_TIME } = require("../../constants/AudioParamEvent");
 const { LINEAR_RAMP_TO_VALUE_AT_TIME } = require("../../constants/AudioParamEvent");
 const { EXPONENTIAL_RAMP_TO_VALUE_AT_TIME } = require("../../constants/AudioParamEvent");
@@ -55,7 +55,7 @@ const AudioParamDSP = {
       if (value === 0) {
         this.outputBus.zeros();
       } else {
-        util.fill(this.outputBus.getMutableData()[0], value);
+        fill(this.outputBus.getMutableData()[0], value);
       }
       this._prevValue = value;
     }
@@ -227,7 +227,7 @@ const AudioParamDSP = {
             const discreteTimeConstant = 1 - Math.exp(-1 / (sampleRate * timeConstant));
             const time = (quantumStartFrame + writeIndex) / sampleRate;
 
-            value = audioParamUtil.computeValueAtTime(timeline, time, this._userValue);
+            value = AudioParamUtils.computeValueAtTime(timeline, time, this._userValue);
 
             if (discreteTimeConstant !== 1) {
               schedParams = { type: SET_TARGET_AT_TIME, target, discreteTimeConstant };

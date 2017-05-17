@@ -1,9 +1,10 @@
 "use strict";
 
-const util = require("../util");
 const AudioScheduledSourceNode = require("./AudioScheduledSourceNode");
 const AudioBuffer = require("./AudioBuffer");
 const AudioBufferSourceNodeDSP = require("./dsp/AudioBufferSourceNode");
+const { defaults } = require("../utils");
+const { toImpl, toNumber } = require("../utils");
 const { CONTROL_RATE } = require("../constants/AudioParamRate");
 const { FINISHED } = require("../constants/PlaybackState");
 
@@ -24,11 +25,11 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
    * @param {number}       opts.loopEnd
    */
   constructor(context, opts = {}) {
-    let playbackRate = util.defaults(opts.playbackRate, DEFAULT_PLAYBACK_RATE);
-    let detune = util.defaults(opts.detune, DEFAULT_DETUNE);
-    let loop = util.defaults(opts.loop, DEFAULT_LOOP);
-    let loopStart = util.defaults(opts.loopStart, DEFAULT_LOOP_START);
-    let loopEnd = util.defaults(opts.loopEnd, DEFAULT_LOOP_END);
+    let playbackRate = defaults(opts.playbackRate, DEFAULT_PLAYBACK_RATE);
+    let detune = defaults(opts.detune, DEFAULT_DETUNE);
+    let loop = defaults(opts.loop, DEFAULT_LOOP);
+    let loopStart = defaults(opts.loopStart, DEFAULT_LOOP_START);
+    let loopEnd = defaults(opts.loopEnd, DEFAULT_LOOP_END);
 
     super(context, opts);
 
@@ -55,7 +56,7 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
    * @param {AudioBuffer} value
    */
   setBuffer(value) {
-    value = util.toImpl(value);
+    value = toImpl(value);
 
     /* istanbul ignore else */
     if (value instanceof AudioBuffer) {
@@ -130,7 +131,7 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
    * @param {number} value
    */
   setLoopStart(value) {
-    value = Math.max(0, util.toNumber(value));
+    value = Math.max(0, toNumber(value));
     this._loopStart = value;
   }
 
@@ -145,7 +146,7 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
    * @param {number} value
    */
   setLoopEnd(value) {
-    value = Math.max(0, util.toNumber(value));
+    value = Math.max(0, toNumber(value));
     this._loopEnd = value;
   }
 
@@ -160,12 +161,12 @@ class AudioBufferSourceNode extends AudioScheduledSourceNode {
       return;
     }
 
-    offset = util.defaults(offset, 0);
-    duration = util.defaults(duration, Infinity);
+    offset = defaults(offset, 0);
+    duration = defaults(duration, Infinity);
 
-    when = Math.max(this.context.currentTime, util.toNumber(when));
+    when = Math.max(this.context.currentTime, toNumber(when));
     offset = Math.max(0, offset);
-    duration = Math.max(0, util.toNumber(duration));
+    duration = Math.max(0, toNumber(duration));
 
     this._startTime = when;
     this._startFrame = Math.round(when * this.sampleRate);

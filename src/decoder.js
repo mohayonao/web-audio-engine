@@ -2,8 +2,8 @@
 
 const audioType = require("audio-type");
 const WavDecoder = require("wav-decoder");
-const decoderUtil = require("./util/decoderUtil");
-const audioDataUtil = require("./util/audioDataUtil");
+const DecoderUtils = require("./utils/DecoderUtils");
+const AudioDataUtils = require("./utils/AudioDataUtils");
 const AudioBuffer = require("./api/AudioBuffer");
 
 const decoders = {};
@@ -42,8 +42,8 @@ function decode(audioData, opts) {
     );
   }
 
-  return decoderUtil.decode(decodeFn, audioData, opts).then((audioData) => {
-    return audioDataUtil.toAudioBuffer(audioData, AudioBuffer);
+  return DecoderUtils.decode(decodeFn, audioData, opts).then((audioData) => {
+    return AudioDataUtils.toAudioBuffer(audioData, AudioBuffer);
   });
 }
 

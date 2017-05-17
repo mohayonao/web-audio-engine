@@ -1,8 +1,8 @@
 "use strict";
 
-const util = require("../util");
 const AudioNode = require("./AudioNode");
 const BiquadFilterNodeDSP = require("./dsp/BiquadFilterNode");
+const { defaults } = require("../utils");
 const { MAX } = require("../constants/ChannelCountMode");
 const { CONTROL_RATE } = require("../constants/AudioParamRate");
 const { LOWPASS } = require("../constants/BiquadFilterType");
@@ -35,11 +35,11 @@ class BiquadFilterNode extends AudioNode {
    * @param {number}       opts.gain
    */
   constructor(context, opts = {}) {
-    let type = util.defaults(opts.type, DEFAULT_TYPE);
-    let frequency = util.defaults(opts.frequency, DEFAULT_FREQUENCY);
-    let detune = util.defaults(opts.detune, DEFAULT_DETUNE);
-    let Q = util.defaults(opts.Q, DEFAULT_Q);
-    let gain = util.defaults(opts.gain, DEFAULT_GAIN);
+    let type = defaults(opts.type, DEFAULT_TYPE);
+    let frequency = defaults(opts.frequency, DEFAULT_FREQUENCY);
+    let detune = defaults(opts.detune, DEFAULT_DETUNE);
+    let Q = defaults(opts.Q, DEFAULT_Q);
+    let gain = defaults(opts.gain, DEFAULT_GAIN);
 
     super(context, opts, {
       inputs: [ 1 ],

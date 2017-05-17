@@ -1,7 +1,7 @@
 "use strict";
 
-const util = require("../../util");
 const AudioBuffer = require("../AudioBuffer");
+const { fill } = require("../../utils");
 
 const ScriptProcessorNodeDSP = {
   dspInit() {
@@ -57,7 +57,7 @@ const ScriptProcessorNodeDSP = {
 
       this.context.addPostProcess(() => {
         for (let ch = 0; ch < numberOfOutputChannels; ch++) {
-          util.fill(outputChannelData[ch], 0);
+          fill(outputChannelData[ch], 0);
         }
         this._eventItem.playbackTime = playbackTime;
         this.dispatchEvent(this._eventItem);

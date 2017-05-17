@@ -1,9 +1,10 @@
 "use strict";
 
-const util = require("../util");
 const AudioNode = require("./AudioNode");
 const AudioBuffer = require("./AudioBuffer");
 const ConvolverNodeDSP = require("./dsp/ConvolverNode");
+const { defaults } = require("../utils");
+const { toImpl } = require("../utils");
 const { CLAMPED_MAX, EXPLICIT } = require("../constants/ChannelCountMode");
 
 const DEFAULT_DISABLE_NORMALIZATION = false;
@@ -15,7 +16,7 @@ class ConvolverNode extends AudioNode {
    * @param {boolean}      opts.disableNormalization
    */
   constructor(context, opts = {}) {
-    let disableNormalization = util.defaults(opts.disableNormalization, DEFAULT_DISABLE_NORMALIZATION);
+    let disableNormalization = defaults(opts.disableNormalization, DEFAULT_DISABLE_NORMALIZATION);
 
     super(context, opts, {
       inputs: [ 1 ],
@@ -42,7 +43,7 @@ class ConvolverNode extends AudioNode {
    * @param {AudioBuffer} value
    */
   setBuffer(value) {
-    value = util.toImpl(value);
+    value = toImpl(value);
 
     /* istanbul ignore else */
     if (value instanceof AudioBuffer) {

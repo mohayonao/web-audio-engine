@@ -1,7 +1,8 @@
 "use strict";
 
-const util = require("../util");
 const AudioNode = require("./AudioNode");
+const { defaults } = require("../utils");
+const { toNumber } = require("../utils");
 const { CLAMPED_MAX, EXPLICIT } = require("../constants/ChannelCountMode");
 
 const PanningModelTypes = [ "equalpower", "HRTF" ];
@@ -30,14 +31,14 @@ class BasePannerNode extends AudioNode {
    * @param {number}       opts.coneOuterGain
    */
   constructor(context, opts = {}) {
-    let panningModel = util.defaults(opts.panningModel, DEFAULT_PANNING_MODEL);
-    let distanceModel = util.defaults(opts.distanceModel, DEFAULT_DISTANCE_MODEL);
-    let refDistance = util.defaults(opts.refDistance, DEFAULT_REF_DISTANCE);
-    let maxDistance = util.defaults(opts.maxDistance, DEFAULT_MAX_DISTANCE);
-    let rolloffFactor = util.defaults(opts.rolloffFactor, DEFAULT_ROLLOFF_FACTOR);
-    let coneInnerAngle = util.defaults(opts.coneInnerAngle, DEFAULT_CONE_INNER_ANGLE);
-    let coneOuterAngle = util.defaults(opts.coneOuterAngle, DEFAULT_CONE_OUTER_ANGLE);
-    let coneOuterGain = util.defaults(opts.coneOuterGain, DEFAULT_CONE_OUTER_GAIN);
+    let panningModel = defaults(opts.panningModel, DEFAULT_PANNING_MODEL);
+    let distanceModel = defaults(opts.distanceModel, DEFAULT_DISTANCE_MODEL);
+    let refDistance = defaults(opts.refDistance, DEFAULT_REF_DISTANCE);
+    let maxDistance = defaults(opts.maxDistance, DEFAULT_MAX_DISTANCE);
+    let rolloffFactor = defaults(opts.rolloffFactor, DEFAULT_ROLLOFF_FACTOR);
+    let coneInnerAngle = defaults(opts.coneInnerAngle, DEFAULT_CONE_INNER_ANGLE);
+    let coneOuterAngle = defaults(opts.coneOuterAngle, DEFAULT_CONE_OUTER_ANGLE);
+    let coneOuterGain = defaults(opts.coneOuterGain, DEFAULT_CONE_OUTER_GAIN);
 
     super(context, opts, {
       inputs: [ 1 ],
@@ -103,7 +104,7 @@ class BasePannerNode extends AudioNode {
    * @param {number} value
    */
   setRefDistance(value) {
-    this._refDistance = util.toNumber(value);
+    this._refDistance = toNumber(value);
   }
 
   /**
@@ -117,7 +118,7 @@ class BasePannerNode extends AudioNode {
    * @param {number} value
    */
   setMaxDistance(value) {
-    this._maxDistance = util.toNumber(value);
+    this._maxDistance = toNumber(value);
   }
 
   /**
@@ -131,7 +132,7 @@ class BasePannerNode extends AudioNode {
    * @param {number} value
    */
   setRolloffFactor(value) {
-    this._rolloffFactor = util.toNumber(value);
+    this._rolloffFactor = toNumber(value);
   }
 
   /**
@@ -145,7 +146,7 @@ class BasePannerNode extends AudioNode {
    * @param {number} value
    */
   setConeInnerAngle(value) {
-    this._coneInnerAngle = util.toNumber(value);
+    this._coneInnerAngle = toNumber(value);
   }
 
   /**
@@ -159,7 +160,7 @@ class BasePannerNode extends AudioNode {
    * @param {number} value
    */
   setConeOuterAngle(value) {
-    this._coneOuterAngle = util.toNumber(value);
+    this._coneOuterAngle = toNumber(value);
   }
 
   /**
@@ -173,7 +174,7 @@ class BasePannerNode extends AudioNode {
    * @param {number} value
    */
   setConeOuterGain(value) {
-    this._coneOuterGain = util.toNumber(value);
+    this._coneOuterGain = toNumber(value);
   }
 }
 

@@ -5,22 +5,22 @@ require("run-with-mocha");
 const assert = require("assert");
 const sinon = require("sinon");
 const encoder = require("../src/encoder");
-const encoderUtil = require("../src/util/encoderUtil");
+const EncoderUtils = require("../src/utils/EncoderUtils");
 
 describe("encoder", () => {
-  let defaultWavEncoder, encoderUtil$encode;
+  let defaultWavEncoder, EncoderUtils$encode;
 
   before(() => {
     defaultWavEncoder = encoder.get("wav");
-    encoderUtil$encode = encoderUtil.encode;
-    encoderUtil.encode = sinon.spy(encoderUtil.encode);
+    EncoderUtils$encode = EncoderUtils.encode;
+    EncoderUtils.encode = sinon.spy(EncoderUtils.encode);
   });
   afterEach(() => {
     encoder.set("wav", defaultWavEncoder);
-    encoderUtil.encode.reset();
+    EncoderUtils.encode.reset();
   });
   after(() => {
-    encoderUtil.encode = encoderUtil$encode;
+    EncoderUtils.encode = EncoderUtils$encode;
   });
 
   it(".get(type: string): function", () => {
@@ -53,8 +53,8 @@ describe("encoder", () => {
     return encoder.encode(audioData, opts).then((arrayBuffer) => {
       assert(encodeFn.callCount === 1);
       assert(encodeFn.calledWith(audioData, opts));
-      assert(encoderUtil.encode.callCount === 1);
-      assert(encoderUtil.encode.calledWith(encodeFn, audioData, opts));
+      assert(EncoderUtils.encode.callCount === 1);
+      assert(EncoderUtils.encode.calledWith(encodeFn, audioData, opts));
       assert(arrayBuffer instanceof ArrayBuffer);
     });
   });

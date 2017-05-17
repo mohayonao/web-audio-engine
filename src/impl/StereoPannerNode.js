@@ -1,8 +1,8 @@
 "use strict";
 
-const util = require("../util");
 const BasePannerNode = require("./BasePannerNode");
 const StereoPannerNodeDSP = require("./dsp/StereoPannerNode");
+const { defaults } = require("../utils");
 const { AUDIO_RATE } = require("../constants/AudioParamRate");
 
 const DEFAULT_PAN = 0;
@@ -14,7 +14,7 @@ class StereoPannerNode extends BasePannerNode {
    * @param {number}       opts.pan
    */
   constructor(context, opts = {}) {
-    let pan = util.defaults(opts.pan, DEFAULT_PAN);
+    let pan = defaults(opts.pan, DEFAULT_PAN);
 
     super(context, opts);
 

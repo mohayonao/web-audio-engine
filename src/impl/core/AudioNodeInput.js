@@ -1,8 +1,8 @@
 "use strict";
 
 const assert = require("assert");
-const util = require("../../util");
 const AudioBus = require("./AudioBus");
+const { toValidNumberOfChannels } = require("../../utils");
 const { CLAMPED_MAX, EXPLICIT } = require("../../constants/ChannelCountMode");
 const { SPEAKERS } = require("../../constants/ChannelInterpretation");
 
@@ -49,7 +49,7 @@ class AudioNodeInput {
    * @param {number} value
    */
   setChannelCount(value) {
-    const channelCount = util.toValidNumberOfChannels(value);
+    const channelCount = toValidNumberOfChannels(value);
 
     /* istanbul ignore else */
     if (channelCount !== this._channelCount) {

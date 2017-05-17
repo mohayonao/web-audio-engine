@@ -1,8 +1,8 @@
 "use strict";
 
-const util = require("../util");
 const AudioNode = require("./AudioNode");
 const WaveShaperNodeDSP = require("./dsp/WaveShaperNode");
+const { defaults } = require("../utils");
 const { MAX } = require("../constants/ChannelCountMode");
 
 const OverSampleTypes = [ "none", "2x", "4x" ];
@@ -18,8 +18,8 @@ class WaveShaperNode extends AudioNode {
    * @param {string}       opts.overSample
    */
   constructor(context, opts = {}) {
-    let curve = util.defaults(opts.curve, DEFAULT_CURVE);
-    let overSample = util.defaults(opts.overSample, DEFAULT_OVERSAMPLE);
+    let curve = defaults(opts.curve, DEFAULT_CURVE);
+    let overSample = defaults(opts.overSample, DEFAULT_OVERSAMPLE);
 
     super(context, opts, {
       inputs: [ 1 ],

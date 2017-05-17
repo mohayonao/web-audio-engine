@@ -1,9 +1,10 @@
 "use strict";
 
-const util = require("../util");
 const AudioScheduledSourceNode = require("./AudioScheduledSourceNode");
 const PeriodicWave = require("./PeriodicWave");
 const OscillatorNodeDSP = require("./dsp/OscillatorNode");
+const { defaults } = require("../utils");
+const { toImpl } = require("../utils");
 const { AUDIO_RATE } = require("../constants/AudioParamRate");
 const { SINE, SAWTOOTH, TRIANGLE, SQUARE, CUSTOM } = require("../constants/OscillatorType");
 
@@ -25,9 +26,9 @@ class OscillatorNode extends AudioScheduledSourceNode {
    * @param {number}       opts.detune
    */
   constructor(context, opts = {}) {
-    let type = util.defaults(opts.type, DEFAULT_TYPE);
-    let frequency = util.defaults(opts.frequency, DEFAULT_FREQUENCY);
-    let detune = util.defaults(opts.detune, DEFAULT_DETUNE);
+    let type = defaults(opts.type, DEFAULT_TYPE);
+    let frequency = defaults(opts.frequency, DEFAULT_FREQUENCY);
+    let detune = defaults(opts.detune, DEFAULT_DETUNE);
 
     super(context, opts);
 
@@ -77,7 +78,7 @@ class OscillatorNode extends AudioScheduledSourceNode {
    * @param {PeriodicWave} periodicWave
    */
   setPeriodicWave(periodicWave) {
-    periodicWave = util.toImpl(periodicWave);
+    periodicWave = toImpl(periodicWave);
 
     /* istanbul ignore else */
     if (periodicWave instanceof PeriodicWave) {

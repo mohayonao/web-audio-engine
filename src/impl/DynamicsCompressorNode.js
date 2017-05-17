@@ -1,8 +1,8 @@
 "use strict";
 
-const util = require("../util");
 const AudioNode = require("./AudioNode");
 const DynamicsCompressorNodeDSP = require("./dsp/DynamicsCompressorNode");
+const { defaults } = require("../utils");
 const { EXPLICIT } = require("../constants/ChannelCountMode");
 const { CONTROL_RATE } = require("../constants/AudioParamRate");
 
@@ -23,11 +23,11 @@ class DynamicsCompressorNode extends AudioNode {
    * @param {number}       opts.release
    */
   constructor(context, opts = {}) {
-    let threshold = util.defaults(opts.threshold, DEFAULT_THRESHOLD);
-    let knee = util.defaults(opts.knee, DEFAULT_KNEE);
-    let ratio = util.defaults(opts.ratio, DEFAULT_RATIO);
-    let attack = util.defaults(opts.attack, DEFAULT_ATTACK);
-    let release = util.defaults(opts.release, DEFAULT_RELEASE);
+    let threshold = defaults(opts.threshold, DEFAULT_THRESHOLD);
+    let knee = defaults(opts.knee, DEFAULT_KNEE);
+    let ratio = defaults(opts.ratio, DEFAULT_RATIO);
+    let attack = defaults(opts.attack, DEFAULT_ATTACK);
+    let release = defaults(opts.release, DEFAULT_RELEASE);
 
     super(context, opts, {
       inputs: [ 1 ],

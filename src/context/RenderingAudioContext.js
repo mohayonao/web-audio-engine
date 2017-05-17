@@ -1,10 +1,11 @@
 "use strict";
 
 const nmap = require("nmap");
-const util = require("../util");
 const config = require("../config");
 const BaseAudioContext = require("../api/BaseAudioContext");
 const encoder = require("../encoder");
+const { defaults, defineProp } = require("../utils");
+const { toValidSampleRate, toValidBlockSize, toValidNumberOfChannels, toValidBitDepth, toAudioTime } = require("../utils");
 const { RUNNING, SUSPENDED } = require("../constants/AudioContextState");
 
 class RenderingAudioContext extends BaseAudioContext {
@@ -17,22 +18,22 @@ class RenderingAudioContext extends BaseAudioContext {
    * @param {boolean} opts.floatingPoint
    */
   constructor(opts = {}) {
-    let sampleRate = util.defaults(opts.sampleRate, config.sampleRate);
-    let blockSize = util.defaults(opts.blockSize, config.blockSize);
-    let numberOfChannels = util.defaults(opts.channels || opts.numberOfChannels, config.numberOfChannels);
-    let bitDepth = util.defaults(opts.bitDepth, config.bitDepth);
+    let sampleRate = defaults(opts.sampleRate, config.sampleRate);
+    let blockSize = defaults(opts.blockSize, config.blockSize);
+    let numberOfChannels = defaults(opts.channels || opts.numberOfChannels, config.numberOfChannels);
+    let bitDepth = defaults(opts.bitDepth, config.bitDepth);
     let floatingPoint = opts.float || opts.floatingPoint;
 
-    sampleRate = util.toValidSampleRate(sampleRate);
-    blockSize = util.toValidBlockSize(blockSize);
-    numberOfChannels = util.toValidNumberOfChannels(numberOfChannels);
-    bitDepth = util.toValidBitDepth(bitDepth);
+    sampleRate = toValidSampleRate(sampleRate);
+    blockSize = toValidBlockSize(blockSize);
+    numberOfChannels = toValidNumberOfChannels(numberOfChannels);
+    bitDepth = toValidBitDepth(bitDepth);
     floatingPoint = !!floatingPoint;
 
     super({ sampleRate, blockSize, numberOfChannels });
 
-    util.defineProp(this, "_format", { sampleRate, channels: numberOfChannels, bitDepth, float: floatingPoint });
-    util.defineProp(this, "_rendered", []);
+    defineProp(this, "_format", { sampleRate, channels: numberOfChannels, bitDepth, float: floatingPoint });
+    defineProp(this, "_rendered", []);
   }
 
   /**
@@ -60,7 +61,7 @@ class RenderingAudioContext extends BaseAudioContext {
    * @param {number|string} time
    */
   processTo(time) {
-    time = util.toAudioTime(time);
+    time = toAudioTime(time);
 
     const duration = time - this.currentTime;
 
