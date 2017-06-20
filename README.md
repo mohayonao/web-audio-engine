@@ -47,11 +47,11 @@ context.resume();
 // composeWith(context);
 ```
 
-### Class: RenderingAudioContxt
+### Class: RenderingAudioContext
 `RenderingAudioContext` records audio data with stepwise processing. It is used to export to a wav file or test a web audio application.
 
-##### new RenderingAudioContxt(opts?: object)
-Creates new `RenderingAudioContxt` instance.
+##### new RenderingAudioContext(opts?: object)
+Creates new `RenderingAudioContext` instance.
 - `opts.sampleRate: number` audio sample rate (in Hz) - _default: 44100_
 - `opts.numberOfChannels: number` audio channels (e.g. 2: stereo) - _default: 2_
 - `opts.blockSize: number` samples each rendering quantum - _default: 128_
@@ -72,7 +72,7 @@ Encode audio data to the binary format.
 
 ```js
 const fs = require("fs");
-const AudioContext = require("web-audio-engine").RenderingAudioContxt;
+const AudioContext = require("web-audio-engine").RenderingAudioContext;
 const context = new AudioContext();
 
 // composeWith(context);
@@ -159,7 +159,7 @@ const mp3decoder = reuiqre("/path/to/mp3decoder");
 wae.decoder.set("mp3", mp3decoder);
 
 const fs = requrie("fs");
-const AudioContext = require("web-audio-engine").RenderingAudioContxt;
+const AudioContext = require("web-audio-engine").RenderingAudioContext;
 const context = new AudioContext();
 const audioData = fs.readFileSync("amen.mp3");
 
@@ -192,7 +192,7 @@ const mp3encoder = reuiqre("/path/to/mp3encoder");
 wae.encoder.set("mp3", mp3encoder);
 
 const fs = requrie("fs");
-const AudioContext = require("web-audio-engine").RenderingAudioContxt;
+const AudioContext = require("web-audio-engine").RenderingAudioContext;
 const context = new AudioContext();
 const audioData = context.exportAsAudioData();
 
