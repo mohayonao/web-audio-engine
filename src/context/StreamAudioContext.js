@@ -4,6 +4,7 @@ const nmap = require("nmap");
 const config = require("../config");
 const BaseAudioContext = require("../api/BaseAudioContext");
 const PCMEncoder = require("../utils/PCMEncoder");
+const setImmediate = require("../utils/setImmediate");
 const { defaults, defineProp } = require("../utils");
 const { toValidSampleRate, toValidBlockSize, toValidNumberOfChannels, toValidBitDepth } = require("../utils");
 const { RUNNING, SUSPENDED, CLOSED } = require("../constants/AudioContextState");
@@ -132,11 +133,11 @@ class StreamAudioContext extends BaseAudioContext {
           }
         }
 
-        setTimeout(renderingProcess, 100);
+        setTimeout(renderingProcess, 0);
       }
     };
     this._isPlaying = true;
-    setTimeout(renderingProcess, 100);
+    setImmediate(renderingProcess);
   }
 
   _suspend() {
