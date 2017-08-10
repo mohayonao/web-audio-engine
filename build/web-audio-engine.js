@@ -3741,7 +3741,7 @@ var StreamAudioContext = function (_BaseAudioContext) {
             }
           }
 
-          setImmediate(renderingProcess);
+          setTimeout(renderingProcess, 0);
         }
       };
       this._isPlaying = true;
