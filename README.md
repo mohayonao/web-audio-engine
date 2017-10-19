@@ -227,7 +227,7 @@ context.encodeAudioData(audioData, { type: "mp3" }).then((arrayBuffer) => {
 
 ```js
 const Speaker = require("speaker");
-const AudioContext = require("web-audio-context").StreamAudioContext;
+const AudioContext = require("web-audio-engine").StreamAudioContext;
 const context = new AudioContext();
 
 const osc = context.createOscillator();
