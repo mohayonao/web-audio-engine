@@ -10,6 +10,7 @@
 ```
 npm install --save web-audio-engine
 ```
+
 ##### download
 - [web-audio-engine.js](https://raw.githubusercontent.com/mohayonao/web-audio-engine/master/build/web-audio-engine.js)
 
@@ -153,12 +154,12 @@ Executes decoding.
 ###### mp3 decoder example
 
 ```js
-const wae = reuiqre("web-audio-engine");
-const mp3decoder = reuiqre("/path/to/mp3decoder");
+const wae = require("web-audio-engine");
+const mp3decoder = require("/path/to/mp3decoder");
 
 wae.decoder.set("mp3", mp3decoder);
 
-const fs = requrie("fs");
+const fs = require("fs");
 const AudioContext = require("web-audio-engine").RenderingAudioContext;
 const context = new AudioContext();
 const audioData = fs.readFileSync("amen.mp3");
@@ -186,12 +187,12 @@ Executes encoding.
 ###### mp3 encoder example
 
 ```js
-const wae = reuiqre("web-audio-engine");
-const mp3encoder = reuiqre("/path/to/mp3encoder");
+const wae = require("web-audio-engine");
+const mp3encoder = require("/path/to/mp3encoder");
 
 wae.encoder.set("mp3", mp3encoder);
 
-const fs = requrie("fs");
+const fs = require("fs");
 const AudioContext = require("web-audio-engine").RenderingAudioContext;
 const context = new AudioContext();
 const audioData = context.exportAsAudioData();
