@@ -9,7 +9,7 @@ const alloc = getAllocFunction();
 function create(length, format) {
   const bitDepth = resolveBitDepth(format.bitDepth, format.float);
   const methodName = resolveWriteMethodName(bitDepth, format.float);
-  const bytes = format.bitDepth >> 3;
+  const bytes = bitDepth >> 3;
   const numberOfChannels = format.channels;
   const bufferLength = numberOfChannels * length * bytes;
 
