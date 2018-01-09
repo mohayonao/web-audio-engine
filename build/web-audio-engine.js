@@ -11833,7 +11833,7 @@ var alloc = getAllocFunction();
 function create(length, format) {
   var bitDepth = resolveBitDepth(format.bitDepth, format.float);
   var methodName = resolveWriteMethodName(bitDepth, format.float);
-  var bytes = format.bitDepth >> 3;
+  var bytes = bitDepth >> 3;
   var numberOfChannels = format.channels;
   var bufferLength = numberOfChannels * length * bytes;
 
